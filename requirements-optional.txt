@@ -1,0 +1,54 @@
+# Optional Dependencies
+# Install specific sections as needed:
+# pip install -r requirements-optional.txt
+
+# Database Drivers (choose one based on your database)
+# PostgreSQL
+# psycopg2-binary==2.9.9
+
+# MySQL
+# PyMySQL==1.1.0
+
+# Data Processing & ML Libraries
+# numpy==1.24.3
+# pandas==2.0.3
+# scikit-learn==1.3.0
+# joblib==1.3.2
+# tensorflow==2.13.0
+# torch==2.0.1
+# transformers==4.33.2
+# opencv-python==4.8.0.76
+# matplotlib==3.7.2
+# seaborn==0.12.2
+# plotly==5.16.1
+
+# Advanced Serialization
+# pydantic==2.4.2
+
+# Caching & Session Storage
+# redis==5.0.0
+# hiredis==2.2.3
+
+# HTTP & Requests
+# requests==2.31.0
+# urllib3==2.0.4
+
+# Advanced Security
+# cryptography==41.0.4
+
+# Database Utilities
+# SQLAlchemy-Utils==0.41.1
+# alembic==1.12.0
+
+# API Documentation
+# flask-restx==1.1.0
+# flasgger==0.9.7.1
+
+# Performance Monitoring
+# psutil==5.9.5
+
+# Production WSGI Server
+gunicorn==21.2.0
+
+# Development and Testing
+faker==19.6.2                 # Generate fake data for testing and development
