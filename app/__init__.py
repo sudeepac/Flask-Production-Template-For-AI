@@ -128,7 +128,7 @@ def _register_root_route(app):
     def index():
         """Application root endpoint - provides overview of available services."""
         return jsonify({
-            'message': 'Flask Production Template - Production Ready',
+            'message': 'Flask Production Template for AI - Production Ready',
             'description': 'A comprehensive Flask application with ML capabilities, proper error handling, and production-ready features.',
             'version': getattr(app, 'version', '1.0.0'),
             'environment': app.config.get('FLASK_ENV', 'development'),

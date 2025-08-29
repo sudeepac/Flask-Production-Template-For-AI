@@ -44,7 +44,7 @@ class APIDocumentation:
         # API configuration
         api_config = {
             'version': app.config.get('API_VERSION', '1.0.0'),
-            'title': app.config.get('API_TITLE', 'Flask Production Template'),
+            'title': app.config.get('API_TITLE', 'Flask Production Template for AI'),
             'description': app.config.get('API_DESCRIPTION', 
                 'A production-ready Flask-based Machine Learning API framework'),
             'doc': app.config.get('API_DOC_URL', '/docs/'),

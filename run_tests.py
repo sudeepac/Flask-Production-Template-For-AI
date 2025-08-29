@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test runner script for Flask Production Template application.
+"""Test runner script for Flask Production Template for AI application.
 
 This script provides a convenient way to run different types of tests
 with various configurations and options.
@@ -374,7 +374,7 @@ def clean_test_artifacts():
 def main():
     """Main function to parse arguments and run tests."""
     parser = argparse.ArgumentParser(
-        description='Test runner for Flask Production Template application',
+        description='Test runner for Flask Production Template for AI application',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

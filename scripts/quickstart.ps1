@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Quick start script for the Flask Production Template project (Windows PowerShell)
+    Quick start script for the Flask Production Template for AI project (Windows PowerShell)
 
 .DESCRIPTION
     This script sets up the development environment, installs dependencies,
@@ -56,7 +56,7 @@
     Skip virtual environment and dependency installation
 
 .NOTES
-    Author: Flask Production Template Project
+    Author: Flask Production Template for AI Project
     Version: 1.0.0
     Requires: PowerShell 5.1+ or PowerShell Core 6+
 #>
@@ -378,7 +378,7 @@ SECRET_KEY=dev-secret-key-change-in-production
 JWT_SECRET_KEY=jwt-secret-key-change-in-production
 
 # API Configuration
-API_TITLE=Flask Production Template
+API_TITLE=Flask Production Template for AI
 API_VERSION=1.0.0
 
 # ML Configuration
@@ -444,7 +444,7 @@ function Start-DevelopmentServer {
 # Main execution
 function Main {
     try {
-        Write-Header "Flask Production Template Quick Start"
+        Write-Header "Flask Production Template for AI Quick Start"
         Write-Info "Environment: $Environment"
         Write-Info "Host: $Host"
         Write-Info "Port: $Port"

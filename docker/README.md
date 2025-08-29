@@ -1,6 +1,6 @@
 # Docker Deployment Guide
 
-This directory contains Docker configuration files for containerized deployment of the Flask Production Template application.
+This directory contains Docker configuration files for containerized deployment of the Flask Production Template for AI application.
 
 ## Quick Start
 

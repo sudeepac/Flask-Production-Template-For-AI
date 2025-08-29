@@ -162,7 +162,7 @@ cython_debug/
 # VS Code
 .vscode/
 
-# Flask Production Template Specific
+# Flask Production Template for AI Specific
 # Environment files
 .env
 .env.local

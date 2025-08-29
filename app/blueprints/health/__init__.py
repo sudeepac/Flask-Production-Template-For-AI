@@ -40,7 +40,7 @@ except ImportError:
 # Blueprint metadata
 __version__ = '1.0.0'
 __description__ = 'Health check and monitoring endpoints'
-__author__ = 'Flask Production Template'
+__author__ = 'Flask Production Template for AI'
 
 # Export blueprint for registration
 __all__ = ['blueprint']

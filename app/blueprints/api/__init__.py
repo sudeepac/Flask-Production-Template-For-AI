@@ -1,7 +1,7 @@
 """API Blueprint.
 
 This blueprint provides core API endpoints and demonstrates
-RESTful patterns and best practices for the Flask Production Template.
+RESTful patterns and best practices for the Flask Production Template for AI.
 
 Endpoints:
 - GET /api/status: API status information
@@ -39,7 +39,7 @@ except ImportError:
 # Blueprint metadata
 __version__ = '1.0.0'
 __description__ = 'Core API endpoints and examples'
-__author__ = 'Flask Production Template'
+__author__ = 'Flask Production Template for AI'
 
 # Export blueprint for registration
 __all__ = ['blueprint']

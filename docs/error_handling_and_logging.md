@@ -1,6 +1,6 @@
 # Error Handling and Logging Guide
 
-This guide demonstrates the enhanced error handling and logging implementation in the Flask Production Template.
+This guide demonstrates the enhanced error handling and logging implementation in the Flask Production Template for AI.
 
 ## Overview
 

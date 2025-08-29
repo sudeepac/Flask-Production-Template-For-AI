@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Flask Production Template Quick Start Script (Unix/Linux/macOS)
+# Flask Production Template for AI Quick Start Script (Unix/Linux/macOS)
 # This script sets up the development environment and starts the Flask application
 
 set -e  # Exit on any error
 
 # Script metadata
-SCRIPT_NAME="Flask Production Template Quick Start"
+SCRIPT_NAME="Flask Production Template for AI Quick Start"
 SCRIPT_VERSION="1.0.0"
-SCRIPT_AUTHOR="Flask Production Template Project"
+SCRIPT_AUTHOR="Flask Production Template for AI Project"
 
 # Default configuration
 DEFAULT_ENVIRONMENT="development"
@@ -381,7 +381,7 @@ SECRET_KEY=dev-secret-key-change-in-production
 JWT_SECRET_KEY=jwt-secret-key-change-in-production
 
 # API Configuration
-API_TITLE=Flask Production Template
+API_TITLE=Flask Production Template for AI
 API_VERSION=1.0.0
 
 # ML Configuration

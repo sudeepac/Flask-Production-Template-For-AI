@@ -87,12 +87,12 @@ api_info_model = api_ns.model('APIInfo', {
     'name': fields.String(
         required=True,
         description='Application name',
-        example='Flask Production Template'
+        example='Flask Production Template for AI'
     ),
     'description': fields.String(
         required=True,
         description='Application description',
-        example='Flask Production Template'
+        example='Flask Production Template for AI'
     ),
     'version': fields.String(
         required=True,
@@ -250,8 +250,8 @@ class APIInfoResource(Resource):
         including name, version, environment, and available features.
         """
         return {
-            'name': 'Flask Production Template',
-            'description': 'Flask Production Template',
+            'name': 'Flask Production Template for AI',
+            'description': 'Flask Production Template for AI',
             'version': getattr(current_app, 'version', '1.0.0'),
             'environment': current_app.config.get('FLASK_ENV', 'development'),
             'debug': current_app.debug,

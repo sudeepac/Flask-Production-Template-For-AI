@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for Flask Production Template
+# GitHub Copilot Instructions for Flask Production Template for AI
 
 ## 🚨 CRITICAL: Read AI Instructions First
 

@@ -1,6 +1,6 @@
-# Testing Guide for Flask Production Template
+# Testing Guide for Flask Production Template for AI
 
-This guide provides comprehensive information about testing the Flask Production Template application, including setup, running tests, and best practices.
+This guide provides comprehensive information about testing the Flask Production Template for AI application, including setup, running tests, and best practices.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ This guide provides comprehensive information about testing the Flask Production
 
 ## Overview
 
-The Flask Production Template testing framework is built using pytest and provides comprehensive test coverage for:
+The Flask Production Template for AI testing framework is built using pytest and provides comprehensive test coverage for:
 
 - **Unit Tests**: Individual component testing
 - **Integration Tests**: Component interaction testing

@@ -1,6 +1,6 @@
-# Contributing to Flask Production Template
+# Contributing to Flask Production Template for AI
 
-Thank you for your interest in contributing to Flask Production Template! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Flask Production Template for AI! This document provides guidelines and information for contributors.
 
 ## 📋 Table of Contents
 
@@ -605,11 +605,11 @@ Contributors are recognized in:
 
 ## 📄 License
 
-By contributing to Flask Production Template, you agree that your contributions will be licensed under the same license as the project (MIT License).
+By contributing to Flask Production Template for AI, you agree that your contributions will be licensed under the same license as the project (MIT License).
 
 ## 🙏 Thank You
 
-Thank you for contributing to Flask Production Template! Your efforts help make this project better for everyone.
+Thank you for contributing to Flask Production Template for AI! Your efforts help make this project better for everyone.
 
 ---
 
