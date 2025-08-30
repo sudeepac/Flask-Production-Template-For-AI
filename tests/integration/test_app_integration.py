@@ -322,13 +322,12 @@ class TestBlueprintIntegration:
         headers = {"Origin": "http://localhost:3000"}
 
         # Test examples blueprint
-        response1 = client.get("/examples/hello", headers=headers)
+        response1 = client.get("/examples/", headers=headers)
         assert response1.status_code == 200
 
         # Test API blueprint
         response2 = client.get("/api/info", headers=headers)
-        # Should work or return 404 if not implemented
-        assert response2.status_code in [200, 404]
+        assert response2.status_code == 200
 
         # Both should handle CORS headers consistently
         # (This depends on actual CORS configuration)

@@ -16,6 +16,9 @@ from app.urls import get_url_prefix
 blueprint = Blueprint("examples", __name__, url_prefix=get_url_prefix("examples"))
 
 
+# Import routes to register them with the blueprint
+from . import routes  # noqa: F401
+
 # Import Flask-RESTX resources for API documentation
 try:
     pass

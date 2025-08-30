@@ -26,6 +26,7 @@ blueprint = Blueprint(
 )
 
 # Import routes to register them with the blueprint
+from . import routes  # noqa: F401
 
 # Import Flask-RESTX resources for API documentation
 try:

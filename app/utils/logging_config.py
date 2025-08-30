@@ -226,8 +226,8 @@ def setup_logging(app: Flask) -> None:
     # Setup file handler with rotation
     file_handler = logging.handlers.RotatingFileHandler(
         log_dir / log_file,
-        max_bytes=max_bytes,
-        backup_count=backup_count,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
         encoding="utf-8",
     )
     file_handler.setLevel(log_level)
@@ -249,8 +249,8 @@ def setup_logging(app: Flask) -> None:
     # Setup error file handler
     error_handler = logging.handlers.RotatingFileHandler(
         log_dir / "error.log",
-        max_bytes=max_bytes,
-        backup_count=backup_count,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
         encoding="utf-8",
     )
     error_handler.setLevel(logging.ERROR)
@@ -261,8 +261,8 @@ def setup_logging(app: Flask) -> None:
     # Setup security log handler
     security_handler = logging.handlers.RotatingFileHandler(
         log_dir / "security.log",
-        max_bytes=max_bytes,
-        backup_count=backup_count,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
         encoding="utf-8",
     )
     security_handler.setLevel(logging.WARNING)

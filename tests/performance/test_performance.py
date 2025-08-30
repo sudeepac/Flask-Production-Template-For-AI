@@ -48,9 +48,8 @@ class TestResponseTimePerformance:
         """Test examples endpoints response time."""
         endpoints = [
             "/examples/",
-            "/examples/hello",
-            "/examples/echo?message=test",
-            "/examples/json",
+            "/examples/health",
+            "/examples/performance-test",
         ]
 
         for endpoint in endpoints:

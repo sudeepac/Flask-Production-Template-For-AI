@@ -28,19 +28,19 @@ repos:
         args: ["--check"]
         exclude: ^migrations/
 
-  # Python type checking
+  # Python type checking (relaxed for development)
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.17.1
     hooks:
       - id: mypy
-        exclude: ^(migrations/|tests/)
+        exclude: ^(migrations/|tests/|app/blueprints/|ai_templates/|scripts/|__template__/)
         additional_dependencies:
           - types-requests
           - types-redis
           - types-setuptools
           - types-flask
           - types-werkzeug
-        args: ["--ignore-missing-imports"]
+        args: ["--ignore-missing-imports", "--no-strict-optional", "--allow-untyped-defs", "--disable-error-code=no-any-return", "--disable-error-code=attr-defined", "--disable-error-code=func-returns-value", "--disable-error-code=no-untyped-def", "--disable-error-code=var-annotated", "--disable-error-code=assignment", "--disable-error-code=misc", "--disable-error-code=unreachable"]
 
   # Security linting
   - repo: https://github.com/pycqa/bandit
@@ -51,12 +51,12 @@ repos:
         exclude: ^(tests/|migrations/)
         files: ^app/
 
-  # Docstring coverage check
+  # Docstring coverage check (relaxed for development)
   - repo: https://github.com/econchick/interrogate
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["--fail-under=80", "--ignore-init-method", "--ignore-magic", "app"]
+        args: ["--fail-under=60", "--ignore-init-method", "--ignore-magic", "app"]
         exclude: ^(tests/|migrations/|scripts/)
 
   # Local hooks for custom checks

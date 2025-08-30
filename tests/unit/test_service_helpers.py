@@ -8,7 +8,7 @@ from app.utils.service_helpers import (
     validate_required_fields,
 )
 from tests.fixtures.app_fixtures import app, client, runner
-from tests.fixtures.data_fixtures import sample_data, sample_list, invalid_data
+from tests.fixtures.data_fixtures import sample_data
 
 
 class TestServiceExceptions:

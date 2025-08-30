@@ -25,3 +25,4 @@ blueprint = Blueprint("auth", __name__, url_prefix=get_url_prefix("auth"))
 
 # Import routes to register them with the blueprint
 # This must be at the end to avoid circular imports
+from . import routes  # noqa: F401
