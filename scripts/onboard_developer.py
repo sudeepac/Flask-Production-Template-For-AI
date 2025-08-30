@@ -286,6 +286,19 @@ class DeveloperOnboarding:
             else:
                 self.print_warning("Some import sorting issues remain")
 
+            # Run automated style fixing script
+            style_fixer = self.project_root / "scripts" / "fix_style_issues.py"
+            if style_fixer.exists():
+                self.print_step("Running automated style fixer...")
+                result = self.run_command(
+                    [sys.executable, str(style_fixer), "--directory", "app"],
+                    check=False,
+                )
+                if result.returncode == 0:
+                    self.print_success("Automated style fixes applied")
+                else:
+                    self.print_warning("Some style issues could not be auto-fixed")
+
             return True
         except Exception as e:
             self.print_error(f"Failed to fix style issues: {e}")
@@ -346,7 +359,18 @@ class DeveloperOnboarding:
         print(f"   {Colors.GREEN}make lint{Colors.END} - Check code quality")
         print(f"   {Colors.GREEN}make fix{Colors.END} - Auto-fix code issues")
 
-        print("\n3. Your code will be automatically checked:")
+        print("\n3. Code quality tools available:")
+        print(
+            f"   {Colors.GREEN}python scripts/check_style_compliance.py --directory app{Colors.END} - Check style compliance"
+        )
+        print(
+            f"   {Colors.GREEN}python scripts/fix_style_issues.py --directory app{Colors.END} - Auto-fix style issues"
+        )
+        print(
+            f"   {Colors.GREEN}pre-commit run --all-files{Colors.END} - Run all quality checks"
+        )
+
+        print("\n4. Your code will be automatically checked:")
         print("   • Before each commit (pre-commit hooks)")
         print("   • Before each push (pre-push hooks)")
         print("   • In CI/CD pipeline (GitHub Actions)")
