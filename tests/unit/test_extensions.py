@@ -4,7 +4,6 @@ This module tests the initialization and functionality of
 Flask extensions used in the application.
 """
 
-
 from app.extensions import cache, db, migrate
 
 

@@ -457,17 +457,17 @@ class TemplateService:
         # Create duplicate data
         duplicate_data = {
             "name": new_name,
-            "description": f"Copy of {original.description}"
-            if original.description
-            else None,
+            "description": (
+                f"Copy of {original.description}" if original.description else None
+            ),
             "category": original.category,
             "is_active": False,  # Start as inactive
             "is_public": False,  # Start as private
             "tags": original.tags.copy() if original.tags else [],
             "metadata": original.metadata.copy() if original.metadata else {},
-            "configuration": original.configuration.copy()
-            if original.configuration
-            else {},
+            "configuration": (
+                original.configuration.copy() if original.configuration else {}
+            ),
         }
 
         return self.create_template(duplicate_data)
@@ -599,9 +599,9 @@ class TemplateAnalyticsService:
                     "id": t.id,
                     "name": t.name,
                     "usage_count": t.usage_count,
-                    "last_used_at": t.last_used_at.isoformat()
-                    if t.last_used_at
-                    else None,
+                    "last_used_at": (
+                        t.last_used_at.isoformat() if t.last_used_at else None
+                    ),
                 }
                 for t in sorted(templates, key=lambda x: x.usage_count, reverse=True)[
                     :5
@@ -627,9 +627,11 @@ class TemplateAnalyticsService:
                     "count": len(templates),
                     "active_count": len([t for t in templates if t.is_active]),
                     "total_usage": sum(t.usage_count for t in templates),
-                    "avg_usage": sum(t.usage_count for t in templates) / len(templates)
-                    if templates
-                    else 0,
+                    "avg_usage": (
+                        sum(t.usage_count for t in templates) / len(templates)
+                        if templates
+                        else 0
+                    ),
                 }
 
         return analysis

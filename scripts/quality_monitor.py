@@ -504,61 +504,73 @@ class QualityMonitor:
         self.print_metric(
             "Test Coverage",
             f"{metrics.test_coverage:.1f}%",
-            "good"
-            if metrics.test_coverage >= 80
-            else "warning"
-            if metrics.test_coverage >= 60
-            else "error",
+            (
+                "good"
+                if metrics.test_coverage >= 80
+                else "warning"
+                if metrics.test_coverage >= 60
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Docstring Coverage",
             f"{metrics.docstring_coverage:.1f}%",
-            "good"
-            if metrics.docstring_coverage >= 90
-            else "warning"
-            if metrics.docstring_coverage >= 70
-            else "error",
+            (
+                "good"
+                if metrics.docstring_coverage >= 90
+                else "warning"
+                if metrics.docstring_coverage >= 70
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Type Coverage",
             f"{metrics.type_coverage:.1f}%",
-            "good"
-            if metrics.type_coverage >= 80
-            else "warning"
-            if metrics.type_coverage >= 60
-            else "error",
+            (
+                "good"
+                if metrics.type_coverage >= 80
+                else "warning"
+                if metrics.type_coverage >= 60
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Complexity Score",
             f"{metrics.complexity_score:.1f}",
-            "good"
-            if metrics.complexity_score <= 10
-            else "warning"
-            if metrics.complexity_score <= 15
-            else "error",
+            (
+                "good"
+                if metrics.complexity_score <= 10
+                else "warning"
+                if metrics.complexity_score <= 15
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Code Duplication",
             f"{metrics.duplication_percentage:.1f}%",
-            "good"
-            if metrics.duplication_percentage <= 5
-            else "warning"
-            if metrics.duplication_percentage <= 10
-            else "error",
+            (
+                "good"
+                if metrics.duplication_percentage <= 5
+                else "warning"
+                if metrics.duplication_percentage <= 10
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Linting Issues",
             str(metrics.linting_issues),
-            "good"
-            if metrics.linting_issues == 0
-            else "warning"
-            if metrics.linting_issues <= 5
-            else "error",
+            (
+                "good"
+                if metrics.linting_issues == 0
+                else "warning"
+                if metrics.linting_issues <= 5
+                else "error"
+            ),
         )
 
         self.print_metric(
@@ -572,21 +584,25 @@ class QualityMonitor:
         self.print_metric(
             "Technical Debt",
             f"{metrics.technical_debt_minutes} minutes",
-            "good"
-            if metrics.technical_debt_minutes <= 30
-            else "warning"
-            if metrics.technical_debt_minutes <= 120
-            else "error",
+            (
+                "good"
+                if metrics.technical_debt_minutes <= 30
+                else "warning"
+                if metrics.technical_debt_minutes <= 120
+                else "error"
+            ),
         )
 
         self.print_metric(
             "Quality Score",
             f"{metrics.quality_score:.1f}/10",
-            "good"
-            if metrics.quality_score >= self.threshold
-            else "warning"
-            if metrics.quality_score >= 6
-            else "error",
+            (
+                "good"
+                if metrics.quality_score >= self.threshold
+                else "warning"
+                if metrics.quality_score >= 6
+                else "error"
+            ),
         )
 
         # Quality gate status
@@ -662,7 +678,11 @@ class QualityMonitor:
 
                 coverage_change = current["test_coverage"] - previous["test_coverage"]
                 trend_icon = (
-                    "📈" if coverage_change > 0 else "📉" if coverage_change < 0 else "➡️"
+                    "📈"
+                    if coverage_change > 0
+                    else "📉"
+                    if coverage_change < 0
+                    else "➡️"
                 )
                 print(f"  Test Coverage: {trend_icon} {coverage_change:+.1f}%")
 

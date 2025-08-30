@@ -6,26 +6,21 @@ RESTful patterns and request/response handling.
 
 from datetime import datetime
 
+from flask import current_app, jsonify, request
+from flask_jwt_extended import jwt_required
+from marshmallow import Schema, fields, validate
+
+from app.extensions import limiter
 from app.services.example_service import ExampleService
-from app.utils.common_imports import (
-    APIError,
-    Schema,
-    ValidationAPIError,
-    current_app,
-    fields,
-    get_module_logger,
+from app.utils.common_imports import get_module_logger
+from app.utils.decorators import (
     handle_api_errors,
-    jsonify,
-    jwt_required,
-    limiter,
     log_endpoint_access,
-    log_performance,
-    log_security_event,
-    request,
-    success_response,
-    validate,
     validate_json_input,
 )
+from app.utils.error_handlers import APIError, ValidationAPIError
+from app.utils.response_helpers import success_response
+from app.utils.security import log_security_event
 
 from . import blueprint
 
@@ -36,7 +31,6 @@ class EchoRequestSchema(Schema):
     message = fields.Str(
         required=True,
         validate=validate.Length(max=1000),
-        description="Message to echo (max 1000 characters)",
     )
     metadata = fields.Dict(required=False)
 
@@ -58,7 +52,6 @@ logger = get_module_logger(__name__)
 
 
 @blueprint.route("/status", methods=["GET"])
-@log_performance
 def api_status():
     """Get API status information.
 
@@ -90,7 +83,6 @@ def api_status():
 
 
 @blueprint.route("/info", methods=["GET"])
-@log_performance
 def api_info():
     """Get application information.
 
@@ -133,7 +125,6 @@ def api_info():
 
 @blueprint.route("/echo", methods=["POST"])
 @limiter.limit("10 per minute")
-@log_performance
 @handle_api_errors
 @validate_json_input(EchoRequestSchema)
 @log_endpoint_access
@@ -186,7 +177,6 @@ def echo(validated_data):
 
 @blueprint.route("/users/bulk", methods=["POST"])
 @jwt_required()
-@log_performance
 def create_user_with_posts():
     """Create a user with multiple posts using the example service."""
     try:

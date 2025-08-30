@@ -58,6 +58,30 @@ test-coverage: ## Run tests with coverage report
 	pytest tests/ --cov=app --cov-report=html --cov-report=term-missing
 	@echo "Coverage report generated in htmlcov/"
 
+coverage-html: ## Generate HTML coverage report and open in browser
+	@echo "Generating HTML coverage report..."
+	python scripts/coverage_report.py --html --open
+
+coverage-xml: ## Generate XML coverage report for CI/CD
+	@echo "Generating XML coverage report..."
+	python scripts/coverage_report.py --xml
+
+coverage-json: ## Generate JSON coverage report
+	@echo "Generating JSON coverage report..."
+	python scripts/coverage_report.py --json
+
+coverage-badge: ## Generate coverage badge SVG
+	@echo "Generating coverage badge..."
+	python scripts/coverage_report.py --badge
+
+coverage-all: ## Generate all coverage reports
+	@echo "Generating all coverage reports..."
+	python scripts/coverage_report.py --html --xml --json --badge --open
+
+coverage-summary: ## Show coverage summary
+	@echo "Coverage Summary:"
+	python scripts/coverage_report.py --summary-only --verbose
+
 test-performance: ## Run performance tests
 	@echo "Running performance tests..."
 	pytest tests/performance/ -v

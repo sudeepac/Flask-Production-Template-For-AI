@@ -57,10 +57,10 @@ numpy==1.24.3  # For ML operations
 
 # Pre-commit Hooks
 pre-commit==3.4.0
-psutil==5.9.5  # System monitoring for health checks
 
 # Performance Monitoring
 psutil==5.9.5
+psutil==5.9.5  # System monitoring for health checks
 pylint==2.17.5
 
 # Development Dependencies

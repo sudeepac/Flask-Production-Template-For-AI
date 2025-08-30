@@ -130,7 +130,7 @@ class ProductionConfig(Config):
 
         if missing_vars:
             raise ValueError(
-                f"Missing required production environment variables: " f"{missing_vars}"
+                f"Missing required production environment variables: {missing_vars}"
             )
 
 

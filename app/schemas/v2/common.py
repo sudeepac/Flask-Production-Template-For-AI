@@ -41,7 +41,7 @@ class ErrorSchema(BaseSchema):
         }
     """
 
-    success = fields.Bool(default=False, dump_only=True)
+    success = fields.Bool(dump_default=False, dump_only=True)
     error = fields.Dict(required=True)
     timestamp = CommonFields.created_at
     request_id = fields.Str(dump_only=True)
@@ -49,8 +49,8 @@ class ErrorSchema(BaseSchema):
     # Error details structure
     code = fields.Str(required=True, validate=validate.Length(min=1, max=50))
     message = fields.Str(required=True, validate=validate.Length(min=1, max=500))
-    details = fields.Dict(missing=None)
-    field = fields.Str(missing=None)  # For field-specific errors
+    details = fields.Dict(load_default=None)
+    field = fields.Str(load_default=None)  # For field-specific errors
 
     @post_load
     def structure_error(self, data: Dict[str, Any], **kwargs) -> Dict[str, Any]:
@@ -88,11 +88,11 @@ class SuccessSchema(BaseSchema):
         }
     """
 
-    success = fields.Bool(default=True, dump_only=True)
-    message = fields.Str(default="Success", validate=validate.Length(max=500))
+    success = fields.Bool(dump_default=True, dump_only=True)
+    message = fields.Str(dump_default="Success", validate=validate.Length(max=500))
     timestamp = CommonFields.created_at
     request_id = fields.Str(dump_only=True)
-    data = fields.Dict(missing=None)  # Optional data payload
+    data = fields.Dict(load_default=None)  # Optional data payload
 
 
 class PaginationSchema(BaseSchema):
@@ -191,7 +191,7 @@ class PaginatedResponseSchema(BaseSchema):
         }
     """
 
-    success = fields.Bool(default=True, dump_only=True)
+    success = fields.Bool(dump_default=True, dump_only=True)
     data = fields.List(fields.Dict(), required=True)
     pagination = fields.Nested(PaginationSchema, required=True)
     metadata = fields.Nested(MetadataSchema, dump_only=True)
@@ -211,7 +211,7 @@ class DataResponseSchema(BaseSchema):
         }
     """
 
-    success = fields.Bool(default=True, dump_only=True)
+    success = fields.Bool(dump_default=True, dump_only=True)
     data = fields.Dict(required=True)
     metadata = fields.Nested(MetadataSchema, dump_only=True)
     timestamp = CommonFields.created_at
@@ -239,8 +239,10 @@ class HealthCheckSchema(BaseSchema):
     status = fields.Str(
         required=True, validate=validate.OneOf(["healthy", "degraded", "unhealthy"])
     )
-    version = fields.Str(default="v2", dump_only=True)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    version = fields.Str(dump_default="v2", dump_only=True)
+    timestamp = fields.DateTime(
+        dump_default=datetime.utcnow, format="iso", dump_only=True
+    )
     uptime_seconds = fields.Float(dump_only=True)
     checks = fields.Dict(dump_only=True)
     environment = fields.Str(dump_only=True)

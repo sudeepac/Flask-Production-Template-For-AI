@@ -147,7 +147,7 @@ import pytest
 from flask import url_for
 
 
-class Test{blueprint_name.replace('_', ' ').title().replace(' ', '')}Routes:
+class Test{blueprint_name.replace("_", " ").title().replace(" ", "")}Routes:
     """Test class for {blueprint_name} routes."""
 
     def test_list_{blueprint_name}(self, client):

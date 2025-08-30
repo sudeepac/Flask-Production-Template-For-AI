@@ -34,8 +34,10 @@ class ErrorSchema(BaseSchema):
 
     error = fields.Str(required=True)
     code = fields.Int(required=True)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
-    details = fields.Str(missing=None)
+    timestamp = fields.DateTime(
+        dump_default=datetime.utcnow, format="iso", dump_only=True
+    )
+    details = fields.Str(load_default=None)
 
 
 class SuccessSchema(BaseSchema):
@@ -52,9 +54,11 @@ class SuccessSchema(BaseSchema):
         }
     """
 
-    message = fields.Str(default="Success")
-    data = fields.Dict(missing=None)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    message = fields.Str(dump_default="Success")
+    data = fields.Dict(load_default=None)
+    timestamp = fields.DateTime(
+        dump_default=datetime.utcnow, format="iso", dump_only=True
+    )
 
 
 class PaginationSchema(BaseSchema):

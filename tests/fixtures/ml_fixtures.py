@@ -370,9 +370,9 @@ def mock_experiment_tracker():
         def log_artifact(self, artifact_path, artifact_name=None):
             if self.current_experiment:
                 name = artifact_name or os.path.basename(artifact_path)
-                self.experiments[self.current_experiment]["artifacts"][
-                    name
-                ] = artifact_path
+                self.experiments[self.current_experiment]["artifacts"][name] = (
+                    artifact_path
+                )
 
         def end_experiment(self):
             if self.current_experiment:

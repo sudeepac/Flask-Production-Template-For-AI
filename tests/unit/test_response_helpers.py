@@ -1,9 +1,8 @@
 """Tests for response helper utilities."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
-from flask import Flask, jsonify
+from flask import Flask
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 

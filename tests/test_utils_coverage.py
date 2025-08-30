@@ -4,7 +4,7 @@ Tests specifically designed to increase coverage for utility modules.
 Focuses on safe, basic functionality that doesn't require complex setup.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 

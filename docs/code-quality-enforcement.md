@@ -118,8 +118,6 @@ pre-commit autoupdate
 
 ## 🔧 IDE Integration
 
-
-
 ## 🚦 CI/CD Quality Gates
 
 Our GitHub Actions workflow enforces strict quality standards:

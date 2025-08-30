@@ -1,10 +1,9 @@
 """Tests for decorator utilities."""
 
-import json
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import patch
 
 import pytest
-from flask import Flask, request
+from flask import Flask
 from marshmallow import Schema
 from marshmallow import ValidationError as MarshmallowValidationError
 from marshmallow import fields
@@ -473,3 +472,119 @@ class TestDecoratorIntegration:
 
             # Check that validation error was logged
             assert mock_logger.warning.called
+
+
+class TestDecoratorEdgeCases:
+    """Test edge cases and error conditions for decorators."""
+
+    def test_validate_json_input_with_empty_schema(self, app_context):
+        """Test validation with empty schema."""
+
+        class EmptySchema(Schema):
+            pass
+
+        with app_context.test_request_context("/", method="POST", json={}):
+
+            @validate_json_input(EmptySchema)
+            def test_function(validated_data):
+                return validated_data
+
+            result = test_function()
+            assert result == {}
+
+    def test_validate_json_input_with_nested_validation_error(self, app_context):
+        """Test validation with nested validation errors."""
+
+        class NestedSchema(Schema):
+            user = fields.Nested(ValidationTestSchema, required=True)
+            metadata = fields.Dict(required=True)
+
+        with app_context.test_request_context(
+            "/", method="POST", json={"user": {"name": "John"}, "metadata": "invalid"}
+        ):
+
+            @validate_json_input(NestedSchema)
+            def test_function(validated_data):
+                return validated_data
+
+            with pytest.raises(ValidationAPIError) as exc_info:
+                test_function()
+
+            assert "Invalid input data" in str(exc_info.value)
+            assert exc_info.value.details is not None
+
+    @patch("app.utils.decorators.request")
+    def test_validate_json_input_malformed_json(self, mock_request, app_context):
+        """Test handling of malformed JSON data."""
+        with app_context.test_request_context("/", method="POST"):
+            mock_request.get_json.side_effect = ValueError("Invalid JSON")
+
+            @validate_json_input(ValidationTestSchema)
+            def test_function(validated_data):
+                return validated_data
+
+            with pytest.raises(ValidationAPIError) as exc_info:
+                test_function()
+
+            assert "No JSON data provided" in str(exc_info.value)
+
+    def test_handle_api_errors_with_custom_exception(self):
+        """Test handling of custom exceptions not derived from APIError."""
+
+        class CustomException(Exception):
+            pass
+
+        @handle_api_errors
+        def test_function():
+            raise CustomException("Custom error message")
+
+        with pytest.raises(APIError) as exc_info:
+            test_function()
+
+        assert "An unexpected error occurred" in str(exc_info.value)
+
+    @patch("app.utils.decorators.logger")
+    def test_handle_api_errors_logging_levels(self, mock_logger):
+        """Test different logging levels for different error types."""
+
+        # Test warning level for validation errors
+        @handle_api_errors
+        def validation_error_function():
+            raise ValidationAPIError("Validation failed")
+
+        with pytest.raises(ValidationAPIError):
+            validation_error_function()
+        mock_logger.warning.assert_called_once()
+        mock_logger.reset_mock()
+
+        # Test error level for general API errors
+        @handle_api_errors
+        def api_error_function():
+            raise APIError("API error")
+
+        with pytest.raises(APIError):
+            api_error_function()
+        mock_logger.error.assert_called_once()
+
+    def test_decorator_order_matters(self, app_context):
+        """Test that decorator order affects behavior."""
+        with app_context.test_request_context(
+            "/", method="POST", json={"name": "John", "age": 30}
+        ):
+            # Test different decorator orders
+            @validate_json_input(ValidationTestSchema)
+            @handle_api_errors
+            def test_function_order1(validated_data):
+                return validated_data
+
+            @handle_api_errors
+            @validate_json_input(ValidationTestSchema)
+            def test_function_order2(validated_data):
+                return validated_data
+
+            # Both should work but handle errors differently
+            result1 = test_function_order1()
+            result2 = test_function_order2()
+
+            assert result1["name"] == "John"
+            assert result2["name"] == "John"

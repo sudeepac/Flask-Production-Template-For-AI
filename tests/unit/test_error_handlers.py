@@ -1,10 +1,10 @@
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
 from flask import Flask
 from marshmallow import ValidationError
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from werkzeug.exceptions import BadRequest, HTTPException, InternalServerError
+from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import BadRequest
 
 from app.utils.error_handlers import (
     APIError,
@@ -98,6 +98,190 @@ class TestGetRequestId:
     @patch("app.utils.error_handlers.g")
     def test_get_request_id_new(self, mock_g, mock_uuid):
         """Test generating new request ID."""
+        # Simulate g object without request_id attribute
+        del mock_g.request_id
+        mock_uuid.return_value.hex = "new-generated-id"
+
+        result = get_request_id()
+
+        assert result == "new-generated-id"
+        assert mock_g.request_id == "new-generated-id"
+        mock_uuid.assert_called_once()
+
+    @patch("app.utils.error_handlers.g")
+    def test_get_request_id_attribute_error(self, mock_g):
+        """Test handling when g object doesn't have request_id attribute."""
+        # Configure mock to raise AttributeError when accessing request_id
+        type(mock_g).request_id = PropertyMock(side_effect=AttributeError)
+
+        with patch("app.utils.error_handlers.uuid4") as mock_uuid:
+            mock_uuid.return_value.hex = "fallback-id"
+            result = get_request_id()
+
+            assert result == "fallback-id"
+            mock_uuid.assert_called_once()
+
+
+class TestLogError:
+    """Test the log_error function."""
+
+    @patch("app.utils.error_handlers.logger")
+    def test_log_error_basic(self, mock_logger):
+        """Test basic error logging."""
+        error = Exception("Test error")
+        log_error(error, "test_context")
+
+        mock_logger.error.assert_called_once()
+        call_args = mock_logger.error.call_args[0][0]
+        assert "test_context" in call_args
+        assert "Test error" in call_args
+
+    @patch("app.utils.error_handlers.logger")
+    @patch("app.utils.error_handlers.get_request_id")
+    def test_log_error_with_request_id(self, mock_get_request_id, mock_logger):
+        """Test error logging includes request ID."""
+        mock_get_request_id.return_value = "test-request-id"
+        error = ValueError("Test validation error")
+
+        log_error(error, "validation_context")
+
+        mock_logger.error.assert_called_once()
+        call_args = mock_logger.error.call_args[0][0]
+        assert "test-request-id" in call_args
+        assert "validation_context" in call_args
+        assert "Test validation error" in call_args
+
+    @patch("app.utils.error_handlers.logger")
+    def test_log_error_with_none_error(self, mock_logger):
+        """Test error logging with None error."""
+        log_error(None, "null_error_context")
+
+        mock_logger.error.assert_called_once()
+        call_args = mock_logger.error.call_args[0][0]
+        assert "null_error_context" in call_args
+        assert "None" in call_args
+
+
+class TestFormatErrorResponse:
+    """Test the format_error_response function."""
+
+    @patch("app.utils.error_handlers.get_request_id")
+    def test_format_error_response_basic(self, mock_get_request_id):
+        """Test basic error response formatting."""
+        mock_get_request_id.return_value = "test-id"
+
+        response = format_error_response("Test error", 400)
+
+        assert response["error"] == "Test error"
+        assert response["status_code"] == 400
+        assert response["request_id"] == "test-id"
+        assert "timestamp" in response
+        assert response["details"] is None
+
+    @patch("app.utils.error_handlers.get_request_id")
+    def test_format_error_response_with_details(self, mock_get_request_id):
+        """Test error response formatting with details."""
+        mock_get_request_id.return_value = "test-id"
+        details = {"field": "validation error"}
+
+        response = format_error_response("Validation failed", 422, details)
+
+        assert response["error"] == "Validation failed"
+        assert response["status_code"] == 422
+        assert response["details"] == details
+        assert response["request_id"] == "test-id"
+
+    @patch("app.utils.error_handlers.get_request_id")
+    def test_format_error_response_timestamp_format(self, mock_get_request_id):
+        """Test that timestamp is in correct ISO format."""
+        mock_get_request_id.return_value = "test-id"
+
+        response = format_error_response("Test error", 500)
+
+        # Check timestamp format (ISO 8601)
+        timestamp = response["timestamp"]
+        assert isinstance(timestamp, str)
+        assert "T" in timestamp  # ISO format includes T separator
+        assert timestamp.endswith("Z")  # UTC timezone indicator
+
+
+class TestHandleValidationError:
+    """Test the handle_validation_error function."""
+
+    @patch("app.utils.error_handlers.log_error")
+    def test_handle_validation_error_marshmallow(self, mock_log_error):
+        """Test handling Marshmallow validation errors."""
+        validation_error = ValidationError({"field": ["Required field"]})
+
+        with pytest.raises(ValidationAPIError) as exc_info:
+            handle_validation_error(validation_error)
+
+        assert "Invalid input data" in str(exc_info.value)
+        assert exc_info.value.details == {"field": ["Required field"]}
+        mock_log_error.assert_called_once_with(validation_error, "Validation error")
+
+    @patch("app.utils.error_handlers.log_error")
+    def test_handle_validation_error_empty_messages(self, mock_log_error):
+        """Test handling validation error with empty messages."""
+        validation_error = ValidationError({})
+
+        with pytest.raises(ValidationAPIError) as exc_info:
+            handle_validation_error(validation_error)
+
+        assert "Invalid input data" in str(exc_info.value)
+        assert exc_info.value.details == {}
+        mock_log_error.assert_called_once()
+
+
+class TestErrorHandlerEdgeCases:
+    """Test edge cases and error conditions."""
+
+    def test_api_error_inheritance_chain(self):
+        """Test that all API error classes inherit correctly."""
+        errors = [
+            ValidationAPIError("test"),
+            NotFoundAPIError("test"),
+            UnauthorizedAPIError("test"),
+            ForbiddenAPIError("test"),
+            ConflictAPIError("test"),
+            RateLimitAPIError("test"),
+            ServiceUnavailableAPIError("test"),
+        ]
+
+        for error in errors:
+            assert isinstance(error, APIError)
+            assert isinstance(error, Exception)
+            assert hasattr(error, "status_code")
+            assert hasattr(error, "details")
+
+    def test_api_error_with_complex_details(self):
+        """Test APIError with complex nested details."""
+        complex_details = {
+            "validation_errors": {
+                "user": {"name": ["Required field"], "email": ["Invalid email format"]},
+                "metadata": ["Invalid structure"],
+            },
+            "request_info": {"endpoint": "/api/users", "method": "POST"},
+        }
+
+        error = ValidationAPIError("Complex validation failed", details=complex_details)
+
+        assert error.details == complex_details
+        assert "Complex validation failed" in str(error)
+        assert error.status_code == 400
+
+    @patch("app.utils.error_handlers.get_request_id")
+    def test_format_error_response_with_none_values(self, mock_get_request_id):
+        """Test error response formatting with None values."""
+        mock_get_request_id.return_value = None
+
+        response = format_error_response(None, None, None)
+
+        assert response["error"] is None
+        assert response["status_code"] is None
+        assert response["details"] is None
+        assert response["request_id"] is None
+        assert "timestamp" in response
         mock_g.request_id = None
         mock_uuid.return_value = Mock()
         mock_uuid.return_value.__str__ = Mock(return_value="new-id")

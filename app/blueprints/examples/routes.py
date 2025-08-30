@@ -12,32 +12,32 @@ This module provides comprehensive examples of:
 import time
 from datetime import datetime
 
-from marshmallow import Schema
+from flask import jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from marshmallow import Schema, fields
 
+from app.extensions import db, limiter
 from app.models.example import Post, User
-from app.utils.common_imports import (
-    APIError,
-    CommonFields,
-    NotFoundAPIError,
-    ValidationAPIError,
-    db,
-    error_response,
-    fields,
-    get_jwt_identity,
-    get_module_logger,
+from app.schemas.common_fields import CommonFields
+from app.utils.common_imports import get_module_logger
+from app.utils.decorators import (
     handle_api_errors,
-    handle_common_exceptions,
-    jsonify,
-    jwt_required,
-    limiter,
     log_endpoint_access,
-    log_performance,
-    log_security_event,
-    request,
-    success_response,
     validate_json_input,
 )
-from app.utils.error_handlers import RateLimitAPIError, UnauthorizedAPIError
+from app.utils.error_handlers import (
+    APIError,
+    NotFoundAPIError,
+    RateLimitAPIError,
+    UnauthorizedAPIError,
+    ValidationAPIError,
+)
+from app.utils.response_helpers import (
+    error_response,
+    handle_common_exceptions,
+    success_response,
+)
+from app.utils.security import log_security_event
 
 from . import blueprint
 
@@ -60,7 +60,6 @@ class PostCreateSchema(Schema):
     title = CommonFields.title
     content = fields.Str(
         required=True,
-        description="Post content",
         validate=fields.Length(min=1, max=5000),
     )
     tags = fields.List(fields.Str(), load_default=[])
@@ -109,7 +108,6 @@ def index():
 
 
 @blueprint.route("/health", methods=["GET"])
-@log_performance
 @handle_common_exceptions
 def health_check():
     """Health check endpoint with comprehensive status reporting."""
@@ -156,7 +154,6 @@ def health_check():
 
 @blueprint.route("/users/advanced", methods=["POST"])
 @limiter.limit("5 per minute")
-@log_performance
 @handle_api_errors
 @validate_json_input(UserCreateSchema)
 @log_endpoint_access
@@ -265,7 +262,6 @@ def create_user_advanced(validated_data):
 @handle_api_errors
 @validate_json_input(post_create_schema)
 @log_endpoint_access
-@log_performance
 def create_post_for_user(user_id: int, validated_data):
     """Create a post for a specific user with comprehensive error handling."""
     # Get authenticated user ID from JWT
@@ -346,7 +342,6 @@ def create_post_for_user(user_id: int, validated_data):
 
 
 @blueprint.route("/simulate-error/<error_type>", methods=["GET"])
-@log_performance
 def simulate_error(error_type: str):
     """Simulate different types of errors for testing error handling."""
     logger.info(
@@ -371,7 +366,6 @@ def simulate_error(error_type: str):
 
 
 @blueprint.route("/performance-test", methods=["GET"])
-@log_performance
 def performance_test():
     """Endpoint for testing performance logging."""
     # Simulate some work
@@ -403,7 +397,6 @@ def performance_test():
 
 @blueprint.route("/profile", methods=["GET"])
 @jwt_required()
-@log_performance
 def get_user_profile():
     """Get current authenticated user's profile.
 

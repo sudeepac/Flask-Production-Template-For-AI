@@ -4,9 +4,6 @@ Tests that actually call endpoints using the test client to increase coverage.
 Focuses on endpoints that should work without complex setup.
 """
 
-import json
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 

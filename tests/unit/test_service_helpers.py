@@ -1,9 +1,7 @@
 """Tests for service helper utilities."""
 
-import logging
-import time
 from datetime import datetime
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import call, patch
 
 import pytest
 

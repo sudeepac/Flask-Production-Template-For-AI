@@ -85,6 +85,14 @@ class APIError(Exception):
         error_code: str = None,
         details: Dict[str, Any] = None,
     ):
+        """Initialize the APIError instance.
+
+        Args:
+            message (str): Error message
+            status_code (int): HTTP status code (default: 500)
+            error_code (str): Application-specific error code
+            details (Dict[str, Any]): Additional error details
+        """
         super().__init__(message)
         self.message = message
         self.status_code = status_code
@@ -98,6 +106,12 @@ class ValidationAPIError(APIError):
     def __init__(
         self, message: str = "Validation failed", details: Dict[str, Any] = None
     ):
+        """Initialize the ValidationAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Validation failed")
+            details (Dict[str, Any]): Additional validation error details
+        """
         super().__init__(message, 400, "validation_error", details)
 
 
@@ -105,6 +119,12 @@ class NotFoundAPIError(APIError):
     """Resource not found exception."""
 
     def __init__(self, message: str = "Resource not found", resource_type: str = None):
+        """Initialize the NotFoundAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Resource not found")
+            resource_type (str): Type of resource that was not found
+        """
         details = {"resource_type": resource_type} if resource_type else {}
         super().__init__(message, 404, "not_found", details)
 
@@ -113,6 +133,11 @@ class UnauthorizedAPIError(APIError):
     """Unauthorized access exception."""
 
     def __init__(self, message: str = "Unauthorized access"):
+        """Initialize the UnauthorizedAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Unauthorized access")
+        """
         super().__init__(message, 401, "unauthorized")
 
 
@@ -120,6 +145,11 @@ class ForbiddenAPIError(APIError):
     """Forbidden access exception."""
 
     def __init__(self, message: str = "Access forbidden"):
+        """Initialize the ForbiddenAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Access forbidden")
+        """
         super().__init__(message, 403, "forbidden")
 
 
@@ -129,6 +159,12 @@ class ConflictAPIError(APIError):
     def __init__(
         self, message: str = "Resource conflict", details: Dict[str, Any] = None
     ):
+        """Initialize the ConflictAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Resource conflict")
+            details (Dict[str, Any]): Additional conflict details
+        """
         super().__init__(message, 409, "conflict", details)
 
 
@@ -136,6 +172,12 @@ class RateLimitAPIError(APIError):
     """Rate limit exceeded exception."""
 
     def __init__(self, message: str = "Rate limit exceeded", retry_after: int = None):
+        """Initialize the RateLimitAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Rate limit exceeded")
+            retry_after (int): Seconds to wait before retrying
+        """
         details = {"retry_after": retry_after} if retry_after else {}
         super().__init__(message, 429, "rate_limit_exceeded", details)
 
@@ -144,6 +186,11 @@ class ServiceUnavailableAPIError(APIError):
     """Service unavailable exception."""
 
     def __init__(self, message: str = "Service temporarily unavailable"):
+        """Initialize the ServiceUnavailableAPIError instance.
+
+        Args:
+            message (str): Error message (default: "Service temporarily unavailable")
+        """
         super().__init__(message, 503, "service_unavailable")
 
 

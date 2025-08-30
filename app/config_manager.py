@@ -128,7 +128,7 @@ class SecurityConfig:
 
             if len(key) < 32:
                 raise ValueError(
-                    f"{key_name} must be at least 32 characters long in " f"production"
+                    f"{key_name} must be at least 32 characters long in production"
                 )
 
             # Check for common weak patterns
@@ -138,9 +138,7 @@ class SecurityConfig:
         elif env == "development" and len(key) < 16:
             import logging
 
-            logging.warning(
-                f"{key_name} is shorter than recommended " f"(16+ characters)"
-            )
+            logging.warning(f"{key_name} is shorter than recommended (16+ characters)")
 
 
 @dataclass

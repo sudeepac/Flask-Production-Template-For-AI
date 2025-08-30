@@ -44,6 +44,7 @@ class ServiceMetrics:
     """Common service metrics tracking."""
 
     def __init__(self):
+        """Initialize the instance."""
         self.operation_count = 0
         self.total_time = 0.0
         self.error_count = 0

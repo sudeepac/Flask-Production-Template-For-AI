@@ -55,9 +55,11 @@ def generate_sample_users(count: int = 10) -> List[Dict[str, Any]]:
             # 25% admin
             "is_admin": random.choice([True, False, False, False]),
             "created_at": fake.date_time_between(start_date="-1y", end_date="now"),
-            "last_login": fake.date_time_between(start_date="-30d", end_date="now")
-            if random.random() > 0.2
-            else None,
+            "last_login": (
+                fake.date_time_between(start_date="-30d", end_date="now")
+                if random.random() > 0.2
+                else None
+            ),
             "profile": {
                 "bio": fake.text(max_nb_chars=200),
                 "location": fake.city(),
@@ -111,9 +113,11 @@ def generate_sample_posts(
             "like_count": random.randint(0, 100),
             "created_at": fake.date_time_between(start_date="-6m", end_date="now"),
             "updated_at": fake.date_time_between(start_date="-1m", end_date="now"),
-            "published_at": fake.date_time_between(start_date="-3m", end_date="now")
-            if random.random() > 0.3
-            else None,
+            "published_at": (
+                fake.date_time_between(start_date="-3m", end_date="now")
+                if random.random() > 0.3
+                else None
+            ),
             "tags": random.sample(
                 [
                     "python",
@@ -364,9 +368,11 @@ def seed_posts(count: int = 20) -> None:
             ),
             author_id=random.choice(users).id,
             status="published" if is_published else "draft",
-            published_at=fake.date_time_between(start_date="-30d", end_date="now")
-            if is_published
-            else None,
+            published_at=(
+                fake.date_time_between(start_date="-30d", end_date="now")
+                if is_published
+                else None
+            ),
         )
         db.session.add(post)
 

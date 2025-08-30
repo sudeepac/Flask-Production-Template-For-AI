@@ -12,7 +12,8 @@ from flask import current_app
 from sqlalchemy import text
 
 from app.extensions import db
-from app.utils.common_imports import error_response, get_utc_timestamp, success_response
+from app.utils.common_imports import get_utc_timestamp
+from app.utils.response_helpers import error_response, success_response
 
 from . import blueprint
 

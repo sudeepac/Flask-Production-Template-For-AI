@@ -4,9 +4,6 @@ Tests specifically designed to increase coverage for API endpoints and routes.
 Focuses on basic endpoint functionality that should work reliably.
 """
 
-import json
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 

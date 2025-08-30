@@ -83,7 +83,8 @@ class BaseModel(db.Model):
 
                 if rel_value is None:
                     result[relationship.key] = None
-                elif hasattr(rel_value, "__iter__") and not isinstance(rel_value, str):
+                elif hasattr(rel_value, "__iter__") and \
+                    not isinstance(rel_value, str):
                     # Collection relationship
                     result[relationship.key] = [
                         (item.to_dict() if hasattr(item, "to_dict") else str(item))

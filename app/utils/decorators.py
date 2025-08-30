@@ -125,8 +125,14 @@ def log_endpoint_access(f: Callable) -> Callable:
 
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
+        """
+            TODO: Add return value description
+        Returns:
+
+        Decorated Function.
+        """
         logger.info(
-            f"Accessing endpoint: {request.endpoint} - " f"Method: {request.method}"
+            f"Accessing endpoint: {request.endpoint} - Method: {request.method}"
         )
         return f(*args, **kwargs)
 

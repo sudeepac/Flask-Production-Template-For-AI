@@ -5,7 +5,6 @@ These tests focus on basic routes and utilities that should work reliably.
 """
 
 import pytest
-from flask import url_for
 
 
 class TestBasicRoutes:

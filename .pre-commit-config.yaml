@@ -5,7 +5,7 @@
 repos:
   # Built-in hooks for basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: ^migrations/
@@ -28,7 +28,7 @@ repos:
 
   # Python import sorting
   - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 6.0.1
     hooks:
       - id: isort
         args: ["--profile", "black", "--filter-files"]
@@ -36,52 +36,51 @@ repos:
 
   # Python code formatting
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 25.1.0
     hooks:
       - id: black
         language_version: python3
         exclude: ^migrations/
 
-  # Python linting (temporarily disabled)
-  # - repo: https://github.com/pycqa/flake8
-  #   rev: 6.0.0
-  #   hooks:
-  #     - id: flake8
-  #       exclude: ^migrations/
-  #       additional_dependencies:
-  #         - flake8-docstrings
-  #         - flake8-import-order
-  #         - flake8-bugbear
-  #         - flake8-comprehensions
-  #         - flake8-simplify
+  # Python linting with auto-fixing
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.12.11
+    hooks:
+      - id: ruff
+        args: ["--fix", "--exit-non-zero-on-fix"]
+        exclude: ^migrations/
+      - id: ruff-format
+        exclude: ^migrations/
 
-  # Python type checking (temporarily disabled)
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v1.5.1
-  #   hooks:
-  #     - id: mypy
-  #       exclude: ^(migrations/|tests/)
-  #       additional_dependencies:
-  #         - types-requests
-  #         - types-redis
-  #         - types-setuptools
-  #       args: ["--ignore-missing-imports"]
+  # Python type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        exclude: ^(migrations/|tests/)
+        additional_dependencies:
+          - types-requests
+          - types-redis
+          - types-setuptools
+          - types-flask
+          - types-werkzeug
+        args: ["--ignore-missing-imports", "--install-types", "--non-interactive"]
 
-  # Security linting (temporarily disabled)
-  # - repo: https://github.com/pycqa/bandit
-  #   rev: 1.7.5
-  #   hooks:
-  #     - id: bandit
-  #       args: ["-r", "app/", "-f", "json", "-o", "bandit-report.json"]
-  #       exclude: ^(tests/|migrations/)
+  # Security linting
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        args: ["-r", "app/", "-f", "json", "-o", "bandit-report.json", "--skip", "B101"]
+        exclude: ^(tests/|migrations/)
 
-  # Docstring coverage check (temporarily disabled)
-  # - repo: https://github.com/econchick/interrogate
-  #   rev: 1.5.0
-  #   hooks:
-  #     - id: interrogate
-  #       args: ["-vv", "--fail-under=90", "--ignore-init-method", "--ignore-magic"]
-  #       exclude: ^(tests/|migrations/|scripts/)
+  # Docstring coverage check
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: ["-vv", "--fail-under=80", "--ignore-init-method", "--ignore-magic", "--generate-badge", ".", "--badge-format", "svg"]
+        exclude: ^(tests/|migrations/|scripts/)
 
   # YAML linting (temporarily disabled)
   # - repo: https://github.com/adrienverge/yamllint.git
@@ -90,13 +89,13 @@ repos:
   #     - id: yamllint
   #       args: ["-d", "relaxed"]
 
-  # Markdown linting (temporarily disabled)
-  # - repo: https://github.com/igorshubovych/markdownlint-cli
-  #   rev: v0.35.0
-  #   hooks:
-  #     - id: markdownlint
-  #       args: ["--fix"]
-  #       exclude: ^(CHANGELOG.md|migrations/)
+  # Markdown linting with auto-fixing
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+        args: ["--fix"]
+        exclude: ^(CHANGELOG.md|migrations/)
 
   # Shell script linting (disabled on Windows)
   # - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -114,7 +113,7 @@ repos:
 
   # SQL formatting (if using raw SQL files)
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 2.3.2
+    rev: 3.4.2
     hooks:
       - id: sqlfluff-lint
         files: \.sql$
@@ -142,13 +141,31 @@ repos:
         files: ^app/(blueprints/.*routes\.py|urls\.py)$
         pass_filenames: false
 
-      # Python Style Compliance Check
+      # Python Style Compliance Check with Auto-Fix
       - id: style-compliance-check
         name: Python Style Compliance Check
         entry: python scripts/check_style_compliance.py
         language: python
         files: \.py$
+        args: ["--directory", "app", "--fix"]
+        pass_filenames: false
+
+      # Auto-fix common style issues
+      - id: auto-fix-style-issues
+        name: Auto-fix Style Issues
+        entry: python scripts/fix_style_issues.py
+        language: python
+        files: \.py$
         args: ["--directory", "app"]
+        pass_filenames: false
+
+      # Auto-generate missing docstrings
+      - id: auto-generate-docstrings
+        name: Auto-generate Missing Docstrings
+        entry: python scripts/fix_specific_docstrings.py
+        language: python
+        files: \.py$
+        args: ["--directory", "app", "--auto-generate"]
         pass_filenames: false
 
       # Check docstring coverage (using interrogate which is already configured above)

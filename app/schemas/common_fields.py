@@ -12,64 +12,53 @@ class CommonFields:
     """Collection of commonly used field definitions."""
 
     # ID fields
-    id_field = fields.Int(dump_only=True, description="Unique identifier")
-    uuid_field = fields.UUID(description="UUID identifier")
+    id_field = fields.Int(dump_only=True)
+    uuid_field = fields.UUID()
 
     # String fields with common validations
     username = fields.Str(
         required=True,
         validate=validate.Length(min=3, max=50),
-        description="Username (3-50 characters)",
     )
 
-    email = fields.Email(required=True, description="Valid email address")
+    email = fields.Email(required=True)
 
     password = fields.Str(
         required=True,
         load_only=True,
         validate=validate.Length(min=8, max=128),
-        description="Password (8-128 characters)",
     )
 
     # Text fields
     title = fields.Str(
         required=True,
         validate=validate.Length(min=1, max=200),
-        description="Title (1-200 characters)",
     )
 
     description = fields.Str(
         validate=validate.Length(max=1000),
-        description="Description (max 1000 characters)",
     )
 
-    bio = fields.Str(
-        validate=validate.Length(max=500), description="Bio (max 500 characters)"
-    )
+    bio = fields.Str(validate=validate.Length(max=500))
 
-    content = fields.Str(
-        validate=validate.Length(max=5000), description="Content (max 5000 characters)"
-    )
+    content = fields.Str(validate=validate.Length(max=5000))
 
     # Timestamp fields
-    created_at = fields.DateTime(dump_only=True, description="Creation timestamp")
+    created_at = fields.DateTime(dump_only=True)
 
-    updated_at = fields.DateTime(dump_only=True, description="Last update timestamp")
+    updated_at = fields.DateTime(dump_only=True)
 
     # Status fields
     status = fields.Str(
         validate=validate.OneOf(["active", "inactive", "pending", "deleted"]),
-        description="Status",
     )
 
-    is_active = fields.Bool(description="Active status")
+    is_active = fields.Bool()
 
     # Metadata fields
-    metadata = fields.Dict(description="Additional metadata")
+    metadata = fields.Dict()
 
-    tags = fields.List(
-        fields.Str(validate=validate.Length(max=50)), description="List of tags"
-    )
+    tags = fields.List(fields.Str(validate=validate.Length(max=50)))
 
 
 # Common validators
@@ -144,23 +133,20 @@ class PaginationSchema:
     """Common pagination fields."""
 
     page = fields.Int(
-        missing=1,
+        load_default=1,
         validate=CommonValidators.positive_integer,
-        description="Page number (starts from 1)",
     )
 
     per_page = fields.Int(
-        missing=20,
+        load_default=20,
         validate=validate.Range(min=1, max=100),
-        description="Items per page (1-100)",
     )
 
-    sort_by = fields.Str(missing="created_at", description="Field to sort by")
+    sort_by = fields.Str(load_default="created_at")
 
     sort_order = fields.Str(
-        missing="desc",
+        load_default="desc",
         validate=validate.OneOf(["asc", "desc"]),
-        description="Sort order (asc/desc)",
     )
 
 
@@ -180,10 +166,10 @@ def create_response_schema(data_schema, message_default="Success"):
     class ResponseSchema(Schema):
         """Schema for standardized API responses."""
 
-        success = fields.Bool(dump_only=True, description="Success status")
-        message = fields.Str(dump_only=True, description="Response message")
-        data = fields.Nested(data_schema, dump_only=True, description="Response data")
-        meta = fields.Dict(dump_only=True, description="Additional metadata")
+        success = fields.Bool(dump_only=True)
+        message = fields.Str(dump_only=True)
+        data = fields.Nested(data_schema, dump_only=True)
+        meta = fields.Dict(dump_only=True)
 
     return ResponseSchema
 
@@ -195,10 +181,8 @@ def create_error_schema():
     class ErrorSchema(Schema):
         """Schema for standardized API error responses."""
 
-        success = fields.Bool(
-            dump_only=True, description="Success status (always false)"
-        )
-        message = fields.Str(dump_only=True, description="Error message")
-        error = fields.Dict(dump_only=True, description="Error details")
+        success = fields.Bool(dump_only=True)
+        message = fields.Str(dump_only=True)
+        error = fields.Dict(dump_only=True)
 
     return ErrorSchema

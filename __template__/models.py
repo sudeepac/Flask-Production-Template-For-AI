@@ -217,7 +217,7 @@ class Template(db.Model, TimestampMixin, UUIDMixin):
         if value.lower() not in valid_categories:
             raise ValueError(
                 f'Invalid category "{value}". '
-                f'Must be one of: {", ".join(valid_categories)}'
+                f"Must be one of: {', '.join(valid_categories)}"
             )
 
         return value.lower()
@@ -289,9 +289,9 @@ class Template(db.Model, TimestampMixin, UUIDMixin):
             "is_active": self.is_active,
             "is_public": self.is_public,
             "usage_count": self.usage_count,
-            "last_used_at": self.last_used_at.isoformat()
-            if self.last_used_at
-            else None,
+            "last_used_at": (
+                self.last_used_at.isoformat() if self.last_used_at else None
+            ),
             "tags": self.tags or [],
             "metadata": self.metadata or {},
             "configuration": self.configuration or {},

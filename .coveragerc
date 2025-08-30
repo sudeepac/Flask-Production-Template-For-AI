@@ -1,0 +1,144 @@
+[run]
+# Configuration for coverage.py
+
+# Source code directories to measure
+source = app
+
+# Omit files from coverage measurement
+omit =
+    # Test files
+    tests/*
+    */tests/*
+
+    # Virtual environment
+    venv/*
+    */venv/*
+    .venv/*
+    */.venv/*
+
+    # Migration files
+    migrations/*
+    */migrations/*
+
+    # Configuration files
+    */config.py
+    config.py
+
+    # Init files (usually just imports)
+    */__init__.py
+
+    # Scripts and utilities
+    scripts/*
+    */scripts/*
+
+    # Static files
+    app/static/*
+    */static/*
+
+    # Templates
+    app/templates/*
+    */templates/*
+
+    # Development and build files
+    setup.py
+    */setup.py
+    build/*
+    dist/*
+    *.egg-info/*
+
+# Include patterns (override omit for specific files)
+include =
+    app/*
+    app/blueprints/*
+    app/models/*
+    app/services/*
+    app/utils/*
+    app/schemas/*
+
+# Parallel processing
+parallel = True
+
+# Branch coverage (measure both line and branch coverage)
+branch = True
+
+# Concurrency support
+concurrency = thread
+
+[report]
+# Reporting configuration
+
+# Minimum coverage percentage to pass
+fail_under = 80
+
+# Show missing lines in report
+show_missing = True
+
+# Skip covered files in report
+skip_covered = False
+
+# Skip empty files
+skip_empty = True
+
+# Sort by coverage percentage
+sort = Cover
+
+# Precision for coverage percentages
+precision = 2
+
+# Exclude lines from coverage reporting
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if 0:
+    if False:
+    if __name__ == .__main__.:
+
+    # Don't complain about abstract methods
+    @(abc\.)?abstractmethod
+
+    # Don't complain about type checking imports
+    if TYPE_CHECKING:
+
+    # Don't complain about platform specific code
+    if sys.platform
+
+    # Don't complain about deprecated code
+    @deprecated
+
+    # Don't complain about pass statements
+    pass
+
+    # Don't complain about ellipsis
+    \.\.\.
+
+[html]
+# HTML report configuration
+directory = htmlcov
+title = Flask Production Template Coverage Report
+show_contexts = True
+
+[xml]
+# XML report configuration (for CI/CD)
+output = coverage.xml
+
+[json]
+# JSON report configuration
+output = coverage.json
+show_contexts = True
+
+[paths]
+# Path mapping for different environments
+source =
+    app/
+    */app/
+    /app/

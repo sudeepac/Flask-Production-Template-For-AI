@@ -62,7 +62,7 @@ def get_blueprint(name: str) -> Blueprint:
     if name not in _BLUEPRINT_REGISTRY:
         available = list(_BLUEPRINT_REGISTRY.keys())
         raise KeyError(
-            f"Blueprint '{name}' not registered. " f"Available blueprints: {available}"
+            f"Blueprint '{name}' not registered. Available blueprints: {available}"
         )
 
     return _BLUEPRINT_REGISTRY[name]

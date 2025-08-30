@@ -1,11 +1,9 @@
 """Tests for security utilities."""
 
-import string
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import bcrypt
 import pytest
-from flask import Flask, request
+from flask import Flask
 
 from app.utils.security import (
     check_password,

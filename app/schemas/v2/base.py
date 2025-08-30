@@ -53,7 +53,7 @@ class BaseSchema(Schema):
     # Common metadata fields (optional)
     created_at = CommonFields.created_at
     updated_at = CommonFields.updated_at
-    version = fields.Str(dump_only=True, default="v2")
+    version = fields.Str(dump_only=True, dump_default="v2")
 
     def __init__(self, *args, **kwargs):
         """Initialize schema with v2-specific settings."""
@@ -183,11 +183,11 @@ class BaseSchema(Schema):
         class ResponseSchema(BaseSchema):
             """Base response schema with common fields."""
 
-            success = fields.Bool(default=True)
-            message = fields.Str(default="Success")
+            success = fields.Bool(dump_default=True)
+            message = fields.Str(dump_default="Success")
             data = fields.Nested(data_schema)
-            timestamp = fields.DateTime(default=datetime.utcnow, format="iso")
-            version = fields.Str(default="v2")
+            timestamp = fields.DateTime(dump_default=datetime.utcnow, format="iso")
+            version = fields.Str(dump_default="v2")
 
         return ResponseSchema
 
@@ -248,7 +248,7 @@ class MetadataMixin:
 
     request_id = fields.Str(dump_only=True)
     processing_time_ms = fields.Float(dump_only=True)
-    api_version = fields.Str(dump_only=True, default="v2")
+    api_version = fields.Str(dump_only=True, dump_default="v2")
     server_timestamp = fields.DateTime(
-        dump_only=True, format="iso", default=datetime.utcnow
+        dump_only=True, format="iso", dump_default=datetime.utcnow
     )

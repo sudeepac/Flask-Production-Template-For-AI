@@ -345,7 +345,7 @@ class {class_name}:
 def sample_{self.blueprint_name}_data():
     """Sample data for {self.blueprint_name} tests."""
     return {{
-        'name': 'Test {self.blueprint_name.replace('_', ' ').title()}',
+        'name': 'Test {self.blueprint_name.replace("_", " ").title()}',
         'description': 'Test description',
         # TODO: Add more fields based on your schema
     }}
@@ -384,19 +384,19 @@ from marshmallow import ValidationError
 # Import schemas from the blueprint
 try:
     from app.blueprints.{self.blueprint_name}.schemas import (
-        {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}RequestSchema,
-        {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}ResponseSchema,
+        {self.blueprint_name.replace("_", " ").title().replace(" ", "")}RequestSchema,
+        {self.blueprint_name.replace("_", " ").title().replace(" ", "")}ResponseSchema,
     )
 except ImportError:
     pytest.skip("Schemas not implemented yet", allow_module_level=True)
 
 
-class Test{self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Schemas:
+class Test{self.blueprint_name.replace("_", " ").title().replace(" ", "")}Schemas:
     """Test class for {self.blueprint_name} schemas."""
 
     def test_request_schema_valid_data(self):
         """Test request schema with valid data."""
-        schema = {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}RequestSchema()
+        schema = {self.blueprint_name.replace("_", " ").title().replace(" ", "")}RequestSchema()
         data = {{
             'name': 'Test Name',
             'description': 'Test Description',
@@ -409,7 +409,7 @@ class Test{self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Schema
 
     def test_request_schema_invalid_data(self):
         """Test request schema with invalid data."""
-        schema = {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}RequestSchema()
+        schema = {self.blueprint_name.replace("_", " ").title().replace(" ", "")}RequestSchema()
         data = {{
             # Missing required fields
         }}
@@ -419,7 +419,7 @@ class Test{self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Schema
 
     def test_response_schema_serialization(self):
         """Test response schema serialization."""
-        schema = {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}ResponseSchema()
+        schema = {self.blueprint_name.replace("_", " ").title().replace(" ", "")}ResponseSchema()
         data = {{
             'id': 1,
             'name': 'Test Name',
@@ -453,18 +453,18 @@ from unittest.mock import Mock, patch
 # Import services from the blueprint
 try:
     from app.blueprints.{self.blueprint_name}.services import (
-        {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Service,
+        {self.blueprint_name.replace("_", " ").title().replace(" ", "")}Service,
     )
 except ImportError:
     pytest.skip("Services not implemented yet", allow_module_level=True)
 
 
-class Test{self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Service:
+class Test{self.blueprint_name.replace("_", " ").title().replace(" ", "")}Service:
     """Test class for {self.blueprint_name} service."""
 
     def test_service_initialization(self):
         """Test service initialization."""
-        service = {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Service()
+        service = {self.blueprint_name.replace("_", " ").title().replace(" ", "")}Service()
         assert service is not None
 
     def test_create_method(self):
@@ -508,18 +508,18 @@ from datetime import datetime
 # Import models from the blueprint
 try:
     from app.blueprints.{self.blueprint_name}.models import (
-        {self.blueprint_name.replace('_', ' ').title().replace(' ', '')},
+        {self.blueprint_name.replace("_", " ").title().replace(" ", "")},
     )
 except ImportError:
     pytest.skip("Models not implemented yet", allow_module_level=True)
 
 
-class Test{self.blueprint_name.replace('_', ' ').title().replace(' ', '')}Model:
+class Test{self.blueprint_name.replace("_", " ").title().replace(" ", "")}Model:
     """Test class for {self.blueprint_name} model."""
 
     def test_model_creation(self, db_session):
         """Test model creation."""
-        model = {self.blueprint_name.replace('_', ' ').title().replace(' ', '')}(
+        model = {self.blueprint_name.replace("_", " ").title().replace(" ", "")}(
             name='Test Name',
             description='Test Description'
         )
