@@ -74,29 +74,25 @@ class User(BaseModel):
         return self.posts.count()
     
     def set_password(self, password: str) -> None:
-        """Set user password (placeholder - implement proper hashing).
+        """Set user password with hashing.
         
         Args:
             password: Plain text password
         """
-        # In a real application, use proper password hashing
-        # from werkzeug.security import generate_password_hash
-        # self.password_hash = generate_password_hash(password)
-        self.password_hash = f"hashed_{password}"  # Placeholder
+        from app.utils.security import hash_password
+        self.password_hash = hash_password(password)
     
     def check_password(self, password: str) -> bool:
-        """Check if provided password is correct.
+        """Check if provided password matches stored hash.
         
         Args:
-            password: Plain text password to check
+            password: Plain text password to verify
             
         Returns:
-            True if password is correct
+            bool: True if password matches, False otherwise
         """
-        # In a real application, use proper password verification
-        # from werkzeug.security import check_password_hash
-        # return check_password_hash(self.password_hash, password)
-        return self.password_hash == f"hashed_{password}"  # Placeholder
+        from app.utils.security import check_password
+        return check_password(password, self.password_hash)
     
     def update_last_login(self) -> None:
         """Update last login timestamp."""

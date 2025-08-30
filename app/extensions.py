@@ -66,9 +66,14 @@ def init_extensions(app):
     cache.init_app(app)
     
     # Initialize CORS
+    cors_origins = app.config.get('CORS_ORIGINS', [])
+    # Fallback to localhost for development if no origins configured
+    if not cors_origins and app.config.get('DEBUG', False):
+        cors_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    
     cors.init_app(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+            "origins": cors_origins,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]
         }

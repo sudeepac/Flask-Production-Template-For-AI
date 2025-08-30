@@ -80,14 +80,16 @@ class SecurityConfig:
     def from_env(cls, env: str = 'development') -> 'SecurityConfig':
         """Create security config from environment variables."""
         secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+        jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
         
-        # Validate secret key in production
-        if env == 'production' and secret_key == 'dev-secret-key-change-in-production':
-            raise ValueError("SECRET_KEY must be set in production environment")
+        # Validate secret keys
+        cls._validate_secret_key(secret_key, env, 'SECRET_KEY')
+        if jwt_secret_key:
+            cls._validate_secret_key(jwt_secret_key, env, 'JWT_SECRET_KEY')
         
         return cls(
             secret_key=secret_key,
-            jwt_secret_key=os.environ.get('JWT_SECRET_KEY'),
+            jwt_secret_key=jwt_secret_key,
             jwt_access_token_expires=timedelta(
                 seconds=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES', '3600'))
             ),
@@ -97,6 +99,35 @@ class SecurityConfig:
             force_https=os.environ.get('FORCE_HTTPS', 'False').lower() == 'true',
             csrf_enabled=os.environ.get('WTF_CSRF_ENABLED', 'True').lower() == 'true'
         )
+    
+    @staticmethod
+    def _validate_secret_key(key: str, env: str, key_name: str) -> None:
+        """Validate secret key strength."""
+        # Check for development defaults
+        weak_defaults = [
+            'dev-secret-key-change-in-production',
+            'development-key',
+            'dev-key',
+            'secret',
+            'password',
+            '123456',
+            'changeme'
+        ]
+        
+        if env == 'production':
+            if key in weak_defaults:
+                raise ValueError(f"{key_name} cannot use weak default value in production")
+            
+            if len(key) < 32:
+                raise ValueError(f"{key_name} must be at least 32 characters long in production")
+            
+            # Check for common weak patterns
+            if key.lower() in ['secret', 'password', 'key'] or key.isdigit():
+                raise ValueError(f"{key_name} is too weak for production use")
+        
+        elif env == 'development' and len(key) < 16:
+            import logging
+            logging.warning(f"{key_name} is shorter than recommended (16+ characters)")
 
 
 @dataclass

@@ -115,6 +115,7 @@ def register_blueprints(app: Flask) -> None:
     blueprint_modules = [
         'health',   # Health check endpoints
         'api',      # Core API endpoints
+        'auth',     # Authentication endpoints
         'examples', # Example endpoints
         # 'ml',       # Uncomment when implemented
         # 'data',     # Uncomment when implemented

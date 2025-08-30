@@ -14,6 +14,7 @@ from datetime import datetime
 from flask import request, jsonify, g
 from marshmallow import Schema, fields, ValidationError as MarshmallowValidationError
 
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.extensions import db, limiter
 from app.models.example import User, Post
 from app.utils.error_handlers import (
@@ -55,7 +56,8 @@ def index():
             '/examples/': 'This index page',
             '/examples/health': 'Health check with database connectivity test',
             '/examples/users/advanced': 'POST - Create user with advanced validation',
-            '/examples/posts/<user_id>': 'POST - Create post for specific user',
+            '/examples/posts/<user_id>': 'POST - Create post for specific user (JWT required)',
+            '/examples/profile': 'GET - Get current user profile (JWT required)',
             '/examples/simulate-error/<error_type>': 'GET - Simulate different error types',
             '/examples/performance-test': 'GET - Performance testing endpoint'
         },
@@ -230,13 +232,27 @@ def create_user_advanced():
 
 
 @blueprint.route('/posts/<int:user_id>', methods=['POST'])
+@jwt_required()
 @limiter.limit("10 per minute")
 @log_performance
 def create_post_for_user(user_id: int):
     """Create a post for a specific user with comprehensive error handling."""
     try:
+        # Get authenticated user ID from JWT
+        current_user_id = get_jwt_identity()
+        
+        # Check if user is trying to create post for themselves
+        if current_user_id != user_id:
+            logger.warning("User attempted to create post for another user", extra={
+                'current_user_id': current_user_id,
+                'target_user_id': user_id,
+                'ip_address': request.remote_addr
+            })
+            raise UnauthorizedAPIError("You can only create posts for yourself")
+        
         logger.info(f"Creating post for user {user_id}", extra={
             'user_id': user_id,
+            'current_user_id': current_user_id,
             'endpoint': 'create_post_for_user'
         })
         
@@ -368,3 +384,65 @@ def performance_test():
         },
         'timestamp': datetime.utcnow().isoformat()
     })
+
+
+@blueprint.route('/profile', methods=['GET'])
+@jwt_required()
+@log_performance
+def get_user_profile():
+    """Get current authenticated user's profile - demonstrates JWT protection."""
+    try:
+        # Get authenticated user ID from JWT
+        current_user_id = get_jwt_identity()
+        
+        logger.info("User profile requested", extra={
+            'user_id': current_user_id,
+            'endpoint': 'get_user_profile',
+            'ip_address': request.remote_addr
+        })
+        
+        # Get user from database
+        user = User.query.get(current_user_id)
+        if not user:
+            logger.error("JWT token contains invalid user ID", extra={
+                'user_id': current_user_id,
+                'ip_address': request.remote_addr
+            })
+            raise NotFoundAPIError("User not found")
+        
+        # Get user's posts count
+        posts_count = Post.query.filter_by(user_id=current_user_id).count()
+        
+        # Log security event
+        log_security_event('profile_accessed', {
+            'user_id': current_user_id,
+            'username': user.username,
+            'ip_address': request.remote_addr
+        })
+        
+        profile_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'created_at': user.created_at.isoformat(),
+            'last_login': user.last_login.isoformat() if user.last_login else None,
+            'posts_count': posts_count,
+            'profile_accessed_at': datetime.utcnow().isoformat()
+        }
+        
+        logger.info("User profile retrieved successfully", extra={
+            'user_id': current_user_id,
+            'posts_count': posts_count
+        })
+        
+        return jsonify(profile_data), 200
+        
+    except NotFoundAPIError:
+        raise  # Re-raise not found errors
+    except Exception as e:
+        logger.error(f"Error retrieving user profile: {e}", extra={
+            'user_id': current_user_id if 'current_user_id' in locals() else 'unknown',
+            'error_type': type(e).__name__,
+            'ip_address': request.remote_addr
+        })
+        raise APIError("Failed to retrieve user profile")
