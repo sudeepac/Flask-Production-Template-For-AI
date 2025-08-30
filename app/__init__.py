@@ -47,9 +47,7 @@ def create_app(config_name="development"):
         config_manager.validate()
         app.config.update(config_manager.get_config())
 
-        # Print config summary in development
-        if config_name == "development":
-            config_manager.print_summary()
+        # Configuration loaded successfully
 
     # Track application start time for uptime calculations
     app._start_time = time.time()
