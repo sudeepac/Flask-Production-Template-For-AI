@@ -15,11 +15,12 @@ from datetime import datetime
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import Schema, fields
+from sqlalchemy import text
 
 from app.extensions import db, limiter
 from app.models.example import Post, User
 from app.schemas.common_fields import CommonFields
-from app.utils.common_imports import get_module_logger
+from app.utils import get_module_logger
 from app.utils.decorators import (
     handle_api_errors,
     log_endpoint_access,
@@ -116,7 +117,7 @@ def health_check():
     # Check database connectivity
     db_status = "healthy"
     try:
-        db.session.execute("SELECT 1")
+        db.session.execute(text("SELECT 1"))
         db_latency = round((time.time() - start_time) * 1000, 2)
     except Exception as e:
         db_status = "unhealthy"

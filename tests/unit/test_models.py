@@ -86,11 +86,6 @@ class TestBaseModel:
         name = re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
         assert name == "order_item_detail"
-            """
-            TODO: Add class description.
-
-            Class ConcreteModel.
-            """
 
     def test_model_inheritance(self):
         """Test that models can properly inherit from BaseModel."""
@@ -122,11 +117,6 @@ class TestBaseModel:
 
         assert updated_at_default == datetime.utcnow
         assert updated_at_onupdate == datetime.utcnow
-            """
-            TODO: Add class description.
-
-            Class TestModel.
-            """
 
 
 class TestConcreteModel:
@@ -213,11 +203,6 @@ class TestConcreteModel:
                 db.session.commit()
 
                 # Test that updated_at changed
-                    """
-                    TODO: Add class description.
-
-                    Class TestModel.
-                    """
                 assert model.updated_at != original_updated_at
                 assert model.updated_at > original_updated_at
 

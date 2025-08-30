@@ -496,11 +496,6 @@ class TestDecoratorEdgeCases:
 
             result = test_function()
             assert result == {}
-                """
-                TODO: Add class description.
-
-                Class NestedSchema.
-                """
 
     def test_validate_json_input_with_nested_validation_error(self, app_context):
         """Test validation with nested validation errors."""
@@ -532,11 +527,6 @@ class TestDecoratorEdgeCases:
             @validate_json_input(ValidationTestSchema)
             def test_function(validated_data):
                 return validated_data
-                    """
-                    TODO: Add class description.
-
-                    Class CustomException.
-                    """
 
             with pytest.raises(ValidationAPIError) as exc_info:
                 test_function()
@@ -550,24 +540,8 @@ class TestDecoratorEdgeCases:
             pass
 
         @handle_api_errors
-            """
-            TODO: Add return description
-            Returns:
-
-            TODO: Add function description.
-
-            Function validation_error_function.
-            """
         def test_function():
             raise CustomException("Custom error message")
-                """
-                TODO: Add return description
-                Returns:
-
-                TODO: Add function description.
-
-                Function api_error_function.
-                """
 
         with pytest.raises(APIError) as exc_info:
             test_function()

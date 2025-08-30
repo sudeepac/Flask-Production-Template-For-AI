@@ -231,12 +231,7 @@ dump.rdb
 *.h5
 *.hdf5
 *.model
-models/*.pkl
-models/*.pickle
-models/*.joblib
-models/*.h5
-models/*.hdf5
-models/*.model
+# ML model files removed
 
 # Data files
 data/

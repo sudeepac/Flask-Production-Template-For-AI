@@ -10,6 +10,7 @@ from datetime import datetime
 import psutil
 from flask import current_app
 from flask_restx import Resource, fields
+from sqlalchemy import text
 
 from app.api_docs import api_docs
 from app.extensions import cache, db
@@ -244,7 +245,7 @@ class DetailedHealthCheckResource(Resource):
         try:
             # Database health check
             db_start = time.time()
-            db.session.execute("SELECT 1")
+            db.session.execute(text("SELECT 1"))
             db_response_time = time.time() - db_start
 
             checks["database"] = {
@@ -403,7 +404,7 @@ class ReadinessCheckResource(Resource):
 
         try:
             # Database connection check
-            db.session.execute("SELECT 1")
+            db.session.execute(text("SELECT 1"))
             checks["database_connection"] = True
         except Exception:
             checks["database_connection"] = False

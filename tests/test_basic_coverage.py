@@ -122,30 +122,37 @@ class TestResponseHelpers:
             pytest.skip("Error response function not available")
 
 
-class TestCommonImports:
-    """Test common imports module."""
+class TestUtils:
+    """Test utils module."""
 
-    def test_import_common_imports(self):
-        """Test importing common imports module."""
+    def test_import_utils(self):
+        """Test importing utils module."""
         try:
-            from app.utils import common_imports
+            from app import utils
 
-            assert common_imports is not None
+            assert utils is not None
         except ImportError:
-            pytest.skip("Common imports not importable")
+            pytest.skip("Utils module not available")
 
-    def test_logger_function_exists(self):
-        """Test that logger function exists."""
+    def test_utils_functions(self):
+        """Test utils functions."""
         try:
-            from app.utils.common_imports import get_module_logger
+            from app.utils import get_module_logger
 
-            assert callable(get_module_logger)
-
-            # Test basic usage
-            logger = get_module_logger(__name__)
+            logger = get_module_logger("test")
             assert logger is not None
-        except (ImportError, AttributeError):
-            pytest.skip("Logger function not available")
+        except ImportError:
+            pytest.skip("Utils module not available")
+
+    def test_utils_schemas(self):
+        """Test utils schemas."""
+        try:
+            from app.utils import BaseRequestSchema, BaseResponseSchema
+
+            assert BaseRequestSchema is not None
+            assert BaseResponseSchema is not None
+        except ImportError:
+            pytest.skip("Utils module not available")
 
 
 class TestSchemas:
@@ -163,7 +170,7 @@ class TestSchemas:
     def test_base_schemas_exist(self):
         """Test that base schemas exist."""
         try:
-            from app.utils.common_imports import BaseRequestSchema, BaseResponseSchema
+            from app.utils import BaseRequestSchema, BaseResponseSchema
 
             assert BaseRequestSchema is not None
             assert BaseResponseSchema is not None

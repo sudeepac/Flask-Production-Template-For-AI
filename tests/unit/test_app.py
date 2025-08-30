@@ -5,6 +5,7 @@ application functionality.
 """
 
 from flask import Flask
+from sqlalchemy import text
 
 from app import create_app
 from app.extensions import cache, db
@@ -129,5 +130,6 @@ class TestAppContext:
             assert db.engine is not None
 
             # Test basic database operations
-            result = db.engine.execute("SELECT 1 as test")
-            assert result.fetchone()["test"] == 1
+            with db.engine.connect() as conn:
+                result = conn.execute(text("SELECT 1 as test"))
+                assert result.fetchone()[0] == 1

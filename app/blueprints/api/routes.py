@@ -12,7 +12,7 @@ from marshmallow import Schema, fields, validate
 
 from app.extensions import limiter
 from app.services.example_service import ExampleService
-from app.utils.common_imports import get_module_logger
+from app.utils import get_module_logger
 from app.utils.decorators import (
     handle_api_errors,
     log_endpoint_access,

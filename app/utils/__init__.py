@@ -28,9 +28,11 @@ from datetime import datetime, timezone
 from functools import wraps
 from typing import Any, Dict, List
 
-# Flask imports removed - not used in this module
+from marshmallow import Schema
 
-logger = logging.get_logger(__name__)
+from app.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 # Common utility functions that are used frequently
@@ -43,6 +45,31 @@ def get_timestamp() -> str:
         str: ISO formatted timestamp
     """
     return datetime.now(timezone.utc).isoformat()
+
+
+def get_utc_timestamp(with_z_suffix: bool = False) -> str:
+    """Get current UTC timestamp in ISO format.
+
+    Args:
+        with_z_suffix: Whether to append 'Z' to indicate UTC timezone
+
+    Returns:
+        ISO formatted timestamp string
+    """
+    timestamp = datetime.utcnow().isoformat()
+    return timestamp + "Z" if with_z_suffix else timestamp
+
+
+def get_module_logger(module_name: str):
+    """Get a logger instance for a module.
+
+    Args:
+        module_name: The module name (usually __name__)
+
+    Returns:
+        Logger instance
+    """
+    return get_logger(module_name)
 
 
 def generate_id(prefix: str = "", length: int = 16) -> str:
@@ -369,9 +396,22 @@ def retry_on_exception(
     return decorator
 
 
+# Common schema base classes
+class BaseRequestSchema(Schema):
+    """Base schema for request validation."""
+    pass
+
+
+class BaseResponseSchema(Schema):
+    """Base schema for response serialization."""
+    pass
+
+
 # Export commonly used utilities
 __all__ = [
     "get_timestamp",
+    "get_utc_timestamp",
+    "get_module_logger",
     "generate_id",
     "safe_json_loads",
     "safe_json_dumps",
@@ -388,4 +428,6 @@ __all__ = [
     "is_valid_url",
     "mask_sensitive_data",
     "retry_on_exception",
+    "BaseRequestSchema",
+    "BaseResponseSchema",
 ]

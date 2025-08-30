@@ -4,6 +4,8 @@ This module tests the initialization and functionality of
 Flask extensions used in the application.
 """
 
+from sqlalchemy import text
+
 from app.extensions import cache, db, migrate
 
 
@@ -22,8 +24,9 @@ class TestDatabaseExtension:
         """Test database connection."""
         with app.app_context():
             # Test basic connection
-            result = db.engine.execute("SELECT 1 as test")
-            assert result.fetchone()["test"] == 1
+            with db.engine.connect() as conn:
+                result = conn.execute(text("SELECT 1 as test"))
+                assert result.fetchone()[0] == 1
 
     def test_db_session(self, app):
         """Test database session functionality."""
@@ -32,7 +35,7 @@ class TestDatabaseExtension:
             assert db.session is not None
 
             # Test session operations
-            db.session.execute("SELECT 1")
+            db.session.execute(text("SELECT 1"))
             db.session.commit()
 
     def test_db_model_base(self, app):
@@ -127,24 +130,11 @@ class TestMigrateExtension:
         # Test that CLI commands are registered
         runner = app.test_cli_runner()
         result = runner.invoke(args=["--help"])
-            """
-            TODO: Add class description.
-
-            Class TestModel.
-            """
         assert "db" in result.output
 
 
 class TestExtensionIntegration:
     """Test integration between extensions."""
-        """
-        TODO: Add return description
-        Returns:
-
-        TODO: Add function description.
-
-        Function get_test_data.
-        """
 
     def test_db_cache_integration(self, app):
         """Test database and cache working together."""

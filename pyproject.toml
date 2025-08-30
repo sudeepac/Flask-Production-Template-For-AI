@@ -79,6 +79,7 @@ known_third_party = [
 # Flake8 Configuration
 [tool.flake8]
 max-line-length = 88
+max-complexity = 10
 extend-ignore = [
     "E203",  # whitespace before ':' (conflicts with black)
     "E501",  # line too long (handled by black)
@@ -92,11 +93,47 @@ exclude = [
     "migrations",
     "build",
     "dist",
+    ".pytest_cache",
 ]
 per-file-ignores = [
     "__init__.py:F401",  # allow unused imports in __init__.py
     "tests/*:S101",      # allow assert statements in tests
+    # Utility module imports consolidated
 ]
+
+# Pytest Configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+    "--cov=app",
+    "--cov-report=html:htmlcov",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+    "--durations=10",
+    "--maxfail=5",
+    "-m", "not slow"
+]
+markers = [
+    "unit: Unit tests - test individual functions and classes",
+    "integration: Integration tests - test component interactions",
+    "slow: Slow running tests - tests that take more than 1 second",
+    "ml: Machine learning tests - test ML models and data processing",
+    "performance: Performance tests - test speed and resource usage"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+junit_family = "xunit2"
 
 # MyPy Configuration
 [tool.mypy]
@@ -129,24 +166,7 @@ module = [
 ]
 ignore_missing_imports = true
 
-# Pytest Configuration
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --strict-markers --strict-config"
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "ml: marks tests as ML model tests",
-]
-filterwarnings = [
-    "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning",
-]
+
 
 # Coverage Configuration
 [tool.coverage.run]

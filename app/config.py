@@ -48,11 +48,7 @@ class Config:
     CACHE_REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
     CACHE_DEFAULT_TIMEOUT = 300  # 5 minutes
 
-    # ML Model Configuration
-    ML_MODEL_PATH = os.environ.get("ML_MODEL_PATH", "models/")
-    ML_MODEL_CACHE_TTL = int(os.environ.get("ML_MODEL_CACHE_TTL", "3600"))  # 1 hour
-    ML_BATCH_SIZE = int(os.environ.get("ML_BATCH_SIZE", "32"))
-    ML_MAX_WORKERS = int(os.environ.get("ML_MAX_WORKERS", "4"))
+    # ML configuration removed
 
     # API Configuration
     API_RATE_LIMIT = os.environ.get("API_RATE_LIMIT", "100 per hour")

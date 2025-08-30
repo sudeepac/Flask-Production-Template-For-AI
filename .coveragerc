@@ -50,7 +50,7 @@ omit =
 include =
     app/*
     app/blueprints/*
-    app/models/*
+    # app/models/* # ML models removed
     app/services/*
     app/utils/*
     app/schemas/*

@@ -276,9 +276,10 @@ class TestPerformanceLogger:
         self.mock_logger.debug.assert_called_once()
         self.mock_logger.handle.assert_called_once()
 
+    @patch("app.utils.logging_config.logging.getLogger")
     def test_performance_logger_default_logger(self):
         """Test PerformanceLogger with default logger."""
-        with patch("app.utils.logging_config.logging.get_logger") as mock_get_logger:
+        with patch("app.utils.logging_config.logging.getLogger") as mock_get_logger:
             mock_logger = Mock()
             mock_get_logger.return_value = mock_logger
 
@@ -294,7 +295,7 @@ class TestSetupLogging:
 
     @patch("app.utils.logging_config.logging.handlers.RotatingFileHandler")
     @patch("app.utils.logging_config.logging.StreamHandler")
-    @patch("app.utils.logging_config.logging.get_logger")
+    @patch("app.utils.logging_config.logging.getLogger")
     def test_setup_logging_development(
         self, mock_get_logger, mock_stream_handler, mock_file_handler
     ):
@@ -321,11 +322,11 @@ class TestSetupLogging:
             setup_logging(app)
 
             # Verify logger configuration calls
-            mock_root_logger.set_level.assert_called()
+            mock_root_logger.setLevel.assert_called()
             mock_root_logger.add_handler.assert_called()
 
     @patch("app.utils.logging_config.logging.handlers.RotatingFileHandler")
-    @patch("app.utils.logging_config.logging.get_logger")
+    @patch("app.utils.logging_config.logging.getLogger")
     def test_setup_logging_production(self, mock_get_logger, mock_file_handler):
         """Test logging setup for production environment."""
         app = Flask(__name__)
@@ -350,7 +351,7 @@ class TestSetupLogging:
             setup_logging(app)
 
             # Verify production-specific configuration
-            mock_root_logger.set_level.assert_called()
+            mock_root_logger.setLevel.assert_called()
             mock_root_logger.add_handler.assert_called()
 
 
@@ -359,7 +360,7 @@ class TestUtilityFunctions:
 
     def test_get_logger(self):
         """Test get_logger function."""
-        with patch("app.utils.logging_config.logging.get_logger") as mock_get_logger:
+        with patch("app.utils.logging_config.logging.getLogger") as mock_get_logger:
             mock_logger = Mock()
             mock_get_logger.return_value = mock_logger
 
@@ -368,7 +369,7 @@ class TestUtilityFunctions:
             mock_get_logger.assert_called_once_with("test.logger")
             assert result == mock_logger
 
-    @patch("logging.get_logger")
+    @patch("logging.getLogger")
     def test_log_security_event(self, mock_get_logger):
         """Test log_security_event function."""
         app = Flask(__name__)

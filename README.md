@@ -1,102 +1,85 @@
 # Flask Production Template for AI
 
-> A production-ready Flask template for building scalable web applications and APIs for AI coders and humans too.
+> Production-ready Flask template for scalable web applications and APIs, optimized for AI-assisted development.
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📖 Introduction
+## 🚀 Quick Start
 
-Welcome to the **Flask Production Template for AI** - a comprehensive, battle-tested Flask template specifically designed for AI developers and coding assistants. This template eliminates the tedious setup process and provides you with a robust foundation to build production-ready applications quickly.
+**For AI Assistants:** Read [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) first for architecture and coding standards.
 
-Whether you're building REST APIs, web applications, microservices, or ML-powered services, this template includes everything you need: security features, database integration, testing frameworks, Docker support, and deployment configurations. It follows industry best practices and includes detailed documentation to help both human developers and AI assistants understand and extend the codebase effectively.
-
-**Key Benefits:**
-
-- 🚀 **Rapid Development**: Get from idea to production in minutes, not hours
-- 🛡️ **Enterprise-Ready**: Built-in security, monitoring, and error handling
-- 🤖 **AI-Friendly**: Structured for easy understanding by coding assistants
-- 📚 **Well-Documented**: Comprehensive guides and inline documentation
-- 🔧 **Highly Configurable**: Easily adaptable to your specific needs
-
-## 🤖 For AI Coding Assistants
-
-**⚠️ IMPORTANT: Before writing any code, please read [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) first!**
-
-This file contains:
-
-- Project architecture and coding standards
-- Directory structure rules
-- Development workflow guidelines
-- Code generation templates
-
-**Quick AI Setup:**
-
+**One-line setup:**
 ```bash
-# Read the AI instructions first
-cat AI_INSTRUCTIONS.md
-
-# Then run the quickstart
-./scripts/quickstart.sh          # macOS/Linux
-.\scripts\quickstart.ps1         # Windows
-```
-
-## 🎯 What is this?
-
-This template provides everything you need to build a **production-ready Flask application** with:
-
-- ✅ **Security** (JWT authentication, input validation)
-- ✅ **Scalability** (caching, database optimization)
-- ✅ **Maintainability** (testing, documentation, CI/CD)
-- ✅ **Developer Experience** (auto-setup scripts, clear structure)
-
-**Perfect for**: REST APIs, web applications, microservices, ML services
-
-## 🚀 Get Started in 2 Minutes
-
-### Option 1: Quick Setup (Recommended)
-
-**Windows:**
-
-```powershell
-git clone <your-repo-url>
-cd flask-production-template
+# Windows
 .\scripts\quickstart.ps1
+
+# macOS/Linux  
+./scripts/quickstart.sh
 ```
 
-**macOS/Linux:**
+## ✨ Features
+
+- 🛡️ **Security**: JWT auth, input validation, security headers
+- 🏗️ **Architecture**: Modular blueprints, typed schemas, service layer
+- 🧪 **Testing**: 90%+ coverage, fixtures, performance tests
+- 📊 **Quality**: Real-time monitoring, pre-commit hooks, automated fixes
+- 🐳 **Deployment**: Docker, production configs, CI/CD ready
+- 🤖 **AI-Optimized**: Deterministic patterns, clear documentation
+
+## 🧪 Testing & Quality
+
+### Quick Commands
+```bash
+# Run all tests with coverage
+make test
+
+# Quality checks
+make lint
+make quality
+
+# Auto-fix code issues
+make fix
+```
+
+### Coverage Reports
+```bash
+# Generate HTML coverage report
+pytest --cov=app --cov-report=html
+open htmlcov/index.html  # View in browser
+
+# Coverage summary
+pytest --cov=app --cov-report=term-missing
+```
+
+### Code Quality Tools
+- **Pre-commit hooks**: Automatic checks on commit
+- **Ruff**: Fast Python linter and formatter
+- **MyPy**: Static type checking
+- **Bandit**: Security vulnerability scanner
+- **Quality Monitor**: Real-time code quality tracking
+
+## 📋 Manual Setup
 
 ```bash
+# 1. Clone and setup environment
 git clone <your-repo-url>
 cd flask-production-template
-chmod +x scripts/quickstart.sh && ./scripts/quickstart.sh
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 2. Install dependencies
+pip install -r requirements.txt -r requirements-optional.txt
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 4. Initialize database and start
+flask db upgrade
+flask run
 ```
-
-### Option 2: Manual Setup
-
-**Prerequisites:** Python 3.8+, Git, pip
-
-**Step-by-step:**
-
-1. **Clone and setup**:
-
-   ```bash
-   git clone <your-repo-url>
-   cd flask-production-template
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-2. **Configure environment** (⚠️ **Important**):
-
-   ```bash
-   cp .env.example .env
-   # Edit .env file - see "Environment Setup" section below
-   ```
-
-3. **Initialize database**:
 
    ```bash
    flask db upgrade

@@ -19,8 +19,7 @@ help: ## Show available commands
 
 setup: ## Set up development environment
 	@echo "Setting up development environment..."
-	pip install -r requirements.txt -r requirements-optional.txt
-	pre-commit install
+	python scripts/setup_dev_environment.py
 	@echo "Development environment ready!"
 
 test: ## Run tests with coverage report
@@ -49,6 +48,18 @@ dev: ## Start development server
 quality: ## Run comprehensive quality monitoring
 	@echo "Running quality monitoring..."
 	python scripts/quality_monitor.py
+
+validate: ## Validate production configuration and style setup
+	@echo "Validating configuration..."
+	python scripts/setup_dev_environment.py --validate-only
+
+check-encoding: ## Check for encoding issues in Python files
+	@echo "Checking encoding issues..."
+	python scripts/quality_monitor.py --encoding-check
+
+check-docstrings: ## Check for missing docstrings
+	@echo "Checking docstrings..."
+	python scripts/quality_monitor.py --docstring-check
 
 clean: ## Clean build artifacts and cache files
 	@echo "Cleaning up..."

@@ -17,7 +17,7 @@ uploads/
 │   └── presentations/    # PowerPoint files
 ├── data/                  # Data file uploads
 │   ├── datasets/         # ML training datasets
-│   ├── models/           # User-uploaded models
+│   # ├── models/           # User-uploaded models (removed)
 │   └── exports/          # Exported data files
 └── temp/                  # Temporary files
     ├── processing/       # Files being processed

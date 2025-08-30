@@ -385,7 +385,7 @@ API_TITLE=Flask Production Template for AI
 API_VERSION=1.0.0
 
 # ML Configuration
-MODEL_PATH=models/
+# MODEL_PATH=models/ # ML configuration removed
 CACHE_TYPE=simple
 
 # Logging

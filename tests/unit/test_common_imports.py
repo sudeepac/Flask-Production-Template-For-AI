@@ -1,7 +1,7 @@
-"""Unit tests for app.utils.common_imports module.
+"""Unit tests for app.utils module.
 
 This module tests the utility functions and base classes
-provided by the common_imports module.
+provided by the consolidated utils module.
 """
 
 from datetime import datetime
@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 import pytest
 from marshmallow import Schema, fields
 
-from app.utils.common_imports import (
+from app.utils import (
     BaseRequestSchema,
     BaseResponseSchema,
     get_module_logger,
@@ -187,11 +187,6 @@ class TestBaseRequestSchema:
         valid_data = {"name": "John Doe", "email": "john@example.com"}
         result = schema.load(valid_data)
         assert result == valid_data
-            """
-            TODO: Add class description.
-
-            Class TestRequestSchema.
-            """
 
     def test_base_request_schema_validation_error(self):
         """Test that extended BaseRequestSchema handles validation errors."""
@@ -252,11 +247,6 @@ class TestBaseResponseSchema:
         assert isinstance(schema, BaseResponseSchema)
         assert isinstance(schema, Schema)
 
-    """
-    TODO: Add class description.
-
-    Class TestResponseSchema.
-    """
         # Test serialization
         test_data = {
             "id": 1,
@@ -297,11 +287,6 @@ class TestBaseResponseSchema:
         # Should be able to dump any dict
         test_data = {"any_field": "any_value"}
         result = schema.dump(test_data)
-            """
-            TODO: Add class description.
-
-            Class TimestampedResponseSchema.
-            """
         assert result == test_data
 
     def test_base_schemas_are_different_classes(self):
@@ -317,16 +302,6 @@ class TestBaseResponseSchema:
 
 class TestSchemaIntegration:
     """Test integration between base schemas and common functionality."""
-        """
-        TODO: Add class description.
-
-        Class CreateItemRequestSchema.
-            """
-            TODO: Add class description.
-
-            Class ItemResponseSchema.
-            """
-        """
 
     def test_schemas_with_timestamp_utility(self):
         """Test using schemas with timestamp utility function."""

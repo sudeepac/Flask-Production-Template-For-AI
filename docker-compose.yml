@@ -5,20 +5,22 @@ services:
   app:
     build:
       context: .
-      target: development
+      target: ${BUILD_TARGET:-development}
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
-      - DATABASE_URL=postgresql://postgres:password@db:5432/flask_production_template_dev
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-1}
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-flask_production_template_dev}
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=dev-secret-key-change-in-production
-      - JWT_SECRET_KEY=dev-jwt-secret-change-in-production
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-jwt-secret-change-in-production}
     volumes:
       - .:/app
       - /app/__pycache__
       - /app/venv
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
     depends_on:
       - db
       - redis
@@ -30,14 +32,13 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_DB=flask_production_template_dev
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=${POSTGRES_DB:-flask_production_template_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/db_init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
     restart: unless-stopped
@@ -54,22 +55,20 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
 
-  # Nginx (for production)
+  # Nginx (optional for production)
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/nginx/ssl:/etc/nginx/ssl
     depends_on:
       - app
     networks:
       - app-network
     restart: unless-stopped
     profiles:
-      - production
+      - nginx
 
 volumes:
   postgres_data:

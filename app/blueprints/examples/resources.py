@@ -8,6 +8,7 @@ from datetime import datetime
 
 from flask import current_app, request
 from flask_restx import Resource, fields
+from sqlalchemy import text
 
 from app.api_docs import api_docs
 from app.extensions import db
@@ -346,7 +347,7 @@ class ExamplesHealthResource(Resource):
         try:
             # Database health check
             db_start = time.time()
-            db.session.execute("SELECT 1")
+            db.session.execute(text("SELECT 1"))
             db_time = time.time() - db_start
             checks["database"] = {
                 "status": "healthy",
@@ -693,7 +694,7 @@ class PerformanceTestResource(Resource):
         # Database operations test
         db_start = time.time()
         for i in range(10):
-            db.session.execute("SELECT 1")
+            db.session.execute(text("SELECT 1"))
         db_time = time.time() - db_start
 
         test_results["database_operations"] = {

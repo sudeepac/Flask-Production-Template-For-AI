@@ -55,129 +55,48 @@ example_bp = Blueprint(
 
 @example_bp.route("/", methods=["GET"])
 def list_items():
-    """List all items with pagination support.
+    """List all items.
 
     Returns:
-        JSON response containing items list and pagination metadata
-
-    Raises:
-        BadRequest: If pagination parameters are invalid
+        JSON response with items list
     """
     try:
-        page = request.args.get("page", 1, type=int)
-        per_page = request.args.get("per_page", 10, type=int)
-
-        if page < 1 or per_page < 1 or per_page > 100:
-            raise BadRequest("Invalid pagination parameters")
-
-        # TODO: Implement actual data retrieval logic
+        # TODO: Implement data retrieval
         items = []
-        total = 0
-
-        return jsonify(
-            {
-                "items": items,
-                "pagination": {
-                    "page": page,
-                    "per_page": per_page,
-                    "total": total,
-                    "pages": (total + per_page - 1) // per_page,
-                },
-            }
-        )
-
-    except BadRequest:
-        raise
+        return jsonify({"items": items})
     except Exception as e:
-        # Log the error in production
-        raise BadRequest(f"Failed to retrieve items: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 @example_bp.route("/<int:item_id>", methods=["GET"])
 def get_item(item_id: int):
-    """Get a specific item by ID.
+    """Get item by ID.
 
     Args:
-        item_id: The unique identifier for the item
+        item_id: Item identifier
 
     Returns:
-        JSON response containing the item data
-
-    Raises:
-        NotFound: If the item doesn't exist
-        BadRequest: If the request is malformed
+        JSON response with item data
     """
     try:
-        if item_id <= 0:
-            raise BadRequest("Item ID must be a positive integer")
-
-        # TODO: Implement actual data retrieval logic
-        item = None
-
-        if not item:
-            raise NotFound(f"Item with ID {item_id} not found")
-
+        # TODO: Implement data retrieval
+        item = {"id": item_id}
         return jsonify({"item": item})
-
-    except (NotFound, BadRequest):
-        raise
     except Exception as e:
-        # Log the error in production
-        raise BadRequest(f"Failed to retrieve item: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 @example_bp.route("/", methods=["POST"])
 def create_item():
-    """Create a new item.
+    """Create new item.
 
     Returns:
-        JSON response containing the created item data
-
-    Raises:
-        BadRequest: If the request data is invalid
+        JSON response with created item
     """
     try:
         data = request.get_json()
-
-        if not data:
-            raise BadRequest("Request body must contain valid JSON")
-
-        # TODO: Implement validation and creation logic
-        # TODO: Add input sanitization
-        # TODO: Add database transaction handling
-
-        created_item = {}
-
+        # TODO: Implement validation and creation
+        created_item = data or {}
         return jsonify({"item": created_item}), 201
-
-    except BadRequest:
-        raise
     except Exception as e:
-        # Log the error in production
-        raise BadRequest(f"Failed to create item: {str(e)}")
-
-
-@example_bp.errorhandler(BadRequest)
-def handle_bad_request(error):
-    """Handle bad request errors.
-
-    Args:
-        error: The BadRequest exception
-
-    Returns:
-        JSON error response
-    """
-    return jsonify({"error": "Bad Request", "message": str(error.description)}), 400
-
-
-@example_bp.errorhandler(NotFound)
-def handle_not_found(error):
-    """Handle not found errors.
-
-    Args:
-        error: The NotFound exception
-
-    Returns:
-        JSON error response
-    """
-    return jsonify({"error": "Not Found", "message": str(error.description)}), 404
+        return jsonify({"error": str(e)}), 500

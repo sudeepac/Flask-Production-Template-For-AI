@@ -41,13 +41,13 @@ tests/
 ├── api/                        # API tests
 │   └── test_examples_api.py   # API endpoint tests
 ├── ml/                         # Machine learning tests
-│   └── test_ml_services.py    # ML services and model tests
+│   # └── test_ml_services.py    # ML services and model tests (removed)
 ├── performance/                # Performance tests
 │   └── test_performance.py    # Load and performance tests
 └── fixtures/                   # Test fixtures and utilities
     ├── app_fixtures.py        # Application-specific fixtures
     ├── data_fixtures.py       # Data and mock fixtures
-    └── ml_fixtures.py         # ML-specific fixtures
+    # └── ml_fixtures.py         # ML-specific fixtures (removed)
 ```
 
 ## Setup
@@ -426,7 +426,7 @@ pip install -e .
 # Ensure fixtures are properly imported in conftest.py
 from tests.fixtures.app_fixtures import *
 from tests.fixtures.data_fixtures import *
-from tests.fixtures.ml_fixtures import *
+# from tests.fixtures.ml_fixtures import * # ML fixtures removed
 ```
 
 #### Slow Test Performance

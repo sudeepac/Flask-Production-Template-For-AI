@@ -11,10 +11,11 @@ Usage:
 """
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 
 
 class DevEnvironmentSetup:
@@ -29,6 +30,11 @@ class DevEnvironmentSetup:
         self.force = force
         self.project_root = Path(__file__).parent.parent
         self.errors: List[str] = []
+        self.config_files = {
+            'pyproject.toml': self.project_root / 'pyproject.toml',
+            '.pre-commit-config.yaml': self.project_root / '.pre-commit-config.yaml',
+            'requirements.txt': self.project_root / 'requirements.txt'
+        }
 
     def run_command(self, command: List[str], description: str) -> bool:
         """Run a command and handle errors.
@@ -182,6 +188,83 @@ class DevEnvironmentSetup:
 
         return True
 
+    def validate_production_config(self) -> bool:
+        """Validate production configuration settings.
+        
+        Returns:
+            True if configuration is valid, False otherwise.
+        """
+        print("\n🔍 Validating production configuration...")
+        
+        # Check for secure secret key
+        secret_key = os.environ.get('SECRET_KEY')
+        if not secret_key or secret_key in ['dev-secret-key', 'your-secret-key-here']:
+            print("⚠️  WARNING: Using default or weak SECRET_KEY in production")
+            self.errors.append("Weak SECRET_KEY detected")
+        
+        # Check database configuration
+        database_url = os.environ.get('DATABASE_URL')
+        if not database_url:
+            print("⚠️  WARNING: No DATABASE_URL configured")
+            self.errors.append("Missing DATABASE_URL")
+        elif 'sqlite' in database_url.lower():
+            print("⚠️  WARNING: Using SQLite in production (consider PostgreSQL)")
+            self.errors.append("SQLite in production")
+        
+        # Check debug mode
+        debug_mode = os.environ.get('FLASK_DEBUG', '').lower()
+        if debug_mode in ['true', '1', 'on']:
+            print("❌ ERROR: Debug mode enabled in production")
+            return False
+        
+        print("✅ Production configuration validation completed")
+        return True
+    
+    def validate_style_setup(self) -> bool:
+        """Validate style guide tools and configurations.
+        
+        Returns:
+            True if style setup is valid, False otherwise.
+        """
+        print("\n🎨 Validating style guide setup...")
+        
+        # Check config files exist
+        missing_configs = []
+        for name, path in self.config_files.items():
+            if not path.exists():
+                missing_configs.append(name)
+        
+        if missing_configs:
+            print(f"❌ Missing configuration files: {', '.join(missing_configs)}")
+            return False
+        
+        # Check tool installation
+        tools = ['black', 'isort', 'flake8', 'mypy', 'pre-commit']
+        missing_tools = []
+        
+        for tool in tools:
+            try:
+                subprocess.run([tool, '--version'], capture_output=True, check=True)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                missing_tools.append(tool)
+        
+        if missing_tools:
+            print(f"❌ Missing tools: {', '.join(missing_tools)}")
+            return False
+        
+        # Check pre-commit hooks
+        pre_commit_config = self.project_root / '.pre-commit-config.yaml'
+        if pre_commit_config.exists():
+            try:
+                subprocess.run(['pre-commit', 'validate-config'], 
+                             cwd=self.project_root, capture_output=True, check=True)
+            except subprocess.CalledProcessError:
+                print("❌ Invalid pre-commit configuration")
+                return False
+        
+        print("✅ Style guide setup validation completed")
+        return True
+
     def run_setup(self) -> bool:
         """Run the complete setup process."""
         print("🚀 Setting up development environment...")
@@ -196,6 +279,8 @@ class DevEnvironmentSetup:
             ("Setup pre-commit hooks", self.setup_pre_commit_hooks),
             ("Run initial pre-commit check", self.run_initial_pre_commit),
             ("Validate setup", self.validate_setup),
+            ("Validate production config", self.validate_production_config),
+            ("Validate style setup", self.validate_style_setup),
         ]
 
         for step_name, step_func in steps:
@@ -224,11 +309,25 @@ def main():
     parser.add_argument(
         "--force", action="store_true", help="Force reinstall of existing tools"
     )
+    parser.add_argument(
+        "--validate-only", action="store_true", help="Only run validation checks"
+    )
 
     args = parser.parse_args()
 
     setup = DevEnvironmentSetup(force=args.force)
-    success = setup.run_setup()
+    
+    if args.validate_only:
+        print("🔍 Running validation checks only...")
+        prod_valid = setup.validate_production_config()
+        style_valid = setup.validate_style_setup()
+        success = prod_valid and style_valid
+        if success:
+            print("\n✅ All validations passed!")
+        else:
+            print("\n❌ Some validations failed!")
+    else:
+        success = setup.run_setup()
 
     sys.exit(0 if success else 1)
 

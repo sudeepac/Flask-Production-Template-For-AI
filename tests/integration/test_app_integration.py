@@ -5,6 +5,7 @@ of the application, including blueprints, database, and extensions.
 """
 
 from flask import url_for
+from sqlalchemy import text
 
 from app.extensions import cache, db
 
@@ -33,28 +34,30 @@ class TestApplicationIntegration:
         """Test database operations through API endpoints."""
         with app.app_context():
             # Create a test table
-            db.engine.execute(
-                """
-                CREATE TABLE IF NOT EXISTS test_integration (
-                    id INTEGER PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            with db.engine.connect() as conn:
+                conn.execute(
+                    text("""
+                    CREATE TABLE IF NOT EXISTS test_integration (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 )
-            """
-            )
 
-            # Insert test data
-            db.engine.execute(
-                "INSERT INTO test_integration (name) VALUES (?)", ("test_record",)
-            )
+                # Insert test data
+                conn.execute(
+                    text("INSERT INTO test_integration (name) VALUES (:name)"), {"name": "test_record"}
+                )
 
-            # Test that we can query through the application
-            result = db.engine.execute(
-                "SELECT * FROM test_integration WHERE name = ?", ("test_record",)
-            )
-            row = result.fetchone()
-            assert row is not None
-            assert row["name"] == "test_record"
+                # Test that we can query through the application
+                result = conn.execute(
+                    text("SELECT * FROM test_integration WHERE name = :name"), {"name": "test_record"}
+                )
+                row = result.fetchone()
+                assert row is not None
+                assert row[1] == "test_record"  # name is the second column
+                conn.commit()
 
     def test_cache_blueprint_integration(self, app, client):
         """Test cache operations through API endpoints."""
@@ -117,29 +120,31 @@ class TestDatabaseIntegration:
             assert session1 is session2
 
             # Test session operations
-            result = session1.execute("SELECT 1 as test")
-            assert result.fetchone()["test"] == 1
+            result = session1.execute(text("SELECT 1 as test"))
+            assert result.fetchone()[0] == 1
 
     def test_database_transaction_rollback(self, app):
         """Test database transaction rollback functionality."""
         with app.app_context():
             try:
                 # Create test table
-                db.engine.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS test_rollback (
-                        id INTEGER PRIMARY KEY,
-                        name TEXT NOT NULL
+                with db.engine.connect() as conn:
+                    conn.execute(
+                        text("""
+                        CREATE TABLE IF NOT EXISTS test_rollback (
+                            id INTEGER PRIMARY KEY,
+                            name TEXT NOT NULL
+                        )
+                    """)
                     )
-                """
-                )
+                    conn.commit()
 
                 # Start transaction
                 db.session.begin()
 
                 # Insert data
                 db.session.execute(
-                    "INSERT INTO test_rollback (name) VALUES (?)", ("test_data",)
+                    text("INSERT INTO test_rollback (name) VALUES (:name)"), {"name": "test_data"}
                 )
 
                 # Rollback transaction
@@ -147,10 +152,10 @@ class TestDatabaseIntegration:
 
                 # Verify data was not committed
                 result = db.session.execute(
-                    "SELECT COUNT(*) as count FROM test_rollback WHERE name = ?",
-                    ("test_data",),
+                    text("SELECT COUNT(*) as count FROM test_rollback WHERE name = :name"),
+                    {"name": "test_data"},
                 )
-                count = result.fetchone()["count"]
+                count = result.fetchone()[0]
                 assert count == 0
 
             except Exception:
@@ -164,8 +169,8 @@ class TestDatabaseIntegration:
             connections = []
             for i in range(5):
                 conn = db.engine.connect()
-                result = conn.execute("SELECT ? as test", (i,))
-                assert result.fetchone()["test"] == i
+                result = conn.execute(text("SELECT :value as test"), {"value": i})
+                assert result.fetchone()[0] == i
                 connections.append(conn)
 
             # Close all connections
@@ -215,21 +220,23 @@ class TestCacheIntegration:
         """Test cache integration with database operations."""
         with app.app_context():
             # Create test table
-            db.engine.execute(
-                """
-                CREATE TABLE IF NOT EXISTS test_cache_db (
-                    id INTEGER PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    value TEXT NOT NULL
+            with db.engine.connect() as conn:
+                conn.execute(
+                    text("""
+                    CREATE TABLE IF NOT EXISTS test_cache_db (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        value TEXT NOT NULL
+                    )
+                """)
                 )
-            """
-            )
 
-            # Insert test data
-            db.engine.execute(
-                "INSERT INTO test_cache_db (name, value) VALUES (?, ?)",
-                ("test", "database_value"),
-            )
+                # Insert test data
+                conn.execute(
+                    text("INSERT INTO test_cache_db (name, value) VALUES (:name, :value)"),
+                    {"name": "test", "value": "database_value"},
+                )
+                conn.commit()
 
             # Function that uses both cache and database
             def get_cached_value(name):
@@ -251,15 +258,16 @@ class TestCacheIntegration:
                     return cached
 
                 # Get from database
-                result = db.engine.execute(
-                    "SELECT value FROM test_cache_db WHERE name = ?", (name,)
-                )
-                row = result.fetchone()
-                if row:
-                    value = row["value"]
-                    # Cache the result
-                    cache.set(cache_key, value, timeout=60)
-                    return value
+                with db.engine.connect() as conn:
+                    result = conn.execute(
+                        text("SELECT value FROM test_cache_db WHERE name = :name"), {"name": name}
+                    )
+                    row = result.fetchone()
+                    if row:
+                        value = row[0]  # value is the first (and only) column
+                        # Cache the result
+                        cache.set(cache_key, value, timeout=60)
+                        return value
                 return None
 
             # Test cache miss (first call)

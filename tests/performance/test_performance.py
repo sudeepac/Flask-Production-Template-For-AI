@@ -9,6 +9,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pytest
+from sqlalchemy import text
 
 from app.extensions import cache, db
 
@@ -74,33 +75,36 @@ class TestResponseTimePerformance:
         """Test database query performance."""
         with app.app_context():
             # Create test table with data
-            db.engine.execute(
-                """
-                CREATE TABLE IF NOT EXISTS perf_test (
-                    id INTEGER PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    value INTEGER NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            with db.engine.connect() as conn:
+                conn.execute(
+                    text("""
+                    CREATE TABLE IF NOT EXISTS perf_test (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        value INTEGER NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 )
-            """
-            )
 
-            # Insert test data
-            for i in range(100):
-                db.engine.execute(
-                    "INSERT INTO perf_test (name, value) VALUES (?, ?)",
-                    (f"test_{i}", i),
-                )
+                # Insert test data
+                for i in range(100):
+                    conn.execute(
+                        text("INSERT INTO perf_test (name, value) VALUES (?, ?)"),
+                        (f"test_{i}", i),
+                    )
+                conn.commit()
 
             # Measure query performance
             times = []
             for _ in range(10):
                 start_time = time.time()
-                result = db.engine.execute(
-                    "SELECT * FROM perf_test WHERE value > ? ORDER BY value LIMIT 10",
-                    (50,),
-                )
-                rows = result.fetchall()
+                with db.engine.connect() as conn:
+                    result = conn.execute(
+                        text("SELECT * FROM perf_test WHERE value > ? ORDER BY value LIMIT 10"),
+                        (50,),
+                    )
+                    rows = result.fetchall()
                 end_time = time.time()
 
                 assert len(rows) > 0
@@ -335,8 +339,8 @@ class TestMemoryPerformance:
                     connections.append(conn)
 
                     # Use connection
-                    result = conn.execute("SELECT 1 as test")
-                    assert result.fetchone()["test"] == 1
+                    result = conn.execute(text("SELECT 1 as test"))
+                    assert result.fetchone()[0] == 1
 
                 # All connections should work
                 assert len(connections) == 10

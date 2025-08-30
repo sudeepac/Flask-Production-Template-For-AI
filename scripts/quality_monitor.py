@@ -10,15 +10,17 @@ Usage:
 """
 
 import argparse
+import ast
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 
 @dataclass
@@ -708,9 +710,78 @@ class QualityMonitor:
         except KeyboardInterrupt:
             print(f"\n{Colors.YELLOW}👋 Quality monitoring stopped{Colors.END}")
 
+    def check_encoding_issues(self) -> int:
+        """Check for encoding issues in Python files."""
+        issues = 0
+        for root, dirs, files in os.walk(self.project_root):
+            # Skip common directories
+            dirs[:] = [d for d in dirs if d not in {'.git', '__pycache__', '.venv', 'venv', 'node_modules'}]
+            
+            for file in files:
+                if file.endswith('.py'):
+                    file_path = Path(root) / file
+                    try:
+                        with open(file_path, 'rb') as f:
+                            content = f.read()
+                        # Check for non-ASCII characters
+                        try:
+                            content.decode('ascii')
+                        except UnicodeDecodeError:
+                            # File has non-ASCII, check for encoding declaration
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                first_lines = [f.readline().strip(), f.readline().strip()]
+                            
+                            has_encoding = any('coding:' in line or 'coding=' in line for line in first_lines)
+                            if not has_encoding:
+                                print(f"{Colors.YELLOW}⚠️  Missing encoding declaration: {file_path}{Colors.END}")
+                                issues += 1
+                    except Exception:
+                        continue
+        return issues
+
+    def check_missing_docstrings(self) -> int:
+        """Check for missing docstrings in Python files."""
+        missing_count = 0
+        for root, dirs, files in os.walk(self.project_root / 'app'):
+            dirs[:] = [d for d in dirs if d not in {'__pycache__', '.pytest_cache'}]
+            
+            for file in files:
+                if file.endswith('.py'):
+                    file_path = Path(root) / file
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        tree = ast.parse(content)
+                        for node in ast.walk(tree):
+                            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                                # Skip private methods and test functions
+                                if (node.name.startswith('_') and not node.name.startswith('__')) or \
+                                   node.name.startswith('test_'):
+                                    continue
+                                
+                                # Check if has docstring
+                                if not (node.body and isinstance(node.body[0], ast.Expr) and 
+                                       isinstance(node.body[0].value, ast.Constant) and 
+                                       isinstance(node.body[0].value.value, str)):
+                                    missing_count += 1
+                    except Exception:
+                        continue
+        return missing_count
+
     def run_single_check(self) -> bool:
         """Run a single quality check."""
         metrics = self.collect_metrics()
+        
+        # Additional checks
+        encoding_issues = self.check_encoding_issues()
+        missing_docstrings = self.check_missing_docstrings()
+        
+        if encoding_issues > 0:
+            print(f"{Colors.YELLOW}📝 Encoding issues found: {encoding_issues}{Colors.END}")
+        if missing_docstrings > 0:
+            print(f"{Colors.YELLOW}📚 Missing docstrings: {missing_docstrings}{Colors.END}")
+        
         self.display_metrics(metrics)
         self.save_metrics(metrics)
 
@@ -729,6 +800,12 @@ def main():
         "--report", action="store_true", help="Generate a quality trend report"
     )
     parser.add_argument(
+        "--encoding-check", action="store_true", help="Check for encoding issues only"
+    )
+    parser.add_argument(
+        "--docstring-check", action="store_true", help="Check for missing docstrings only"
+    )
+    parser.add_argument(
         "--threshold",
         type=float,
         default=6.0,
@@ -740,7 +817,15 @@ def main():
     project_root = Path(__file__).parent.parent
     monitor = QualityMonitor(project_root, args.threshold)
 
-    if args.report:
+    if args.encoding_check:
+        issues = monitor.check_encoding_issues()
+        print(f"Encoding issues found: {issues}")
+        sys.exit(1 if issues > 0 else 0)
+    elif args.docstring_check:
+        missing = monitor.check_missing_docstrings()
+        print(f"Missing docstrings: {missing}")
+        sys.exit(1 if missing > 0 else 0)
+    elif args.report:
         monitor.generate_report()
     elif args.watch:
         monitor.watch_mode()

@@ -161,7 +161,7 @@ utils/
 services/
 
 # Acceptable if needed for clarity
-ml_models/
+# ml_models/ # ML models removed
 ```
 
 ### Private Members
