@@ -98,6 +98,67 @@ def authenticated_client(client, auth_headers):
     """Create authenticated test client."""
 
     class AuthenticatedClient:
+        """
+        TODO: Add class description.
+
+        Class AuthenticatedClient.
+        """
+            """
+            TODO: Add return description
+            Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function patch.
+    """
+    TODO: Add function description.
+
+    Function delete.
+    """
+    TODO: Add function description.
+
+    Function put.
+    """
+    TODO: Add function description.
+        """
+        TODO: Add return description
+        Returns:
+            """
+            TODO: Add return description
+            Returns:
+
+            TODO: Add function description.
+
+            Function raise_for_status.
+            """
+
+        TODO: Add function description.
+
+        Function json.
+        """
+
+    Function post.
+    """
+            TODO: Add function description.
+
+            Function get.
+            """
         def __init__(self, client, headers):
             self.client = client
             self.headers = headers
@@ -125,6 +186,11 @@ def authenticated_client(client, auth_headers):
     return AuthenticatedClient(client, auth_headers)
 
 
+    """
+    TODO: Add class description.
+
+    Class MockResponse.
+    """
 @pytest.fixture(scope="function")
 def mock_external_api(monkeypatch):
     """Mock external API calls."""
@@ -133,6 +199,28 @@ def mock_external_api(monkeypatch):
         def __init__(self, json_data, status_code=200):
             self.json_data = json_data
             self.status_code = status_code
+                """
+                TODO: Add return description
+                Returns:
+
+                url: TODO: Add description
+                    """
+                    TODO: Add return description
+                    Returns:
+
+                    url: TODO: Add description
+                    Args:
+
+                    TODO: Add function description.
+
+                    Function mock_post.
+                    """
+                Args:
+
+                TODO: Add function description.
+
+                Function mock_get.
+                """
             self.headers = {"Content-Type": "application/json"}
 
         def json(self):
@@ -144,6 +232,41 @@ def mock_external_api(monkeypatch):
 
     def mock_get(url, **kwargs):
         if "api.example.com" in url:
+            """
+            TODO: Add return description
+            Returns:
+                """
+                TODO: Add return description
+                Returns:
+                    """
+                    TODO: Add return description
+                    Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function wrapper.
+    """
+                    timeout: TODO: Add description
+                    Args:
+
+                    TODO: Add function description.
+
+                    Function get.
+                    """
+
+                TODO: Add function description.
+
+                Function apply_async.
+                """
+
+            TODO: Add function description.
+
+            Function delay.
+            """
             return MockResponse({"data": "mocked response"})
         return MockResponse({"error": "not found"}, 404)
 
@@ -165,10 +288,34 @@ def temp_file():
         yield path
     finally:
         os.close(fd)
+            """
+            TODO: Add return description
+            Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function stop.
+    """
+            TODO: Add function description.
+
+            Function start.
+            """
         os.unlink(path)
 
 
 @pytest.fixture(scope="function")
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function get_stats.
+    """
 def temp_directory():
     """Create temporary directory for testing."""
     temp_dir = tempfile.mkdtemp()
@@ -189,11 +336,48 @@ def sample_file_upload(temp_directory):
     with open(file_path, "w") as f:
         f.write("This is a test file for upload testing.\n")
         f.write("It contains multiple lines.\n")
+            """
+            TODO: Add return description
+            Returns:
+
+            logger_name: TODO: Add description
+            level: TODO: Add description
+            Args:
+
+            TODO: Add function description.
+
+            Function get_logs.
+            """
+                """
+                TODO: Add return description
+                Returns:
+
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function clear.
+    """
+                level: TODO: Add description
+                message: TODO: Add description
+                Args:
+
+                TODO: Add function description.
+
+                Function has_log.
+                """
         f.write("And some test data.")
 
     return file_path
 
 
+    """
+    TODO: Add class description.
+
+    Class MockTask.
+    """
 @pytest.fixture(scope="function")
 def sample_image_file(temp_directory):
     """Create sample image file for testing."""
@@ -204,6 +388,17 @@ def sample_image_file(temp_directory):
 
         # Create a simple test image
         image = Image.new("RGB", (100, 100), color="red")
+            """
+            TODO: Add return description
+            Returns:
+
+            func: TODO: Add description
+            Args:
+
+            TODO: Add function description.
+
+            Function mock_task_decorator.
+            """
         file_path = os.path.join(temp_directory, "test_image.png")
         image.save(file_path, "PNG")
 
@@ -214,12 +409,30 @@ def sample_image_file(temp_directory):
         with open(file_path, "wb") as f:
             # Write minimal PNG header
             f.write(b"\x89PNG\r\n\x1a\n")
-            f.write(b"\x00\x00\x00\rIHDR")
+            f.write(b"\x00\x00\x00\r_ihdr")
+                """
+                TODO: Add return description
+                Returns:
+
+                body: TODO: Add description
+                subject: TODO: Add description
+                to: TODO: Add description
+                Args:
+
+                TODO: Add function description.
+
+                Function mock_send_email.
+                """
             f.write(b"\x00\x00\x00d\x00\x00\x00d")
             f.write(b"\x08\x02\x00\x00\x00")
 
         return file_path
 
+    """
+    TODO: Add class description.
+
+    Class PerformanceMonitor.
+    """
 
 @pytest.fixture(scope="function")
 def mock_celery_task(monkeypatch):
@@ -266,6 +479,11 @@ def mock_email_service(monkeypatch):
         email = {"to": to, "subject": subject, "body": body, "kwargs": kwargs}
         sent_emails.append(email)
         return True
+            """
+            TODO: Add class description.
+
+            Class LogCapture.
+            """
 
     monkeypatch.setattr("app.services.email.send_email", mock_send_email)
 

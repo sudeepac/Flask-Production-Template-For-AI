@@ -374,9 +374,9 @@ class TestScalabilityPerformance:
                 # Response time should scale reasonably with payload size
                 # Base time + scaling factor
                 max_expected_time = 0.1 + (size / 100000)
-                assert avg_time < max_expected_time, (
-                    f"Size {size}: {avg_time}s > {max_expected_time}s"
-                )
+                assert (
+                    avg_time < max_expected_time
+                ), f"Size {size}: {avg_time}s > {max_expected_time}s"
 
     def test_concurrent_user_simulation(self, client):
         """Simulate multiple concurrent users."""

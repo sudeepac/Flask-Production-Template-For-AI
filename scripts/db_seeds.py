@@ -391,7 +391,7 @@ def seed_all_data(sample_size: int = 10) -> None:
     seed_users(sample_size)
     seed_posts(sample_size * 2)  # More posts than users
 
-    print("\nDatabase seeding completed successfully!")
+    print("\n_database seeding completed successfully!")
 
 
 def clear_all_data() -> None:

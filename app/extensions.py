@@ -38,7 +38,7 @@ limiter = Limiter(
 )
 
 # Application logger
-logger = logging.getLogger("app")
+logger = logging.get_logger("app")
 
 
 def init_extensions(app):
@@ -148,15 +148,17 @@ def _configure_logging(app):
     )
 
     # Configure root logger
-    logging.basicConfig(level=log_level, format=log_format, datefmt="%Y-%m-%d %H:%M:%S")
+    logging.basic_config(
+        level=log_level, format=log_format, datefmt="%Y-%m-%d %H:%M:%S"
+    )
 
     # Configure app logger
-    logger.setLevel(log_level)
+    logger.set_level(log_level)
 
     # Suppress noisy third-party loggers in production
     if not app.debug:
-        logging.getLogger("werkzeug").setLevel(logging.WARNING)
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.get_logger("werkzeug").set_level(logging.WARNING)
+        logging.get_logger("urllib3").set_level(logging.WARNING)
 
 
 # Utility functions for extensions
@@ -199,4 +201,4 @@ def get_logger(name=None):
         logger = get_logger('app.blueprints.auth')
         logger.info('User logged in')
     """
-    return logging.getLogger(name or "app")
+    return logging.get_logger(name or "app")

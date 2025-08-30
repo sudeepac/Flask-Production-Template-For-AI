@@ -110,7 +110,6 @@ class BaseModelTemplate(Base):
         """
         # Note: In actual implementation, use session.query(cls)
         # return session.query(cls).filter(cls.is_active == True)
-        pass
 
     def __repr__(self) -> str:
         """String representation of the model instance.
@@ -169,7 +168,7 @@ class UserModelTemplate(BaseModelTemplate):
         email = email.lower().strip()
 
         # Basic email validation regex
-        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        email_pattern = r"^[a-z_a-Z0-9._%+-]+@[a-z_a-Z0-9.-]+\.[a-z_a-Z]{2,}$"
 
         if not re.match(email_pattern, email):
             raise ValueError("Invalid email format")
@@ -201,7 +200,7 @@ class UserModelTemplate(BaseModelTemplate):
         # Allow alphanumeric characters, underscores, and hyphens
         import re
 
-        if not re.match(r"^[a-zA-Z0-9_-]+$", username):
+        if not re.match(r"^[a-z_a-Z0-9_-]+$", username):
             raise ValueError(
                 "Username can only contain letters, numbers, underscores, and hyphens"
             )

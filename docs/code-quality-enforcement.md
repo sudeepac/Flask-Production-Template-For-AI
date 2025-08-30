@@ -1,104 +1,69 @@
-# Code Quality Enforcement Guide
+# Code Quality Enforcement Guide - Streamlined
 
-This document outlines the comprehensive code quality enforcement system implemented in this Flask project. Our multi-layered approach ensures that code quality standards are maintained throughout the development lifecycle.
+This document outlines the streamlined code quality enforcement system implemented in this Flask project. Our focused approach maintains high code quality standards while avoiding over-engineering and circular dependencies.
 
 ## 🎯 Overview
 
-Our code quality enforcement system operates at multiple levels:
+Our streamlined code quality enforcement system operates at essential levels:
 
-1. **Pre-commit Hooks** - Immediate feedback during development
-2. **IDE Integration** - Real-time assistance while coding
-3. **CI/CD Pipeline** - Mandatory quality gates
-4. **Real-time Monitoring** - Continuous quality tracking
-5. **Developer Onboarding** - Automated setup for new team members
+1. **Pre-commit Hooks** - Essential checks without auto-fixes
+2. **Quality Monitoring** - Comprehensive metrics tracking
+3. **Development Tools** - Simplified command interface
+4. **Manual Fixes** - Controlled code improvements
 
 ## 🚀 Quick Start for New Developers
 
-### Automated Onboarding
+### Quick Setup
 
-Run the automated onboarding script to set up your complete development environment:
+Set up your development environment with one command:
 
 ```bash
-# Basic onboarding
-make onboard
-
-# Or using Python directly
-python scripts/onboard_developer.py
-
-# Force recreation of existing components
-make onboard-force
+# Complete development setup
+make setup
 ```
 
-This script will:
-
-- ✅ Check Python and Git installation
-- ✅ Set up virtual environment
+This will:
 - ✅ Install all dependencies
 - ✅ Configure pre-commit hooks
-- ✅ Set up IDE integration
-- ✅ Run initial quality checks
+- ✅ Set up development environment
 
 ### Manual Setup (if needed)
 
-If you prefer manual setup:
-
 ```bash
-# 1. Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# 1. Install dependencies
+pip install -r requirements.txt -r requirements-optional.txt
 
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Set up pre-commit hooks
+# 2. Set up pre-commit hooks
 pre-commit install
-pre-commit install --hook-type commit-msg
-pre-commit install --hook-type pre-push
-
-# 4. Run initial setup
-python scripts/setup_dev_environment.py
 ```
 
 ## 🛡️ Pre-commit Hooks
 
-Pre-commit hooks provide immediate feedback and prevent low-quality code from being committed.
+Pre-commit hooks provide immediate feedback with check-only validation to prevent circular loops.
 
 ### Configured Hooks
 
 #### General Code Quality
 
-- **trailing-whitespace** - Removes trailing whitespace
-- **end-of-file-fixer** - Ensures files end with newline
-- **check-yaml/json/toml/xml** - Validates file formats
-- **check-added-large-files** - Prevents large files
+- **check-yaml/json/toml** - Validates file formats
+- **check-added-large-files** - Prevents large files (>1MB)
 - **check-case-conflict** - Detects case conflicts
 - **check-merge-conflict** - Detects merge conflict markers
+- **debug-statements** - Prevents debug statements
 - **detect-private-key** - Prevents committing secrets
 
-#### Python-Specific
+#### Python-Specific (Check-Only)
 
-- **Black** - Code formatting (88 character line length)
-- **isort** - Import sorting and organization
-- **flake8** - Linting and style checking
+- **ruff** - Fast linting and style checking
+- **ruff-format** - Code formatting validation
 - **mypy** - Static type checking
 - **bandit** - Security vulnerability scanning
 - **interrogate** - Docstring coverage checking
-
-#### Additional Tools
-
-- **yamllint** - YAML file linting
-- **markdownlint** - Markdown file linting
-- **shellcheck** - Shell script linting
-- **hadolint** - Dockerfile linting
-- **sqlfluff** - SQL formatting
 
 #### Custom Hooks
 
 - **Blueprint structure validation**
 - **URL prefix consistency checking**
-- **Python style compliance**
-- **TODO/FIXME prevention in production**
-- **Encoding declaration enforcement**
 
 ### Hook Management
 
@@ -107,7 +72,7 @@ Pre-commit hooks provide immediate feedback and prevent low-quality code from be
 pre-commit run --all-files
 
 # Run specific hook
-pre-commit run black
+pre-commit run ruff
 
 # Skip hooks for emergency commits (use sparingly)
 git commit --no-verify -m "Emergency fix"
@@ -116,54 +81,36 @@ git commit --no-verify -m "Emergency fix"
 pre-commit autoupdate
 ```
 
-## 🔧 IDE Integration
+## 🚦 Quality Checks
 
-## 🚦 CI/CD Quality Gates
+Our streamlined quality system focuses on essential checks:
 
-Our GitHub Actions workflow enforces strict quality standards:
+### Core Quality Checks
 
-### Quality Gate Pipeline
-
-1. **Code Quality Job**
-   - ❌ **FAILS** if Black formatting is incorrect
-   - ❌ **FAILS** if imports are not properly sorted
-   - ❌ **FAILS** if flake8 finds linting issues
+1. **Linting and Formatting**
+   - ❌ **FAILS** if ruff finds linting issues
+   - ❌ **FAILS** if code formatting is incorrect
    - ❌ **FAILS** if mypy finds type errors
    - ❌ **FAILS** if bandit finds security vulnerabilities
-   - ❌ **FAILS** if safety finds vulnerable dependencies
-   - ❌ **FAILS** if docstring coverage is below 90%
-   - ❌ **FAILS** if custom style compliance fails
+   - ❌ **FAILS** if docstring coverage is below 80%
 
-2. **Quality Gate Checkpoint**
-   - ❌ **BLOCKS** further pipeline execution if any quality check fails
-   - ✅ **ALLOWS** progression only when all checks pass
-
-3. **Test Suite**
-   - Runs only after quality gate passes
-   - Tests across Python 3.9, 3.10, 3.11
-   - Includes unit, integration, and API tests
-
-4. **Deployment Gate**
-   - Final checkpoint before deployment
-   - Ensures all jobs (quality, tests, performance, docker) succeed
-   - ❌ **PREVENTS** deployment if any check fails
+2. **Testing**
+   - ❌ **FAILS** if test coverage is below configured threshold
+   - ❌ **FAILS** if any tests fail
 
 ### Helpful Error Messages
 
-The CI provides actionable error messages:
+The system provides actionable error messages:
 
 ```
-❌ Code formatting check failed. Run 'make fix-format' to fix.
-❌ Import sorting check failed. Run 'make fix-imports' to fix.
+❌ Code formatting check failed. Run 'make fix' to fix.
 ❌ Linting check failed. Fix the issues above.
 ❌ Type checking failed. Add proper type hints.
-❌ Security vulnerabilities found. Check bandit-report.json
-❌ Vulnerable dependencies found. Update dependencies.
-❌ Docstring coverage below 90%. Add missing docstrings.
-❌ Style compliance check failed. Fix the issues above.
+❌ Security vulnerabilities found. Review and fix.
+❌ Docstring coverage below 80%. Add missing docstrings.
 ```
 
-## 📊 Real-time Quality Monitoring
+## 📊 Quality Monitoring
 
 ### Quality Monitor Script
 
@@ -171,16 +118,10 @@ The `quality_monitor.py` script provides comprehensive quality tracking:
 
 ```bash
 # Single quality check
-make quality-monitor
+make quality
 
-# Continuous monitoring (watches for file changes)
-make quality-watch
-
-# Generate trend report
-make quality-report
-
-# Custom quality threshold
-make quality-threshold THRESHOLD=9.0
+# Or run directly
+python scripts/quality_monitor.py
 ```
 
 ### Monitored Metrics
@@ -216,39 +157,31 @@ The monitor maintains a history of quality metrics in `.quality_metrics.json`:
 - Shows improvement/degradation patterns
 - Helps identify quality debt accumulation
 
-## 🛠️ Available Commands
+## 🛠️ Essential Commands
 
-### Development Commands
+### Streamlined Development Commands
 
 ```bash
-# Start development with quality checks
-make dev                    # Start development server
-make dev-watch             # Start with file watching
-
-# Code quality
-make lint                  # Run all linting
-make format                # Format code
-make type-check           # Run type checking
-make security-scan        # Security vulnerability scan
-
-# Automatic fixes
-make fix                  # Fix all auto-fixable issues
-make fix-format          # Fix formatting issues
-make fix-imports         # Fix import sorting
-make fix-security        # Fix security issues
-
-# Testing
-make test                # Run all tests
-make test-unit          # Run unit tests only
-make test-integration   # Run integration tests
-make test-coverage      # Run with coverage report
-
-# Quality monitoring
-make quality-monitor    # Single quality check
-make quality-watch      # Continuous monitoring
-make quality-report     # Generate trend report
-make quality-pipeline   # Complete quality pipeline
+# Essential workflow commands
+make setup              # Set up development environment
+make test               # Run tests with coverage
+make lint               # Run all quality checks
+make fix                # Auto-fix code issues
+make dev                # Start development server
+make quality            # Run quality monitoring
+make clean              # Clean build artifacts
+make help               # Show all available commands
 ```
+
+### Command Details
+
+- **setup**: Install dependencies and configure pre-commit hooks
+- **test**: Run pytest with coverage reporting
+- **lint**: Run ruff, mypy, bandit, and interrogate checks
+- **fix**: Auto-fix formatting and style issues with ruff and custom scripts
+- **dev**: Start Flask development server with debug mode
+- **quality**: Run comprehensive quality monitoring
+- **clean**: Remove build artifacts and cache files
 
 ### Pre-commit Management
 
@@ -341,7 +274,7 @@ The quality monitoring system provides a comprehensive dashboard of metrics:
 1. **Run quality checks before committing**
 
    ```bash
-   make quality-pipeline
+   make lint
    ```
 
 2. **Use automatic fixes when available**
@@ -350,10 +283,10 @@ The quality monitoring system provides a comprehensive dashboard of metrics:
    make fix
    ```
 
-3. **Monitor quality in real-time during development**
+3. **Monitor code quality regularly**
 
    ```bash
-   make quality-watch
+   make quality
    ```
 
 4. **Write tests for new code**
@@ -366,18 +299,18 @@ The quality monitoring system provides a comprehensive dashboard of metrics:
 
 6. **Document your code**
    - Add docstrings to all functions/classes
-   - Maintain >90% docstring coverage
+   - Maintain >80% docstring coverage
 
 ### For Team Leads
 
 1. **Monitor quality trends**
 
    ```bash
-   make quality-report
+   make quality
    ```
 
 2. **Set quality thresholds**
-   - Adjust thresholds based on project needs
+   - Adjust thresholds in quality_monitor.py
    - Gradually increase standards over time
 
 3. **Review quality metrics in code reviews**
@@ -387,7 +320,7 @@ The quality monitoring system provides a comprehensive dashboard of metrics:
 4. **Onboard new developers properly**
 
    ```bash
-   make onboard
+   make setup
    ```
 
 ## 🔄 Continuous Improvement
@@ -412,12 +345,12 @@ Our quality enforcement system is designed to evolve:
 ## 📚 Additional Resources
 
 - [Pre-commit Documentation](https://pre-commit.com/)
-- [Black Code Formatter](https://black.readthedocs.io/)
-- [flake8 Linting](https://flake8.pycqa.org/)
+- [Ruff Linter and Formatter](https://docs.astral.sh/ruff/)
 - [mypy Type Checking](https://mypy.readthedocs.io/)
 - [bandit Security Linting](https://bandit.readthedocs.io/)
 - [pytest Testing Framework](https://docs.pytest.org/)
+- [interrogate Docstring Coverage](https://interrogate.readthedocs.io/)
 
 ---
 
-**Remember**: Quality enforcement is not about restriction—it's about enabling the team to write better code with confidence and consistency. The automated systems handle the tedious checks, allowing developers to focus on solving business problems.
+**Remember**: Our streamlined quality enforcement focuses on essential checks without over-engineering. The simplified system maintains high standards while avoiding circular dependencies and tool conflicts, enabling developers to focus on solving business problems efficiently.

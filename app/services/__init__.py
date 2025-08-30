@@ -12,7 +12,7 @@ import logging
 
 # Services module initialization
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 # ML services temporarily disabled due to joblib/numpy dependency issues
 # This will be re-enabled once dependencies are resolved

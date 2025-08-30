@@ -47,9 +47,9 @@ class StructuredFormatter(logging.Formatter):
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage(),
+            "message": record.get_message(),
             "module": record.module,
-            "function": record.funcName,
+            "function": record.func_name,
             "line": record.lineno,
         }
 
@@ -74,7 +74,7 @@ class StructuredFormatter(logging.Formatter):
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__,
                 "message": str(record.exc_info[1]),
-                "traceback": self.formatException(record.exc_info),
+                "traceback": self.format_exception(record.exc_info),
             }
 
         # Add performance metrics if available
@@ -115,7 +115,7 @@ class ColoredConsoleFormatter(logging.Formatter):
 
         # Build formatted message
         formatted = f"{color}[{timestamp}] {record.levelname:8s}{reset} "
-        formatted += f"{record.name}: {record.getMessage()}"
+        formatted += f"{record.name}: {record.get_message()}"
 
         # Add request ID if available
         if has_request_context() and hasattr(g, "request_id"):
@@ -123,7 +123,7 @@ class ColoredConsoleFormatter(logging.Formatter):
 
         # Add exception info if present
         if record.exc_info:
-            formatted += "\n" + self.formatException(record.exc_info)
+            formatted += "\n" + self.format_exception(record.exc_info)
 
         return formatted
 
@@ -163,7 +163,7 @@ class PerformanceLogger:
             logger: Logger instance to use
         """
         self.operation = operation
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or logging.get_logger(__name__)
         self.start_time = None
 
     def __enter__(self):
@@ -209,78 +209,78 @@ def setup_logging(app: Flask) -> None:
     log_dir.mkdir(exist_ok=True)
 
     # Clear existing handlers
-    root_logger = logging.getLogger()
+    root_logger = logging.get_logger()
     root_logger.handlers.clear()
 
     # Set root logger level
-    root_logger.setLevel(log_level)
+    root_logger.set_level(log_level)
 
     # Setup console handler for development
     if app.debug or app.config.get("FLASK_ENV") == "development":
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(log_level)
-        console_handler.setFormatter(ColoredConsoleFormatter())
-        console_handler.addFilter(RequestFilter())
-        root_logger.addHandler(console_handler)
+        console_handler.set_level(log_level)
+        console_handler.set_formatter(ColoredConsoleFormatter())
+        console_handler.add_filter(RequestFilter())
+        root_logger.add_handler(console_handler)
 
     # Setup file handler with rotation
     file_handler = logging.handlers.RotatingFileHandler(
         log_dir / log_file,
-        maxBytes=max_bytes,
-        backupCount=backup_count,
+        max_bytes=max_bytes,
+        backup_count=backup_count,
         encoding="utf-8",
     )
-    file_handler.setLevel(log_level)
+    file_handler.set_level(log_level)
 
     # Use structured logging for production
     if app.config.get("FLASK_ENV") == "production":
-        file_handler.setFormatter(StructuredFormatter())
+        file_handler.set_formatter(StructuredFormatter())
     else:
-        file_handler.setFormatter(
+        file_handler.set_formatter(
             logging.Formatter(
                 "%(asctime)s %(levelname)-8s %(name)s: %(message)s "
                 "[%(filename)s:%(lineno)d]"
             )
         )
 
-    file_handler.addFilter(RequestFilter())
-    root_logger.addHandler(file_handler)
+    file_handler.add_filter(RequestFilter())
+    root_logger.add_handler(file_handler)
 
     # Setup error file handler
     error_handler = logging.handlers.RotatingFileHandler(
         log_dir / "error.log",
-        maxBytes=max_bytes,
-        backupCount=backup_count,
+        max_bytes=max_bytes,
+        backup_count=backup_count,
         encoding="utf-8",
     )
-    error_handler.setLevel(logging.ERROR)
-    error_handler.setFormatter(StructuredFormatter())
-    error_handler.addFilter(RequestFilter())
-    root_logger.addHandler(error_handler)
+    error_handler.set_level(logging.ERROR)
+    error_handler.set_formatter(StructuredFormatter())
+    error_handler.add_filter(RequestFilter())
+    root_logger.add_handler(error_handler)
 
     # Setup security log handler
     security_handler = logging.handlers.RotatingFileHandler(
         log_dir / "security.log",
-        maxBytes=max_bytes,
-        backupCount=backup_count,
+        max_bytes=max_bytes,
+        backup_count=backup_count,
         encoding="utf-8",
     )
-    security_handler.setLevel(logging.WARNING)
-    security_handler.setFormatter(StructuredFormatter())
-    security_handler.addFilter(RequestFilter())
+    security_handler.set_level(logging.WARNING)
+    security_handler.set_formatter(StructuredFormatter())
+    security_handler.add_filter(RequestFilter())
 
     # Create security logger
-    security_logger = logging.getLogger("security")
-    security_logger.addHandler(security_handler)
-    security_logger.setLevel(logging.WARNING)
+    security_logger = logging.get_logger("security")
+    security_logger.add_handler(security_handler)
+    security_logger.set_level(logging.WARNING)
 
     # Configure third-party loggers
     _configure_third_party_loggers(app)
 
     # Setup Flask app logger
-    app.logger.setLevel(log_level)
+    app.logger.set_level(log_level)
 
-    app.logger.info(f"Logging configured - Level: {logging.getLevelName(log_level)}")
+    app.logger.info(f"Logging configured - Level: {logging.get_level_name(log_level)}")
 
 
 def _configure_third_party_loggers(app: Flask) -> None:
@@ -291,18 +291,18 @@ def _configure_third_party_loggers(app: Flask) -> None:
     """
     # Suppress noisy loggers in production
     if not app.debug:
-        logging.getLogger("werkzeug").setLevel(logging.WARNING)
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
-        logging.getLogger("requests").setLevel(logging.WARNING)
-        logging.getLogger("boto3").setLevel(logging.WARNING)
-        logging.getLogger("botocore").setLevel(logging.WARNING)
-        logging.getLogger("s3transfer").setLevel(logging.WARNING)
+        logging.get_logger("werkzeug").set_level(logging.WARNING)
+        logging.get_logger("urllib3").set_level(logging.WARNING)
+        logging.get_logger("requests").set_level(logging.WARNING)
+        logging.get_logger("boto3").set_level(logging.WARNING)
+        logging.get_logger("botocore").set_level(logging.WARNING)
+        logging.get_logger("s3transfer").set_level(logging.WARNING)
 
     # Set SQLAlchemy logging
     if app.config.get("SQLALCHEMY_ECHO"):
-        logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+        logging.get_logger("sqlalchemy.engine").set_level(logging.INFO)
     else:
-        logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+        logging.get_logger("sqlalchemy.engine").set_level(logging.WARNING)
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -314,7 +314,7 @@ def get_logger(name: str) -> logging.Logger:
     Returns:
         Configured logger instance
     """
-    return logging.getLogger(name)
+    return logging.get_logger(name)
 
 
 def log_security_event(
@@ -331,7 +331,7 @@ def log_security_event(
         details: Additional event details
         level: Log level
     """
-    security_logger = logging.getLogger("security")
+    security_logger = logging.get_logger("security")
 
     # Build security context
     context = {

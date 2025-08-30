@@ -191,6 +191,11 @@ class TestHandleServiceErrors:
         """Test decorator with service class method."""
 
         class TestService:
+            """
+            TODO: Add class description.
+
+            Class TestService.
+            """
             @handle_service_errors()
             def test_method(self):
                 raise ValueError("Test error")
@@ -224,6 +229,11 @@ class TestServiceOperation:
 
     @patch("app.utils.service_helpers.logger")
     @patch("time.time")
+        """
+        TODO: Add class description.
+
+        Class TestService.
+        """
     def test_operation_with_metrics(self, mock_time, mock_logger):
         """Test decorator with metrics tracking."""
         mock_time.side_effect = [0.0, 1.0]

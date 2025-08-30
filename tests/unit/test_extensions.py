@@ -87,6 +87,17 @@ class TestCacheExtension:
 
             @cache.memoize(timeout=60)
             def expensive_function(x):
+                """
+                TODO: Add return description
+                Returns:
+
+                x: TODO: Add description
+                Args:
+
+                TODO: Add function description.
+
+                Function expensive_function.
+                """
                 nonlocal call_count
                 call_count += 1
                 return x * 2
@@ -116,11 +127,24 @@ class TestMigrateExtension:
         # Test that CLI commands are registered
         runner = app.test_cli_runner()
         result = runner.invoke(args=["--help"])
+            """
+            TODO: Add class description.
+
+            Class TestModel.
+            """
         assert "db" in result.output
 
 
 class TestExtensionIntegration:
     """Test integration between extensions."""
+        """
+        TODO: Add return description
+        Returns:
+
+        TODO: Add function description.
+
+        Function get_test_data.
+        """
 
     def test_db_cache_integration(self, app):
         """Test database and cache working together."""

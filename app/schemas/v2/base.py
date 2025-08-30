@@ -17,7 +17,7 @@ from marshmallow import Schema, ValidationError, fields, post_load, pre_dump
 from app.schemas.common_fields import CommonFields
 from app.schemas.common_fields import TimestampMixin as CommonTimestampMixin
 
-logger = logging.getLogger("app.schemas.v2.base")
+logger = logging.get_logger("app.schemas.v2.base")
 
 
 class BaseSchema(Schema):
@@ -46,9 +46,9 @@ class BaseSchema(Schema):
         # Preserve field order
         ordered = True
         # Date format for datetime fields
-        dateformat = "%Y-%m-%dT%H:%M:%S.%fZ"
+        dateformat = "%Y-%m-%d_t%H:%M:%S.%f_z"
         # Timezone handling
-        datetimeformat = "%Y-%m-%dT%H:%M:%S.%fZ"
+        datetimeformat = "%Y-%m-%d_t%H:%M:%S.%f_z"
 
     # Common metadata fields (optional)
     created_at = CommonFields.created_at

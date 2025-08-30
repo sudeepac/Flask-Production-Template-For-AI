@@ -203,6 +203,33 @@ def mock_ml_model(monkeypatch):
     """
 
     class MockModel:
+        """
+            """
+            TODO: Add return description
+            Returns:
+                """
+                TODO: Add return description
+                Returns:
+
+                data: TODO: Add description
+                Args:
+
+                TODO: Add function description.
+
+                Function predict_proba.
+                """
+
+            data: TODO: Add description
+            Args:
+
+            TODO: Add function description.
+
+            Function predict.
+            """
+        TODO: Add class description.
+
+        Class MockModel.
+        """
         def predict(self, data):
             return [0.5] * len(data)
 

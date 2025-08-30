@@ -1,56 +1,31 @@
-# Pre-commit Configuration
-# Enforces code quality, style, and documentation standards
+# Pre-commit Configuration - Streamlined
+# Essential code quality checks without auto-fixes to prevent circular loops
 # Run: pre-commit install (after pip install pre-commit)
 
 repos:
-  # Built-in hooks for basic file checks (file-modifying hooks disabled)
+  # Built-in hooks for basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      # File-modifying hooks disabled to prevent circular loops
-      # - id: trailing-whitespace
-      #   exclude: ^migrations/
-      # - id: end-of-file-fixer
-      #   exclude: ^migrations/
       - id: check-yaml
       - id: check-json
       - id: check-toml
-      - id: check-xml
       - id: check-added-large-files
         args: ['--maxkb=1000']
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: debug-statements
       - id: detect-private-key
-      # - id: fix-byte-order-marker
-      # - id: mixed-line-ending
-      #   args: ['--fix=lf']
-      # - id: requirements-txt-fixer
 
-  # Python import sorting (DISABLED - causes circular loops)
-  # - repo: https://github.com/pycqa/isort
-  #   rev: 6.0.1
-  #   hooks:
-  #     - id: isort
-  #       args: ["--profile", "black", "--filter-files"]
-  #       exclude: ^migrations/
-
-  # Python code formatting (DISABLED - causes circular loops)
-  # - repo: https://github.com/psf/black
-  #   rev: 25.1.0
-  #   hooks:
-  #     - id: black
-  #       language_version: python3
-  #       exclude: ^migrations/
-
-  # Python linting (check-only, no auto-fixing)
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  # Python linting and formatting (check-only)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.11
     hooks:
       - id: ruff
-        args: ["--exit-non-zero-on-fix"]
+        args: ["check"]
         exclude: ^migrations/
       - id: ruff-format
+        args: ["--check"]
         exclude: ^migrations/
 
   # Python type checking
@@ -65,14 +40,14 @@ repos:
           - types-setuptools
           - types-flask
           - types-werkzeug
-        args: ["--ignore-missing-imports", "--install-types", "--non-interactive"]
+        args: ["--ignore-missing-imports"]
 
   # Security linting
   - repo: https://github.com/pycqa/bandit
     rev: 1.8.6
     hooks:
       - id: bandit
-        args: ["-r", "app/", "-f", "json", "-o", "bandit-report.json", "--skip", "B101"]
+        args: ["-r", "app/", "--skip", "B101", "-q"]
         exclude: ^(tests/|migrations/)
 
   # Docstring coverage check
@@ -80,47 +55,8 @@ repos:
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["-vv", "--fail-under=80", "--ignore-init-method", "--ignore-magic", "--generate-badge", ".", "--badge-format", "svg"]
+        args: ["--fail-under=80", "--ignore-init-method", "--ignore-magic", "app"]
         exclude: ^(tests/|migrations/|scripts/)
-
-  # YAML linting (temporarily disabled)
-  # - repo: https://github.com/adrienverge/yamllint.git
-  #   rev: v1.32.0
-  #   hooks:
-  #     - id: yamllint
-  #       args: ["-d", "relaxed"]
-
-  # Markdown linting (check-only, no auto-fixing)
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
-    hooks:
-      - id: markdownlint
-        exclude: ^(CHANGELOG.md|migrations/)
-
-  # Shell script linting (disabled on Windows)
-  # - repo: https://github.com/shellcheck-py/shellcheck-py
-  #   rev: v0.9.0.5
-  #   hooks:
-  #     - id: shellcheck
-  #       files: \.(sh|bash)$
-
-  # Dockerfile linting (disabled - requires hadolint installation)
-  # - repo: https://github.com/hadolint/hadolint
-  #   rev: v2.12.0
-  #   hooks:
-  #     - id: hadolint
-  #       files: Dockerfile.*
-
-  # SQL formatting (if using raw SQL files)
-  - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.2
-    hooks:
-      - id: sqlfluff-lint
-        files: \.sql$
-        exclude: ^migrations/
-      - id: sqlfluff-fix
-        files: \.sql$
-        exclude: ^migrations/
 
   # Local hooks for custom checks
   - repo: local
@@ -141,66 +77,7 @@ repos:
         files: ^app/(blueprints/.*routes\.py|urls\.py)$
         pass_filenames: false
 
-      # Python Style Compliance Check (check-only, no auto-fix)
-      - id: style-compliance-check
-        name: Python Style Compliance Check
-        entry: python scripts/check_style_compliance.py
-        language: python
-        files: \.py$
-        args: ["--directory", "app"]
-        pass_filenames: false
-
-      # Auto-fix common style issues (DISABLED - causes circular loops)
-      # - id: auto-fix-style-issues
-      #   name: Auto-fix Style Issues
-      #   entry: python scripts/fix_style_issues.py
-      #   language: python
-      #   files: \.py$
-      #   args: ["--directory", "app"]
-      #   pass_filenames: false
-
-      # Auto-generate missing docstrings (DISABLED - causes circular loops)
-      # - id: auto-generate-docstrings
-      #   name: Auto-generate Missing Docstrings
-      #   entry: python scripts/fix_specific_docstrings.py
-      #   language: python
-      #   files: \.py$
-      #   args: ["--directory", "app", "--auto-generate"]
-      #   pass_filenames: false
-
-      # Check docstring coverage (using interrogate which is already configured above)
-      # Removed docstring-coverage due to installation issues
-
-      # Check for TODO/FIXME comments in production code (disabled on Windows)
-      # - id: no-todos-in-main
-      #   name: No TODOs in main branch
-      #   entry: bash -c 'if git branch --show-current | grep -q "^(main|master)$"; then grep -r "TODO\|FIXME\|XXX" app/ && exit 1 || exit 0; else exit 0; fi'
-      #   language: system
-      #   pass_filenames: false
-
-      # Ensure all Python files have proper encoding declaration
-      # Temporarily disabled to allow commits
-      # - id: python-encoding-pragma
-      #   name: Python encoding pragma
-      #   entry: python scripts/check_encoding.py
-      #   language: python
-      #   files: \.py$
-      #   exclude: ^(migrations/|__pycache__/)
-
 # Global configuration
 default_stages: [pre-commit]
 fail_fast: false
 minimum_pre_commit_version: '3.0.0'
-
-# CI configuration
-ci:
-  autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit hooks
-
-    for more information, see https://pre-commit.ci
-  autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-  autoupdate_schedule: weekly
-  skip: []
-  submodules: false

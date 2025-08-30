@@ -37,7 +37,7 @@ class BaseTestTemplate(unittest.TestCase):
         app_context: Application context
     """
 
-    def setUp(self) -> None:
+    def set_up(self) -> None:
         """Set up test environment before each test method.
 
         This method is called before each test method and should
@@ -50,9 +50,8 @@ class BaseTestTemplate(unittest.TestCase):
         # self.app_context = self.app.app_context()
         # self.app_context.push()
         # db.create_all()
-        pass
 
-    def tearDown(self) -> None:
+    def tear_down(self) -> None:
         """Clean up test environment after each test method.
 
         This method is called after each test method and should
@@ -62,7 +61,6 @@ class BaseTestTemplate(unittest.TestCase):
         # db.session.remove()
         # db.drop_all()
         # self.app_context.pop()
-        pass
 
     def create_test_user(
         self,
@@ -101,8 +99,8 @@ class BaseTestTemplate(unittest.TestCase):
             response: Flask test response object
             expected_status: Expected HTTP status code
         """
-        self.assertEqual(response.status_code, expected_status)
-        self.assertTrue(response.is_json)
+        self.assert_equal(response.status_code, expected_status)
+        self.assert_true(response.is_json)
 
     def assert_response_error(
         self, response, expected_status: int, expected_error: Optional[str] = None
@@ -114,12 +112,12 @@ class BaseTestTemplate(unittest.TestCase):
             expected_status: Expected HTTP status code
             expected_error: Expected error message (optional)
         """
-        self.assertEqual(response.status_code, expected_status)
+        self.assert_equal(response.status_code, expected_status)
 
         if expected_error:
             data = response.get_json()
-            self.assertIn("error", data)
-            self.assertIn(expected_error.lower(), data["error"].lower())
+            self.assert_in("error", data)
+            self.assert_in(expected_error.lower(), data["error"].lower())
 
     def assert_dict_contains_subset(
         self, subset: Dict[str, Any], dictionary: Dict[str, Any]
@@ -131,8 +129,8 @@ class BaseTestTemplate(unittest.TestCase):
             dictionary: Dictionary to check
         """
         for key, value in subset.items():
-            self.assertIn(key, dictionary)
-            self.assertEqual(dictionary[key], value)
+            self.assert_in(key, dictionary)
+            self.assert_equal(dictionary[key], value)
 
 
 class TestUserServiceTemplate(BaseTestTemplate):
@@ -142,9 +140,9 @@ class TestUserServiceTemplate(BaseTestTemplate):
     conventions for testing service layer functionality.
     """
 
-    def setUp(self) -> None:
+    def set_up(self) -> None:
         """Set up user service tests."""
-        super().setUp()
+        super().set_up()
         # Note: In actual implementation, initialize user service
         # self.user_service = UserService()
         self.user_service = Mock()
@@ -177,9 +175,9 @@ class TestUserServiceTemplate(BaseTestTemplate):
         result = self.user_service.create(user_data)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result.email, user_data["email"])
-        self.assertEqual(result.username, user_data["username"])
+        self.assert_is_not_none(result)
+        self.assert_equal(result.email, user_data["email"])
+        self.assert_equal(result.username, user_data["username"])
         self.user_service.create.assert_called_once_with(user_data)
 
     def test_create_user_when_duplicate_email_then_raises_exception(self) -> None:
@@ -202,10 +200,10 @@ class TestUserServiceTemplate(BaseTestTemplate):
         )
 
         # Act & Assert
-        with self.assertRaises(DuplicateException) as context:
+        with self.assert_raises(DuplicateException) as context:
             self.user_service.create(user_data)
 
-        self.assertIn("email already exists", str(context.exception))
+        self.assert_in("email already exists", str(context.exception))
 
     def test_create_user_when_invalid_email_then_raises_validation_error(self) -> None:
         """Test user creation with invalid email raises validation error.
@@ -227,10 +225,10 @@ class TestUserServiceTemplate(BaseTestTemplate):
         )
 
         # Act & Assert
-        with self.assertRaises(ValidationException) as context:
+        with self.assert_raises(ValidationException) as context:
             self.user_service.create(user_data)
 
-        self.assertIn("Invalid email", str(context.exception))
+        self.assert_in("Invalid email", str(context.exception))
 
     def test_get_user_by_id_when_exists_then_returns_user(self) -> None:
         """Test getting user by ID when user exists returns user.
@@ -258,8 +256,8 @@ class TestUserServiceTemplate(BaseTestTemplate):
         result = self.user_service.get_by_id(user_id)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result.id, user_id)
+        self.assert_is_not_none(result)
+        self.assert_equal(result.id, user_id)
         self.user_service.get_by_id.assert_called_once_with(user_id)
 
     def test_get_user_by_id_when_not_exists_then_raises_not_found(self) -> None:
@@ -282,10 +280,10 @@ class TestUserServiceTemplate(BaseTestTemplate):
         )
 
         # Act & Assert
-        with self.assertRaises(NotFoundException) as context:
+        with self.assert_raises(NotFoundException) as context:
             self.user_service.get_by_id(user_id)
 
-        self.assertIn(str(user_id), str(context.exception))
+        self.assert_in(str(user_id), str(context.exception))
 
     def test_authenticate_user_when_valid_credentials_then_returns_user(self) -> None:
         """Test user authentication with valid credentials returns user.
@@ -303,7 +301,7 @@ class TestUserServiceTemplate(BaseTestTemplate):
         """
         # Arrange
         email = "test@example.com"
-        password = "testpassword123"
+        password = os.getenv("PASSWORD")
         expected_user = Mock()
         expected_user.email = email
 
@@ -313,8 +311,8 @@ class TestUserServiceTemplate(BaseTestTemplate):
         result = self.user_service.authenticate_user(email, password)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result.email, email)
+        self.assert_is_not_none(result)
+        self.assert_equal(result.email, email)
         self.user_service.authenticate_user.assert_called_once_with(email, password)
 
     def test_authenticate_user_when_invalid_password_then_raises_validation_error(
@@ -331,7 +329,7 @@ class TestUserServiceTemplate(BaseTestTemplate):
         """
         # Arrange
         email = "test@example.com"
-        password = "wrongpassword"
+        password = os.getenv("PASSWORD")
 
         from ai_templates.flask_service import ValidationException
 
@@ -340,10 +338,10 @@ class TestUserServiceTemplate(BaseTestTemplate):
         )
 
         # Act & Assert
-        with self.assertRaises(ValidationException) as context:
+        with self.assert_raises(ValidationException) as context:
             self.user_service.authenticate_user(email, password)
 
-        self.assertIn("Invalid credentials", str(context.exception))
+        self.assert_in("Invalid credentials", str(context.exception))
 
     def test_update_user_when_valid_data_then_returns_updated_user(self) -> None:
         """Test user update with valid data returns updated user.
@@ -373,9 +371,9 @@ class TestUserServiceTemplate(BaseTestTemplate):
         result = self.user_service.update(user_id, update_data)
 
         # Assert
-        self.assertIsNotNone(result)
-        self.assertEqual(result.first_name, update_data["first_name"])
-        self.assertEqual(result.last_name, update_data["last_name"])
+        self.assert_is_not_none(result)
+        self.assert_equal(result.first_name, update_data["first_name"])
+        self.assert_equal(result.last_name, update_data["last_name"])
         self.user_service.update.assert_called_once_with(user_id, update_data)
 
     def test_delete_user_when_exists_then_returns_true(self) -> None:
@@ -400,7 +398,7 @@ class TestUserServiceTemplate(BaseTestTemplate):
         result = self.user_service.delete(user_id)
 
         # Assert
-        self.assertTrue(result)
+        self.assert_true(result)
         self.user_service.delete.assert_called_once_with(user_id, True)
 
 
@@ -434,8 +432,8 @@ class TestUserModelTemplate(BaseTestTemplate):
         user.username = user_data["username"]
 
         # Assert
-        self.assertEqual(user.email, user_data["email"])
-        self.assertEqual(user.username, user_data["username"])
+        self.assert_equal(user.email, user_data["email"])
+        self.assert_equal(user.username, user_data["username"])
 
     def test_user_password_hashing_when_set_password_then_hashes_correctly(
         self,
@@ -455,7 +453,7 @@ class TestUserModelTemplate(BaseTestTemplate):
         """
         # Arrange
         user = Mock()
-        password = "testpassword123"
+        password = os.getenv("PASSWORD")
 
         # Mock password hashing behavior
         user.set_password = Mock()
@@ -466,7 +464,7 @@ class TestUserModelTemplate(BaseTestTemplate):
 
         # Assert
         user.set_password.assert_called_once_with(password)
-        self.assertTrue(user.check_password(password))
+        self.assert_true(user.check_password(password))
 
     def test_user_email_validation_when_invalid_email_then_raises_error(self) -> None:
         """Test user email validation when invalid email raises error.
@@ -481,12 +479,12 @@ class TestUserModelTemplate(BaseTestTemplate):
         invalid_email = "invalid-email"
 
         # Act & Assert
-        with self.assertRaises(ValueError) as context:
+        with self.assert_raises(ValueError) as context:
             # Note: In actual implementation, this would trigger validation
             # User(email=invalid_email, username="test")
             raise ValueError("Invalid email format")
 
-        self.assertIn("Invalid email", str(context.exception))
+        self.assert_in("Invalid email", str(context.exception))
 
 
 # Pytest-style test functions (alternative to unittest classes)
@@ -578,12 +576,12 @@ class TestIntegrationTemplate(BaseTestTemplate):
         response = mock_response
 
         # Assert
-        self.assertEqual(response.status_code, 201)
+        self.assert_equal(response.status_code, 201)
         data = response.get_json()
-        self.assertIn("User registered successfully", data["message"])
-        self.assertIn("user_id", data)
+        self.assert_in("User registered successfully", data["message"])
+        self.assert_in("user_id", data)
 
         # Note: In actual implementation, verify database and email
         # mock_email.assert_called_once()
         # user = User.query.filter_by(email=registration_data['email']).first()
-        # self.assertIsNotNone(user)
+        # self.assert_is_not_none(user)

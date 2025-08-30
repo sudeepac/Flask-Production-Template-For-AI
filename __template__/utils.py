@@ -42,7 +42,7 @@ def validate_template_name(name: str) -> bool:
         return False
 
     # Check for valid characters (alphanumeric, spaces, hyphens, underscores)
-    pattern = r"^[a-zA-Z0-9\s\-_]+$"
+    pattern = r"^[a-z_a-Z0-9\s\-_]+$"
     if not re.match(pattern, name.strip()):
         return False
 
@@ -73,7 +73,7 @@ def sanitize_template_name(name: str) -> str:
     sanitized = re.sub(r"\s+", " ", sanitized)
 
     # Remove invalid characters
-    sanitized = re.sub(r"[^a-zA-Z0-9\s\-_]", "", sanitized)
+    sanitized = re.sub(r"[^a-z_a-Z0-9\s\-_]", "", sanitized)
 
     # Limit length
     if len(sanitized) > 100:
@@ -114,7 +114,7 @@ def validate_template_tags(tags: List[str]) -> List[str]:
             continue
 
         # Validate tag format
-        if not re.match(r"^[a-zA-Z0-9\-_]+$", sanitized_tag):
+        if not re.match(r"^[a-z_a-Z0-9\-_]+$", sanitized_tag):
             raise ValidationError(f'Tag "{tag}" contains invalid characters')
 
         # Check tag length
@@ -385,6 +385,25 @@ def require_template_permission(permission: str):
     """
 
     def decorator(f: Callable) -> Callable:
+        """
+        TODO: Add return description
+            """
+            TODO: Add return description
+            Returns:
+
+            TODO: Add function description.
+
+            Function decorated_function.
+            """
+        Returns:
+
+        f: TODO: Add description
+        Args:
+
+        TODO: Add function description.
+
+        Function decorator.
+        """
         @wraps(f)
         def decorated_function(*args, **kwargs):
             # This is a placeholder implementation

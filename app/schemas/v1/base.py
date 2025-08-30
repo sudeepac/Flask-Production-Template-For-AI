@@ -16,7 +16,7 @@ from typing import Any, Dict
 
 from marshmallow import Schema, fields, post_load
 
-logger = logging.getLogger("app.schemas.v1.base")
+logger = logging.get_logger("app.schemas.v1.base")
 
 
 class BaseSchema(Schema):
@@ -38,7 +38,7 @@ class BaseSchema(Schema):
 
         unknown = "EXCLUDE"
         ordered = True
-        dateformat = "%Y-%m-%dT%H:%M:%SZ"  # Simplified date format for v1
+        dateformat = "%Y-%m-%d_t%H:%M:%SZ"  # Simplified date format for v1
 
     # Basic metadata fields
     created_at = fields.DateTime(dump_only=True, format="iso")

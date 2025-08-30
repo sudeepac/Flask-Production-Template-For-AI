@@ -30,7 +30,7 @@ from typing import Any, Dict, List
 
 # Flask imports removed - not used in this module
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 
 # Common utility functions that are used frequently
@@ -282,7 +282,7 @@ def is_valid_email(email: str) -> bool:
     """
     import re
 
-    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    pattern = r"^[a-z_a-Z0-9._%+-]+@[a-z_a-Z0-9.-]+\.[a-z_a-Z]{2,}$"
     return bool(re.match(pattern, email))
 
 

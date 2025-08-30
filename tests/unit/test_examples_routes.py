@@ -1112,7 +1112,6 @@ class TestExamplesRoutesIntegration:
 
         # This is verified by the individual endpoint tests,
         # but this integration test ensures the patterns are consistent
-        pass
 
     def test_logging_consistency_across_endpoints(self):
         """Test that logging patterns are consistent across endpoints."""
@@ -1125,7 +1124,6 @@ class TestExamplesRoutesIntegration:
 
         # This pattern is verified in individual tests
         # but this integration test documents the expected consistency
-        pass
 
     def test_response_format_consistency(self):
         """Test that response formats are consistent across endpoints."""
@@ -1137,4 +1135,3 @@ class TestExamplesRoutesIntegration:
         success_response_fields = ["message", "data"]
 
         # This pattern is verified in individual tests
-        pass

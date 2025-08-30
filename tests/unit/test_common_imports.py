@@ -171,6 +171,11 @@ class TestBaseRequestSchema:
         """Test that BaseRequestSchema can be extended."""
 
         class TestRequestSchema(BaseRequestSchema):
+            """
+            TODO: Add class description.
+
+            Class TestRequestSchema.
+            """
             name = fields.Str(required=True)
             email = fields.Email(required=True)
 
@@ -182,6 +187,11 @@ class TestBaseRequestSchema:
         valid_data = {"name": "John Doe", "email": "john@example.com"}
         result = schema.load(valid_data)
         assert result == valid_data
+            """
+            TODO: Add class description.
+
+            Class TestRequestSchema.
+            """
 
     def test_base_request_schema_validation_error(self):
         """Test that extended BaseRequestSchema handles validation errors."""
@@ -219,6 +229,11 @@ class TestBaseResponseSchema:
         """Test that BaseResponseSchema inherits from Schema."""
         assert issubclass(BaseResponseSchema, Schema)
 
+    """
+    TODO: Add class description.
+
+    Class TestResponseSchema.
+    """
     def test_base_response_schema_instantiation(self):
         """Test that BaseResponseSchema can be instantiated."""
         schema = BaseResponseSchema()
@@ -237,6 +252,11 @@ class TestBaseResponseSchema:
         assert isinstance(schema, BaseResponseSchema)
         assert isinstance(schema, Schema)
 
+    """
+    TODO: Add class description.
+
+    Class TestResponseSchema.
+    """
         # Test serialization
         test_data = {
             "id": 1,
@@ -277,6 +297,11 @@ class TestBaseResponseSchema:
         # Should be able to dump any dict
         test_data = {"any_field": "any_value"}
         result = schema.dump(test_data)
+            """
+            TODO: Add class description.
+
+            Class TimestampedResponseSchema.
+            """
         assert result == test_data
 
     def test_base_schemas_are_different_classes(self):
@@ -292,6 +317,16 @@ class TestBaseResponseSchema:
 
 class TestSchemaIntegration:
     """Test integration between base schemas and common functionality."""
+        """
+        TODO: Add class description.
+
+        Class CreateItemRequestSchema.
+            """
+            TODO: Add class description.
+
+            Class ItemResponseSchema.
+            """
+        """
 
     def test_schemas_with_timestamp_utility(self):
         """Test using schemas with timestamp utility function."""

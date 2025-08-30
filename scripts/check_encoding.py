@@ -89,7 +89,7 @@ def check_python_encoding():
         print("[ERROR] Python encoding errors found:")
         for error in errors:
             print(f"  - {error}")
-        print("\nTo fix: Add '# -*- coding: utf-8 -*-' to the first or second line")
+        print("\n_to fix: Add '# -*- coding: utf-8 -*-' to the first or second line")
         return False
 
     if warnings:

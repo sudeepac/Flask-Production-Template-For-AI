@@ -86,13 +86,13 @@ class APIDocumentation:
         """
         return {
             "Bearer": {
-                "type": "apiKey",
+                "type": "api_key",
                 "in": "header",
                 "name": "Authorization",
                 "description": "JWT Bearer token. Format: Bearer <token>",
             },
             "ApiKey": {
-                "type": "apiKey",
+                "type": "api_key",
                 "in": "header",
                 "name": "X-API-Key",
                 "description": "API Key for authentication",

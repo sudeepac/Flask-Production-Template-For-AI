@@ -29,7 +29,7 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Flask
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 # Blueprint registry
 _BLUEPRINT_REGISTRY: Dict[str, Blueprint] = {}
@@ -107,7 +107,7 @@ def register_blueprints(app: Flask) -> None:
     Args:
         app: Flask application instance
     """
-    logger = logging.getLogger(__name__)
+    logger = logging.get_logger(__name__)
     logger.info("Starting blueprint registration process")
 
     # Import and register core blueprints
@@ -166,7 +166,7 @@ def register_blueprints(app: Flask) -> None:
     logger.info(f"Registered {registered_count} blueprints")
 
     # Log blueprint information
-    if logger.isEnabledFor(logging.DEBUG):
+    if logger.is_enabled_for(logging.DEBUG):
         for name, info in get_blueprint_info().items():
             logger.debug(f"Blueprint '{name}': {info}")
 

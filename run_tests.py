@@ -219,7 +219,7 @@ def run_all_tests(args):
 
     end_time = time.time()
     duration = end_time - start_time
-    print(f"\nAll tests completed in {duration:.2f} seconds")
+    print(f"\n_all tests completed in {duration:.2f} seconds")
 
 
 def run_linting(args):
@@ -229,22 +229,22 @@ def run_linting(args):
     print("=" * 50)
 
     # Run flake8
-    print("\nRunning flake8...")
+    print("\n_running flake8...")
     cmd = [sys.executable, "-m", "flake8", "app/", "tests/"]
     run_command(cmd)
 
     # Run black check
-    print("\nChecking code formatting with black...")
+    print("\n_checking code formatting with black...")
     cmd = [sys.executable, "-m", "black", "--check", "app/", "tests/"]
     run_command(cmd)
 
     # Run isort check
-    print("\nChecking import sorting with isort...")
+    print("\n_checking import sorting with isort...")
     cmd = [sys.executable, "-m", "isort", "--check-only", "app/", "tests/"]
     run_command(cmd)
 
     # Run mypy
-    print("\nRunning type checking with mypy...")
+    print("\n_running type checking with mypy...")
     cmd = [sys.executable, "-m", "mypy", "app/"]
     run_command(cmd)
 
@@ -256,7 +256,7 @@ def run_security_checks(args):
     print("=" * 50)
 
     # Run bandit
-    print("\nRunning bandit security checks...")
+    print("\n_running bandit security checks...")
     cmd = [
         sys.executable,
         "-m",
@@ -271,7 +271,7 @@ def run_security_checks(args):
     run_command(cmd)
 
     # Run safety
-    print("\nChecking dependencies for known vulnerabilities...")
+    print("\n_checking dependencies for known vulnerabilities...")
     cmd = [
         sys.executable,
         "-m",
@@ -316,7 +316,7 @@ def generate_test_report(args):
 
     run_command(cmd)
 
-    print("\nTest reports generated in 'reports/' directory:")
+    print("\n_test reports generated in 'reports/' directory:")
     print("- HTML report: reports/test_report.html")
     print("- Coverage report: reports/coverage/index.html")
     print("- JSON report: reports/test_report.json")
@@ -326,7 +326,7 @@ def generate_test_report(args):
 
 def clean_test_artifacts():
     """Clean test artifacts and cache files."""
-    print("\nCleaning test artifacts...")
+    print("\n_cleaning test artifacts...")
 
     import shutil
 

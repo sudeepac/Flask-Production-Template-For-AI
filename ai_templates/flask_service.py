@@ -65,8 +65,6 @@ class ValidationException(ServiceException):
     business rules or validation requirements.
     """
 
-    pass
-
 
 class NotFoundException(ServiceException):
     """Exception raised when requested resource is not found.
@@ -75,8 +73,6 @@ class NotFoundException(ServiceException):
     doesn't exist in the database.
     """
 
-    pass
-
 
 class DuplicateException(ServiceException):
     """Exception raised when attempting to create duplicate resource.
@@ -84,8 +80,6 @@ class DuplicateException(ServiceException):
     This exception should be raised when trying to create a resource
     that violates uniqueness constraints.
     """
-
-    pass
 
 
 class BaseServiceTemplate(ABC):
@@ -341,7 +335,6 @@ class BaseServiceTemplate(ABC):
         Raises:
             ValidationException: If validation fails
         """
-        pass
 
     @abstractmethod
     def _validate_update_data(
@@ -359,7 +352,6 @@ class BaseServiceTemplate(ABC):
         Raises:
             ValidationException: If validation fails
         """
-        pass
 
     def _apply_filters(self, query, filters: Dict[str, Any]):
         """Apply filters to query.

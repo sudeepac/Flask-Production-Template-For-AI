@@ -247,6 +247,14 @@ class TestRegisterEndpoint:
 
         # Mock no existing username but existing email
         def mock_filter_by(**kwargs):
+            """
+            TODO: Add return description
+            Returns:
+
+            TODO: Add function description.
+
+            Function mock_filter_by.
+            """
             if "username" in kwargs:
                 return Mock(first=Mock(return_value=None))
             elif "email" in kwargs:
@@ -824,4 +832,3 @@ class TestAuthRoutesIntegration:
 
         # This is verified by the individual endpoint tests,
         # but this integration test ensures the patterns are consistent
-        pass

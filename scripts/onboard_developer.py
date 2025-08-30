@@ -211,13 +211,13 @@ class DeveloperOnboarding:
                 )
 
             # Set project-specific Git hooks path
-            self.run_command(["git", "config", "core.hooksPath", ".git/hooks"])
+            self.run_command(["git", "config", "core.hooks_path", ".git/hooks"])
 
             # Configure Git to use the project's gitignore
             gitignore_path = self.project_root / ".gitignore"
             if gitignore_path.exists():
                 self.run_command(
-                    ["git", "config", "core.excludesFile", str(gitignore_path)]
+                    ["git", "config", "core.excludes_file", str(gitignore_path)]
                 )
 
             self.print_success("Git settings configured")
@@ -356,7 +356,7 @@ class DeveloperOnboarding:
             print(f"\n{Colors.RED}⚠️  Some issues occurred during setup:{Colors.END}")
             for error in self.errors:
                 print(f"   • {error}")
-            print("\nPlease resolve these issues before proceeding.")
+            print("\n_please resolve these issues before proceeding.")
 
     def run(self) -> bool:
         """Run the complete onboarding process."""

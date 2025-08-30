@@ -30,7 +30,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.exceptions import HTTPException
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 
 def handle_validation_error(error: ValidationError):

@@ -615,7 +615,7 @@ def main() -> None:
         generate_tests_for_blueprint(blueprint_name)
 
     print("\n✅ Test generation completed!")
-    print("\nNext steps:")
+    print("\n_next steps:")
     print("1. Review generated test files")
     print("2. Implement TODO test cases")
     print("3. Add test fixtures and data")

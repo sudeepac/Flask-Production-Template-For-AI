@@ -182,25 +182,23 @@ class QualityMonitor:
             ["coverage", "json"]
         )
 
-        if report_exit_code == 0:
-            try:
-                # Read the generated coverage.json file
-                coverage_file = self.project_root / "coverage.json"
-                if coverage_file.exists():
-                    with open(coverage_file, "r") as f:
-                        data = json.load(f)
-                    coverage_percent = data.get("totals", {}).get(
-                        "percent_covered", 0.0
-                    )
+        # Try to read coverage data regardless of report generation exit code
+        try:
+            # Read the generated coverage.json file
+            coverage_file = self.project_root / "coverage.json"
+            if coverage_file.exists():
+                with open(coverage_file, "r") as f:
+                    data = json.load(f)
+                coverage_percent = data.get("totals", {}).get("percent_covered", 0.0)
 
-                    # If tests failed but we got coverage data, apply a penalty
-                    if exit_code != 0 and coverage_percent > 0:
-                        # Reduce coverage score by 20% if tests are failing
-                        coverage_percent *= 0.8
+                # If tests failed but we got coverage data, apply a penalty
+                if exit_code != 0 and coverage_percent > 0:
+                    # Reduce coverage score by 20% if tests are failing
+                    coverage_percent *= 0.8
 
-                    return coverage_percent
-            except Exception:
-                pass
+                return coverage_percent
+        except Exception:
+            pass
 
         # Fallback: check if any tests exist at all
         test_files = list(self.project_root.rglob("tests/**/*.py"))
@@ -209,7 +207,7 @@ class QualityMonitor:
         if not test_files:
             return 0.0  # No tests exist
 
-        # Tests exist but failed to run - return very low coverage
+        # Tests exist but failed to run and no coverage data available - return very low coverage
         return 5.0
 
     def get_linting_issues(self) -> int:
@@ -507,9 +505,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.test_coverage >= 80
-                else "warning"
-                if metrics.test_coverage >= 60
-                else "error"
+                else "warning" if metrics.test_coverage >= 60 else "error"
             ),
         )
 
@@ -519,9 +515,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.docstring_coverage >= 90
-                else "warning"
-                if metrics.docstring_coverage >= 70
-                else "error"
+                else "warning" if metrics.docstring_coverage >= 70 else "error"
             ),
         )
 
@@ -531,9 +525,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.type_coverage >= 80
-                else "warning"
-                if metrics.type_coverage >= 60
-                else "error"
+                else "warning" if metrics.type_coverage >= 60 else "error"
             ),
         )
 
@@ -543,9 +535,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.complexity_score <= 10
-                else "warning"
-                if metrics.complexity_score <= 15
-                else "error"
+                else "warning" if metrics.complexity_score <= 15 else "error"
             ),
         )
 
@@ -555,9 +545,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.duplication_percentage <= 5
-                else "warning"
-                if metrics.duplication_percentage <= 10
-                else "error"
+                else "warning" if metrics.duplication_percentage <= 10 else "error"
             ),
         )
 
@@ -567,9 +555,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.linting_issues == 0
-                else "warning"
-                if metrics.linting_issues <= 5
-                else "error"
+                else "warning" if metrics.linting_issues <= 5 else "error"
             ),
         )
 
@@ -587,9 +573,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.technical_debt_minutes <= 30
-                else "warning"
-                if metrics.technical_debt_minutes <= 120
-                else "error"
+                else "warning" if metrics.technical_debt_minutes <= 120 else "error"
             ),
         )
 
@@ -599,9 +583,7 @@ class QualityMonitor:
             (
                 "good"
                 if metrics.quality_score >= self.threshold
-                else "warning"
-                if metrics.quality_score >= 6
-                else "error"
+                else "warning" if metrics.quality_score >= 6 else "error"
             ),
         )
 
@@ -680,9 +662,7 @@ class QualityMonitor:
                 trend_icon = (
                     "📈"
                     if coverage_change > 0
-                    else "📉"
-                    if coverage_change < 0
-                    else "➡️"
+                    else "📉" if coverage_change < 0 else "➡️"
                 )
                 print(f"  Test Coverage: {trend_icon} {coverage_change:+.1f}%")
 

@@ -813,7 +813,7 @@ Examples:
             print(f"Docstrings added: {result['docstrings_added']}")
 
             if args.verbose and result["breakdown"]:
-                print("\nBreakdown:")
+                print("\n_breakdown:")
                 for doc_type, count in result["breakdown"].items():
                     if count > 0 and doc_type != "total":
                         print(f"  {doc_type}: {count}")
@@ -827,7 +827,7 @@ Examples:
             print(f"Total docstrings added: {results['total_docstrings']}")
 
             if args.verbose:
-                print("\nFile details:")
+                print("\n_file details:")
                 for file_result in results["files"]:
                     if file_result["docstrings_added"] > 0:
                         print(
@@ -835,7 +835,7 @@ Examples:
                         )
 
             if not auto_generate and results["total_docstrings"] > 0:
-                print("\nRun with --auto-generate to apply changes")
+                print("\n_run with --auto-generate to apply changes")
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

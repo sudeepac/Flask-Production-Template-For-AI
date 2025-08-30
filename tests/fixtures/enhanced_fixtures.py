@@ -381,6 +381,11 @@ class TestSchemaFactory:
         """Create a user validation schema for testing."""
 
         class UserSchema(Schema):
+            """
+            TODO: Add class description.
+
+            Class UserSchema.
+            """
             username = fields.Str(required=True, validate=lambda x: len(x) >= 3)
             email = fields.Email(required=True)
             age = fields.Int(required=False, validate=lambda x: x >= 0)
@@ -388,6 +393,11 @@ class TestSchemaFactory:
 
         return UserSchema()
 
+    """
+    TODO: Add class description.
+
+    Class PostSchema.
+    """
     @staticmethod
     def create_post_schema():
         """Create a post validation schema for testing."""

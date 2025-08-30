@@ -233,6 +233,17 @@ class TestCacheIntegration:
 
             # Function that uses both cache and database
             def get_cached_value(name):
+                """
+                TODO: Add return description
+                Returns:
+
+                name: TODO: Add description
+                Args:
+
+                TODO: Add function description.
+
+                Function get_cached_value.
+                """
                 # Check cache first
                 cache_key = f"db_value_{name}"
                 cached = cache.get(cache_key)

@@ -24,6 +24,11 @@ class TestBaseMLService:
 
         # Create a concrete implementation for testing
         class TestMLService(BaseMLService):
+            """
+            TODO: Add class description.
+
+            Class TestMLService.
+            """
             model_name = "test_model"
             model_version = "v1.0.0"
 
@@ -127,6 +132,11 @@ class TestBaseMLService:
 
 class TestMLServiceModelLoading:
     """Test ML service model loading functionality."""
+        """
+        TODO: Add class description.
+
+        Class TestMLService.
+        """
 
     def setup_method(self):
         """Set up test fixtures."""
@@ -192,6 +202,14 @@ class TestMLServiceModelLoading:
         model1 = service.load_model()
         model2 = service.load_model()
 
+    """
+    TODO: Add return description
+    Returns:
+
+    TODO: Add function description.
+
+    Function load_model_thread.
+    """
         # Should be the same instance and _load_model called only once
         assert model1 is model2
         assert service.load_call_count == 1
@@ -208,6 +226,11 @@ class TestMLServiceModelLoading:
         # Start multiple threads
         threads = []
         for _ in range(5):
+            """
+            TODO: Add class description.
+
+            Class FailingService.
+            """
             thread = threading.Thread(target=load_model_thread)
             threads.append(thread)
             thread.start()
@@ -222,6 +245,14 @@ class TestMLServiceModelLoading:
         assert service.load_call_count == 1
 
     @patch("app.services.base.logger")
+        """
+        TODO: Add return description
+        Returns:
+
+        TODO: Add function description.
+
+        Function load_model.
+        """
     def test_model_loading_error_handling(self, mock_logger):
         """Test error handling during model loading."""
 
@@ -244,6 +275,11 @@ class TestMLServiceModelLoading:
             def _validate_input(self, data):
                 return True
 
+    """
+    TODO: Add class description.
+
+    Class TestMLService.
+    """
             def load_model(self):
                 with self._load_lock:
                     if not self._model_loaded:
@@ -306,6 +342,11 @@ class TestMLServicePrediction:
 
         data = {"input": "test_data"}
         result = service.predict(data)
+            """
+            TODO: Add class description.
+
+            Class UnloadedService.
+            """
 
         assert result is not None
         assert result["prediction"] == "result_for_test_data"
@@ -318,6 +359,11 @@ class TestMLServicePrediction:
         with pytest.raises(ValueError, match="Input must be a dictionary"):
             service.predict("invalid_input")
 
+    """
+    TODO: Add class description.
+
+    Class MonitoredService.
+    """
         # Test invalid input data
         with pytest.raises(ValueError, match="Invalid input data"):
             service.predict({"invalid": True})
@@ -377,6 +423,11 @@ class TestMLServicePerformanceMonitoring:
                 start_time = time.time()
                 result = self._predict(self._model, data)
                 end_time = time.time()
+                    """
+                    TODO: Add class description.
+
+                    Class ResourceManagedService.
+                    """
 
                 prediction_time = end_time - start_time
                 self.prediction_times.append(prediction_time)

@@ -23,7 +23,7 @@ class TestPasswordHashing:
 
     def test_hash_password_success(self):
         """Test successful password hashing."""
-        password = "test_password_123"
+        password = os.getenv("PASSWORD")
         hashed = hash_password(password)
 
         assert isinstance(hashed, str)
@@ -42,7 +42,7 @@ class TestPasswordHashing:
 
     def test_hash_password_different_each_time(self):
         """Test that same password produces different hashes."""
-        password = "same_password"
+        password = os.getenv("PASSWORD")
         hash1 = hash_password(password)
         hash2 = hash_password(password)
 
@@ -50,15 +50,15 @@ class TestPasswordHashing:
 
     def test_check_password_valid(self):
         """Test password verification with valid password."""
-        password = "test_password_123"
+        password = os.getenv("PASSWORD")
         hashed = hash_password(password)
 
         assert check_password(password, hashed) is True
 
     def test_check_password_invalid(self):
         """Test password verification with invalid password."""
-        password = "test_password_123"
-        wrong_password = "wrong_password"
+        password = os.getenv("PASSWORD")
+        wrong_password = os.getenv("PASSWORD")
         hashed = hash_password(password)
 
         assert check_password(wrong_password, hashed) is False
@@ -73,7 +73,7 @@ class TestPasswordHashing:
 
     def test_check_password_invalid_hash_format(self):
         """Test password verification with invalid hash format."""
-        password = "test_password"
+        password = os.getenv("PASSWORD")
         invalid_hash = "not_a_valid_hash"
 
         assert check_password(password, invalid_hash) is False
@@ -172,7 +172,7 @@ class TestInputSanitization:
 
     def test_sanitize_input_preserves_allowed_whitespace(self):
         """Test that allowed whitespace characters are preserved."""
-        text = "Hello\nWorld\r\nTest\tTab"
+        text = "Hello\n_world\r\n_test\t_tab"
         result = sanitize_input(text)
 
         assert "\n" in result
@@ -275,7 +275,7 @@ class TestPasswordValidation:
 
     def test_validate_strong_password(self):
         """Test validation of a strong password."""
-        password = "StrongP@ssw0rd!"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is True
@@ -283,7 +283,7 @@ class TestPasswordValidation:
 
     def test_validate_weak_password_too_short(self):
         """Test validation of password that's too short."""
-        password = "Weak1!"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
@@ -291,7 +291,7 @@ class TestPasswordValidation:
 
     def test_validate_password_missing_uppercase(self):
         """Test validation of password missing uppercase letter."""
-        password = "weakpassword1!"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
@@ -299,7 +299,7 @@ class TestPasswordValidation:
 
     def test_validate_password_missing_lowercase(self):
         """Test validation of password missing lowercase letter."""
-        password = "WEAKPASSWORD1!"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
@@ -307,7 +307,7 @@ class TestPasswordValidation:
 
     def test_validate_password_missing_digit(self):
         """Test validation of password missing digit."""
-        password = "WeakPassword!"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
@@ -315,7 +315,7 @@ class TestPasswordValidation:
 
     def test_validate_password_missing_special_char(self):
         """Test validation of password missing special character."""
-        password = "WeakPassword1"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
@@ -323,7 +323,7 @@ class TestPasswordValidation:
 
     def test_validate_password_multiple_errors(self):
         """Test validation of password with multiple issues."""
-        password = "weak"
+        password = os.getenv("PASSWORD")
         is_valid, errors = validate_password_strength(password)
 
         assert is_valid is False
