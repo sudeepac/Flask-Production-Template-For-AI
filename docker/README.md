@@ -40,12 +40,14 @@ cp .env.example .env.prod
 ## Architecture
 
 ### Development Stack
+
 - **Flask App**: Development server with hot reload
 - **PostgreSQL**: Database with persistent storage
 - **Redis**: Caching and session storage
 - **Volumes**: Code mounted for live editing
 
 ### Production Stack
+
 - **Flask App**: Gunicorn WSGI server with multiple workers
 - **Nginx**: Reverse proxy with SSL termination and load balancing
 - **PostgreSQL**: Optimized database configuration
@@ -55,16 +57,19 @@ cp .env.example .env.prod
 ## Configuration Files
 
 ### Core Files
+
 - `Dockerfile`: Multi-stage build (development/production)
 - `docker-compose.yml`: Base services configuration
 - `docker-compose.prod.yml`: Production overrides
 - `.dockerignore`: Build context optimization
 
 ### Scripts
+
 - `docker-dev.ps1`: Development environment management
 - `docker-prod.ps1`: Production deployment management
 
 ### Nginx
+
 - `nginx/nginx.conf`: Production reverse proxy configuration
 - SSL termination and security headers
 - Rate limiting and load balancing
@@ -73,6 +78,7 @@ cp .env.example .env.prod
 ## Environment Variables
 
 ### Development (.env)
+
 ```bash
 FLASK_ENV=development
 FLASK_DEBUG=1
@@ -83,6 +89,7 @@ JWT_SECRET_KEY=dev-jwt-secret
 ```
 
 ### Production (.env.prod)
+
 ```bash
 FLASK_ENV=production
 FLASK_DEBUG=0
@@ -98,19 +105,22 @@ JWT_SECRET_KEY=secure-jwt-secret
 ## Service Endpoints
 
 ### Development
-- **Application**: http://localhost:5000
+
+- **Application**: <http://localhost:5000>
 - **Database**: localhost:5432
 - **Redis**: localhost:6379
 
 ### Production
-- **Application (Nginx)**: https://localhost
-- **Application (Direct)**: http://localhost:5000
+
+- **Application (Nginx)**: <https://localhost>
+- **Application (Direct)**: <http://localhost:5000>
 - **Database**: localhost:5432 (if exposed)
 - **Redis**: localhost:6379 (if exposed)
 
 ## Management Commands
 
 ### Development Commands
+
 ```powershell
 # Start with rebuild
 .\docker-dev.ps1 up -Build
@@ -131,6 +141,7 @@ JWT_SECRET_KEY=secure-jwt-secret
 ```
 
 ### Production Commands
+
 ```powershell
 # Deploy
 .\docker-prod.ps1 deploy -Build
@@ -153,17 +164,20 @@ JWT_SECRET_KEY=secure-jwt-secret
 ## Health Checks
 
 ### Application Health
+
 - **Endpoint**: `/health/`
 - **Interval**: 30 seconds
 - **Timeout**: 10 seconds
 - **Retries**: 3
 
 ### Database Health
+
 - Connection testing
 - Query performance monitoring
 - Automatic failover (in clustered setup)
 
 ### Redis Health
+
 - Connection testing
 - Memory usage monitoring
 - Cache hit rate tracking
@@ -171,12 +185,14 @@ JWT_SECRET_KEY=secure-jwt-secret
 ## Security Features
 
 ### Nginx Security
+
 - SSL/TLS termination
 - Security headers (HSTS, CSP, etc.)
 - Rate limiting
 - Request size limits
 
 ### Container Security
+
 - Non-root user execution
 - Minimal base images
 - Security scanning
@@ -185,6 +201,7 @@ JWT_SECRET_KEY=secure-jwt-secret
 ## Monitoring & Logging
 
 ### Application Logs
+
 ```powershell
 # View all logs
 docker-compose logs
@@ -197,6 +214,7 @@ docker-compose logs -t app
 ```
 
 ### Resource Monitoring
+
 ```powershell
 # Container stats
 docker stats
@@ -213,29 +231,33 @@ docker-compose exec app curl -f http://localhost:5000/health/
 ### Common Issues
 
 1. **Port conflicts**
+
    ```powershell
    # Check port usage
    netstat -an | findstr :5000
    ```
 
 2. **Database connection issues**
+
    ```powershell
    # Check database logs
    docker-compose logs db
-   
+
    # Test connection
    docker-compose exec app python -c "from app.extensions import db; print(db.engine.execute('SELECT 1').scalar())"
    ```
 
 3. **Memory issues**
+
    ```powershell
    # Check resource usage
    docker stats --no-stream
-   
+
    # Increase memory limits in docker-compose.prod.yml
    ```
 
 4. **SSL certificate issues**
+
    ```powershell
    # Generate self-signed certificates for testing
    mkdir -p docker/nginx/ssl
@@ -264,6 +286,7 @@ docker-compose exec app curl -f http://localhost:5000/health/
 ## Backup & Recovery
 
 ### Database Backup
+
 ```powershell
 # Automated backup
 .\docker-prod.ps1 backup
@@ -273,6 +296,7 @@ docker-compose exec db pg_dump -U postgres flask_production_template_prod > back
 ```
 
 ### Database Restore
+
 ```powershell
 # Automated restore
 .\docker-prod.ps1 restore
@@ -282,6 +306,7 @@ cat backup.sql | docker-compose exec -T db psql -U postgres -d flask_production_
 ```
 
 ### Volume Backup
+
 ```powershell
 # Backup volumes
 docker run --rm -v flask_production_template_postgres_data:/data -v ${PWD}:/backup alpine tar czf /backup/postgres_backup.tar.gz -C /data .

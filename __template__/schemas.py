@@ -11,294 +11,278 @@ Schema Types:
 See AI_INSTRUCTIONS.md §3 for schema implementation guidelines.
 """
 
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, ValidationError, fields, validate, validates
+
 from app.schemas.v2.base import BaseSchema, TimestampMixin
-from app.schemas.v2.common import PaginatedResponseSchema, DataResponseSchema
+from app.schemas.v2.common import DataResponseSchema, PaginatedResponseSchema
 
 
 class TemplateRequestSchema(BaseSchema):
     """Schema for template creation/update requests.
-    
+
     This schema validates incoming request data for creating
     or updating template resources.
     """
-    
+
     name = fields.Str(
         required=True,
         validate=validate.Length(min=1, max=100),
-        metadata={'description': 'Template name'}
+        metadata={"description": "Template name"},
     )
-    
+
     description = fields.Str(
         required=False,
         validate=validate.Length(max=500),
-        metadata={'description': 'Template description'}
+        metadata={"description": "Template description"},
     )
-    
+
     category = fields.Str(
         required=False,
-        validate=validate.OneOf(['general', 'specific', 'custom']),
-        metadata={'description': 'Template category'}
+        validate=validate.OneOf(["general", "specific", "custom"]),
+        metadata={"description": "Template category"},
     )
-    
+
     tags = fields.List(
         fields.Str(validate=validate.Length(min=1, max=50)),
         required=False,
         validate=validate.Length(max=10),
-        metadata={'description': 'Template tags'}
+        metadata={"description": "Template tags"},
     )
-    
+
     is_active = fields.Bool(
         required=False,
         default=True,
-        metadata={'description': 'Whether template is active'}
+        metadata={"description": "Whether template is active"},
     )
-    
+
     metadata = fields.Dict(
-        required=False,
-        metadata={'description': 'Additional template metadata'}
+        required=False, metadata={"description": "Additional template metadata"}
     )
-    
-    @validates('name')
+
+    @validates("name")
     def validate_name(self, value):
         """Validate template name.
-        
+
         Args:
             value: Template name to validate
-            
+
         Raises:
             ValidationError: If name is invalid
         """
         if not value.strip():
-            raise ValidationError('Template name cannot be empty')
-        
+            raise ValidationError("Template name cannot be empty")
+
         # Check for reserved names
-        reserved_names = ['admin', 'api', 'system', 'default']
+        reserved_names = ["admin", "api", "system", "default"]
         if value.lower() in reserved_names:
             raise ValidationError(f'Template name "{value}" is reserved')
-    
-    @validates('tags')
+
+    @validates("tags")
     def validate_tags(self, value):
         """Validate template tags.
-        
+
         Args:
             value: List of tags to validate
-            
+
         Raises:
             ValidationError: If tags are invalid
         """
         if value:
             # Check for duplicate tags
             if len(value) != len(set(value)):
-                raise ValidationError('Duplicate tags are not allowed')
-            
+                raise ValidationError("Duplicate tags are not allowed")
+
             # Check for invalid characters
             for tag in value:
-                if not tag.replace('-', '').replace('_', '').isalnum():
+                if not tag.replace("-", "").replace("_", "").isalnum():
                     raise ValidationError(
                         f'Tag "{tag}" contains invalid characters. '
-                        'Only alphanumeric characters, hyphens, and underscores are allowed.'
+                        "Only alphanumeric characters, hyphens, and underscores are allowed."
                     )
 
 
 class TemplateSchema(BaseSchema, TimestampMixin):
     """Schema for template resource representation.
-    
+
     This schema defines the structure of template resources
     in API responses.
     """
-    
-    id = fields.Int(
-        required=True,
-        metadata={'description': 'Template ID'}
-    )
-    
-    name = fields.Str(
-        required=True,
-        metadata={'description': 'Template name'}
-    )
-    
+
+    id = fields.Int(required=True, metadata={"description": "Template ID"})
+
+    name = fields.Str(required=True, metadata={"description": "Template name"})
+
     description = fields.Str(
         required=False,
         allow_none=True,
-        metadata={'description': 'Template description'}
+        metadata={"description": "Template description"},
     )
-    
+
     category = fields.Str(
-        required=False,
-        allow_none=True,
-        metadata={'description': 'Template category'}
+        required=False, allow_none=True, metadata={"description": "Template category"}
     )
-    
+
     tags = fields.List(
-        fields.Str(),
-        required=False,
-        metadata={'description': 'Template tags'}
+        fields.Str(), required=False, metadata={"description": "Template tags"}
     )
-    
+
     is_active = fields.Bool(
-        required=True,
-        metadata={'description': 'Whether template is active'}
+        required=True, metadata={"description": "Whether template is active"}
     )
-    
+
     usage_count = fields.Int(
         required=False,
-        metadata={'description': 'Number of times template has been used'}
+        metadata={"description": "Number of times template has been used"},
     )
-    
+
     metadata = fields.Dict(
         required=False,
         allow_none=True,
-        metadata={'description': 'Additional template metadata'}
+        metadata={"description": "Additional template metadata"},
     )
-    
+
     # Computed fields
-    url = fields.Method('get_url', metadata={'description': 'Template URL'})
-    
+    url = fields.Method("get_url", metadata={"description": "Template URL"})
+
     def get_url(self, obj):
         """Generate URL for the template.
-        
+
         Args:
             obj: Template object
-            
+
         Returns:
             str: Template URL
         """
         from flask import url_for
-        return url_for('template.get_template', template_id=obj.get('id'), _external=True)
+
+        return url_for(
+            "template.get_template", template_id=obj.get("id"), _external=True
+        )
 
 
 class TemplateResponseSchema(DataResponseSchema):
     """Schema for single template responses.
-    
+
     This schema wraps a single template resource in the
     standard API response format.
     """
-    
+
     data = fields.Nested(
-        TemplateSchema,
-        required=True,
-        metadata={'description': 'Template data'}
+        TemplateSchema, required=True, metadata={"description": "Template data"}
     )
 
 
 class TemplateListResponseSchema(PaginatedResponseSchema):
     """Schema for template list responses.
-    
+
     This schema wraps a list of template resources with
     pagination information in the standard API response format.
     """
-    
+
     data = fields.List(
         fields.Nested(TemplateSchema),
         required=True,
-        metadata={'description': 'List of templates'}
+        metadata={"description": "List of templates"},
     )
 
 
 class TemplateSearchSchema(BaseSchema):
     """Schema for template search requests.
-    
+
     This schema validates search parameters for finding templates.
     """
-    
+
     query = fields.Str(
         required=False,
         validate=validate.Length(min=1, max=100),
-        metadata={'description': 'Search query'}
+        metadata={"description": "Search query"},
     )
-    
+
     category = fields.Str(
         required=False,
-        validate=validate.OneOf(['general', 'specific', 'custom']),
-        metadata={'description': 'Filter by category'}
+        validate=validate.OneOf(["general", "specific", "custom"]),
+        metadata={"description": "Filter by category"},
     )
-    
+
     tags = fields.List(
-        fields.Str(),
-        required=False,
-        metadata={'description': 'Filter by tags'}
+        fields.Str(), required=False, metadata={"description": "Filter by tags"}
     )
-    
+
     is_active = fields.Bool(
-        required=False,
-        metadata={'description': 'Filter by active status'}
+        required=False, metadata={"description": "Filter by active status"}
     )
-    
+
     sort_by = fields.Str(
         required=False,
-        validate=validate.OneOf(['name', 'created_at', 'updated_at', 'usage_count']),
-        default='created_at',
-        metadata={'description': 'Sort field'}
+        validate=validate.OneOf(["name", "created_at", "updated_at", "usage_count"]),
+        default="created_at",
+        metadata={"description": "Sort field"},
     )
-    
+
     sort_order = fields.Str(
         required=False,
-        validate=validate.OneOf(['asc', 'desc']),
-        default='desc',
-        metadata={'description': 'Sort order'}
+        validate=validate.OneOf(["asc", "desc"]),
+        default="desc",
+        metadata={"description": "Sort order"},
     )
-    
+
     page = fields.Int(
         required=False,
         validate=validate.Range(min=1),
         default=1,
-        metadata={'description': 'Page number'}
+        metadata={"description": "Page number"},
     )
-    
+
     per_page = fields.Int(
         required=False,
         validate=validate.Range(min=1, max=100),
         default=10,
-        metadata={'description': 'Items per page'}
+        metadata={"description": "Items per page"},
     )
 
 
 class TemplateBulkActionSchema(BaseSchema):
     """Schema for bulk actions on templates.
-    
+
     This schema validates requests for performing bulk operations
     on multiple templates.
     """
-    
+
     action = fields.Str(
         required=True,
-        validate=validate.OneOf(['activate', 'deactivate', 'delete']),
-        metadata={'description': 'Bulk action to perform'}
+        validate=validate.OneOf(["activate", "deactivate", "delete"]),
+        metadata={"description": "Bulk action to perform"},
     )
-    
+
     template_ids = fields.List(
         fields.Int(validate=validate.Range(min=1)),
         required=True,
         validate=validate.Length(min=1, max=100),
-        metadata={'description': 'List of template IDs'}
+        metadata={"description": "List of template IDs"},
     )
-    
-    @validates('template_ids')
+
+    @validates("template_ids")
     def validate_template_ids(self, value):
         """Validate template IDs.
-        
+
         Args:
             value: List of template IDs to validate
-            
+
         Raises:
             ValidationError: If IDs are invalid
         """
         if len(value) != len(set(value)):
-            raise ValidationError('Duplicate template IDs are not allowed')
+            raise ValidationError("Duplicate template IDs are not allowed")
 
 
 class TemplateBulkActionResponseSchema(DataResponseSchema):
     """Schema for bulk action responses.
-    
+
     This schema defines the response format for bulk operations.
     """
-    
-    data = fields.Dict(
-        required=True,
-        metadata={'description': 'Bulk action results'}
-    )
-    
+
+    data = fields.Dict(required=True, metadata={"description": "Bulk action results"})
+
     # The data dict should contain:
     # - action: str - The action performed
     # - total: int - Total number of items processed
@@ -309,50 +293,45 @@ class TemplateBulkActionResponseSchema(DataResponseSchema):
 
 class TemplateStatsSchema(BaseSchema):
     """Schema for template statistics.
-    
+
     This schema defines the structure for template usage statistics.
     """
-    
+
     total_templates = fields.Int(
-        required=True,
-        metadata={'description': 'Total number of templates'}
+        required=True, metadata={"description": "Total number of templates"}
     )
-    
+
     active_templates = fields.Int(
-        required=True,
-        metadata={'description': 'Number of active templates'}
+        required=True, metadata={"description": "Number of active templates"}
     )
-    
+
     inactive_templates = fields.Int(
-        required=True,
-        metadata={'description': 'Number of inactive templates'}
+        required=True, metadata={"description": "Number of inactive templates"}
     )
-    
+
     categories = fields.Dict(
-        required=True,
-        metadata={'description': 'Template count by category'}
+        required=True, metadata={"description": "Template count by category"}
     )
-    
+
     popular_tags = fields.List(
         fields.Dict(),
         required=True,
-        metadata={'description': 'Most popular tags with usage counts'}
+        metadata={"description": "Most popular tags with usage counts"},
     )
-    
+
     usage_stats = fields.Dict(
-        required=True,
-        metadata={'description': 'Template usage statistics'}
+        required=True, metadata={"description": "Template usage statistics"}
     )
 
 
 class TemplateStatsResponseSchema(DataResponseSchema):
     """Schema for template statistics responses.
-    
+
     This schema wraps template statistics in the standard API response format.
     """
-    
+
     data = fields.Nested(
         TemplateStatsSchema,
         required=True,
-        metadata={'description': 'Template statistics'}
+        metadata={"description": "Template statistics"},
     )

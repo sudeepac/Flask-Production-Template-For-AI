@@ -52,11 +52,11 @@ templates/
 </head>
 <body>
     {% block navbar %}{% endblock %}
-    
+
     <main>
         {% block content %}{% endblock %}
     </main>
-    
+
     {% block footer %}{% endblock %}
     {% block scripts %}{% endblock %}
 </body>
@@ -84,18 +84,21 @@ templates/
 ## Jinja2 Features
 
 ### Variables
+
 ```html
 <h1>{{ page_title }}</h1>
 <p>Welcome, {{ user.name }}!</p>
 ```
 
 ### Filters
+
 ```html
 <p>{{ content|truncate(100) }}</p>
 <p>{{ date|strftime('%Y-%m-%d') }}</p>
 ```
 
 ### Control Structures
+
 ```html
 {% if user.is_authenticated %}
     <p>Welcome back!</p>
@@ -109,11 +112,13 @@ templates/
 ```
 
 ### Includes
+
 ```html
 {% include 'components/navbar.html' %}
 ```
 
 ### Macros
+
 ```html
 {% macro render_field(field) %}
     <div class="form-group">

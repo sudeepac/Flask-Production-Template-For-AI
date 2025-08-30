@@ -9,6 +9,7 @@ This directory contains scripts for managing the database, migrations, and seedi
 A comprehensive CLI tool for managing database schema and migrations.
 
 **Usage:**
+
 ```bash
 # Initialize database with migrations
 python scripts/db_init.py init
@@ -34,6 +35,7 @@ python scripts/db_init.py --help
 A CLI tool for populating the database with sample data for development and testing.
 
 **Usage:**
+
 ```bash
 # Seed with default amounts (10 users, 20 posts)
 python scripts/db_seeds.py
@@ -53,16 +55,19 @@ python scripts/db_seeds.py --help
 For a fresh database setup:
 
 1. **Initialize the database:**
+
    ```bash
    python scripts/db_init.py init
    ```
 
 2. **Seed with sample data:**
+
    ```bash
    python scripts/db_seeds.py --users 10 --posts 20
    ```
 
 3. **Start the development server:**
+
    ```bash
    python -m flask run
    ```
@@ -72,16 +77,19 @@ For a fresh database setup:
 When making model changes:
 
 1. **Create a migration:**
+
    ```bash
    python scripts/db_init.py migrate -m "Describe your changes"
    ```
 
 2. **Apply the migration:**
+
    ```bash
    python scripts/db_init.py upgrade
    ```
 
 3. **Re-seed if needed:**
+
    ```bash
    python scripts/db_seeds.py --clear --users 5 --posts 10
    ```
@@ -89,6 +97,7 @@ When making model changes:
 ## Features
 
 ### Database Initialization (`db_init.py`)
+
 - ✅ Initialize Flask-Migrate
 - ✅ Create initial migrations
 - ✅ Apply/rollback migrations
@@ -97,6 +106,7 @@ When making model changes:
 - ✅ CLI interface with help
 
 ### Database Seeding (`db_seeds.py`)
+
 - ✅ Generate realistic sample users
 - ✅ Generate sample blog posts with relationships
 - ✅ Configurable data amounts
@@ -107,6 +117,7 @@ When making model changes:
 ## Dependencies
 
 These scripts require:
+
 - `flask-migrate` - Database migrations
 - `click` - CLI interface
 - `faker` - Sample data generation (for seeding)

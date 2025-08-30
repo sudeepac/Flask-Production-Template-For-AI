@@ -27,18 +27,22 @@ models/
 ## Supported Model Formats
 
 ### Scikit-learn
+
 - `.pkl` - Pickle format (default)
 - `.joblib` - Joblib format (recommended for large models)
 
 ### PyTorch
+
 - `.pth` - PyTorch state dict
 - `.pt` - PyTorch model
 
 ### TensorFlow
+
 - `.h5` - Keras HDF5 format
 - `.pb` - TensorFlow SavedModel
 
 ### ONNX
+
 - `.onnx` - Open Neural Network Exchange format
 
 ## Model Naming Convention
@@ -48,6 +52,7 @@ models/
 ```
 
 Examples:
+
 - `fraud_detector_v1_20240101.pkl`
 - `sentiment_classifier_v2_20240115.joblib`
 - `recommendation_engine_v3_20240201.pth`
@@ -89,7 +94,7 @@ from app.services.base import BaseMLService
 class FraudDetectionService(BaseMLService):
     model_name = "fraud_detector"
     model_version = "v1"
-    
+
     def predict(self, data):
         # Model is available as self.model
         return self.model.predict(data)

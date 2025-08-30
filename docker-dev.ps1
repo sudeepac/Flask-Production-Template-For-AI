@@ -6,7 +6,7 @@ param(
     [Parameter(Position=0)]
     [ValidateSet('up', 'down', 'restart', 'logs', 'shell', 'db-shell', 'redis-shell', 'build', 'clean', 'status')]
     [string]$Command = 'up',
-    
+
     [switch]$Build,
     [switch]$Detach,
     [switch]$Follow
@@ -64,15 +64,15 @@ function Test-DockerRunning {
 
 function Start-Environment {
     Write-ColorOutput "Starting development environment..." $Green
-    
+
     $buildFlag = if ($Build) { "--build" } else { "" }
     $detachFlag = if ($Detach) { "-d" } else { "" }
-    
+
     $cmd = "docker-compose up $buildFlag $detachFlag"
     Write-ColorOutput "Running: $cmd" $Yellow
-    
+
     Invoke-Expression $cmd
-    
+
     if ($LASTEXITCODE -eq 0 -and $Detach) {
         Write-ColorOutput "Environment started successfully!" $Green
         Write-ColorOutput "Application: http://localhost:5000" $Blue
@@ -121,26 +121,26 @@ function Build-Containers {
 
 function Clean-Environment {
     Write-ColorOutput "Cleaning up Docker environment..." $Yellow
-    
+
     # Stop and remove containers
     docker-compose down -v --remove-orphans
-    
+
     # Remove images
     $images = docker images "flask-production-template*" -q
     if ($images) {
         docker rmi $images -f
     }
-    
+
     # Clean up unused resources
     docker system prune -f
-    
+
     Write-ColorOutput "Cleanup completed." $Green
 }
 
 function Show-Status {
     Write-ColorOutput "Container Status:" $Blue
     docker-compose ps
-    
+
     Write-Host ""
     Write-ColorOutput "Resource Usage:" $Blue
     docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"

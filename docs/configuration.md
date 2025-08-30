@@ -64,6 +64,7 @@ LOG_FILE=/path/to/logfile.log  # Optional file logging
 ## Environment-Specific Defaults
 
 ### Development
+
 - Debug mode enabled
 - SQLite database
 - Detailed logging (DEBUG level)
@@ -71,12 +72,14 @@ LOG_FILE=/path/to/logfile.log  # Optional file logging
 - CSRF protection enabled
 
 ### Testing
+
 - In-memory SQLite database
 - Minimal logging (WARNING level)
 - Debug mode disabled
 - Fast test execution
 
 ### Production
+
 - Debug mode disabled
 - Requires SECRET_KEY and DATABASE_URL
 - Warning-level logging
@@ -88,28 +91,33 @@ LOG_FILE=/path/to/logfile.log  # Optional file logging
 The system is organized into logical components:
 
 ### DatabaseConfig
+
 - Connection settings
 - Pool configuration
 - Query recording
 
 ### CacheConfig
+
 - Redis or simple cache
 - Timeout settings
 - Key prefixes
 
 ### SecurityConfig
+
 - Secret keys
 - JWT settings
 - CSRF protection
 - HTTPS enforcement
 
 ### APIConfig
+
 - Versioning
 - Rate limiting
 - CORS settings
 - Documentation
 
 ### LoggingConfig
+
 - Log levels
 - Output formats
 - File logging
@@ -194,21 +202,27 @@ app.config.update(config_manager.get_config())
 ### Common Issues
 
 1. **Missing SECRET_KEY in Production**
+
    ```
    ValueError: SECRET_KEY: Production secret key is required
    ```
+
    Solution: Set `SECRET_KEY` environment variable
 
 2. **Database Connection Errors**
+
    ```
    sqlalchemy.exc.OperationalError
    ```
+
    Solution: Check `DATABASE_URL` format and database availability
 
 3. **Redis Connection Issues**
+
    ```
    redis.exceptions.ConnectionError
    ```
+
    Solution: Verify `REDIS_URL` or use simple cache (`CACHE_TYPE=simple`)
 
 ### Debug Configuration

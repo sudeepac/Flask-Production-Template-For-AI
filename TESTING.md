@@ -229,18 +229,18 @@ from app import create_app
 
 class TestExample:
     """Test class for example functionality."""
-    
+
     def test_basic_functionality(self, app, client):
         """Test basic functionality."""
         response = client.get('/')
         assert response.status_code == 200
-    
+
     @pytest.mark.slow
     def test_slow_operation(self, app):
         """Test that takes longer to run."""
         # Slow test implementation
         pass
-    
+
     @pytest.mark.parametrize("input_data,expected", [
         ("test1", "result1"),
         ("test2", "result2"),
@@ -503,10 +503,10 @@ def pytest_collection_modifyitems(config, items):
 def test_with_performance_monitoring(self, performance_monitor):
     """Test with performance monitoring."""
     performance_monitor.start()
-    
+
     # Your test code here
     result = expensive_operation()
-    
+
     stats = performance_monitor.stop()
     assert stats['duration'] < 1.0  # Should complete in under 1 second
     assert result is not None

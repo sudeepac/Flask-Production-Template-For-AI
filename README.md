@@ -13,6 +13,7 @@ Welcome to the **Flask Production Template for AI** - a comprehensive, battle-te
 Whether you're building REST APIs, web applications, microservices, or ML-powered services, this template includes everything you need: security features, database integration, testing frameworks, Docker support, and deployment configurations. It follows industry best practices and includes detailed documentation to help both human developers and AI assistants understand and extend the codebase effectively.
 
 **Key Benefits:**
+
 - 🚀 **Rapid Development**: Get from idea to production in minutes, not hours
 - 🛡️ **Enterprise-Ready**: Built-in security, monitoring, and error handling
 - 🤖 **AI-Friendly**: Structured for easy understanding by coding assistants
@@ -24,12 +25,14 @@ Whether you're building REST APIs, web applications, microservices, or ML-powere
 **⚠️ IMPORTANT: Before writing any code, please read [`AI_INSTRUCTIONS.md`](./AI_INSTRUCTIONS.md) first!**
 
 This file contains:
+
 - Project architecture and coding standards
 - Directory structure rules
 - Development workflow guidelines
 - Code generation templates
 
 **Quick AI Setup:**
+
 ```bash
 # Read the AI instructions first
 cat AI_INSTRUCTIONS.md
@@ -42,6 +45,7 @@ cat AI_INSTRUCTIONS.md
 ## 🎯 What is this?
 
 This template provides everything you need to build a **production-ready Flask application** with:
+
 - ✅ **Security** (JWT authentication, input validation)
 - ✅ **Scalability** (caching, database optimization)
 - ✅ **Maintainability** (testing, documentation, CI/CD)
@@ -54,6 +58,7 @@ This template provides everything you need to build a **production-ready Flask a
 ### Option 1: Quick Setup (Recommended)
 
 **Windows:**
+
 ```powershell
 git clone <your-repo-url>
 cd flask-production-template
@@ -61,6 +66,7 @@ cd flask-production-template
 ```
 
 **macOS/Linux:**
+
 ```bash
 git clone <your-repo-url>
 cd flask-production-template
@@ -74,6 +80,7 @@ chmod +x scripts/quickstart.sh && ./scripts/quickstart.sh
 **Step-by-step:**
 
 1. **Clone and setup**:
+
    ```bash
    git clone <your-repo-url>
    cd flask-production-template
@@ -83,17 +90,20 @@ chmod +x scripts/quickstart.sh && ./scripts/quickstart.sh
    ```
 
 2. **Configure environment** (⚠️ **Important**):
+
    ```bash
    cp .env.example .env
    # Edit .env file - see "Environment Setup" section below
    ```
 
 3. **Initialize database**:
+
    ```bash
    flask db upgrade
    ```
 
 4. **Start the server**:
+
    ```bash
    flask run
    ```
@@ -105,18 +115,21 @@ chmod +x scripts/quickstart.sh && ./scripts/quickstart.sh
 ## 📖 What's Next?
 
 **👋 New to this template?** Start here:
+
 1. 📝 [Environment Setup](#-environment-setup) - **Required first step**
 2. 🏗️ [Project Structure](#-project-structure) - Understand the codebase
 3. 🧪 [Testing Guide](TESTING.md) - Run tests and understand quality
 4. 🤝 [Contributing Guide](CONTRIBUTING.md) - Development workflow
 
 **🚀 Ready to build?** Jump to:
+
 - 🔌 [API Documentation](#-api-endpoints) - Available endpoints
 - 🛠️ [Adding Features](#-adding-features) - Extend the template
 - 🐳 [Docker Setup](#-docker-deployment) - Containerized development
 - 🔒 [Security Guide](#-security) - Production security
 
 **📚 Deep dive documentation:**
+
 - 📋 [Configuration Guide](docs/configuration.md) - Advanced settings
 - 🔍 [Error Handling & Logging](docs/error_handling_and_logging.md) - Debugging
 - 🚀 [Deployment Guide](#-deployment) - Production deployment
@@ -126,11 +139,13 @@ chmod +x scripts/quickstart.sh && ./scripts/quickstart.sh
 > ⚠️ **This step is required** - The application won't start without proper environment configuration.
 
 ### 1. Copy Environment Template
+
 ```bash
 cp .env.example .env
 ```
 
 ### 2. Generate Secure Keys
+
 ```bash
 # Run these commands and copy the output to your .env file
 python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
@@ -138,6 +153,7 @@ python -c "import secrets; print('JWT_SECRET_KEY=' + secrets.token_hex(32))"
 ```
 
 ### 3. Edit Your .env File
+
 Open `.env` and update these **required** settings:
 
 ```env
@@ -156,6 +172,7 @@ FLASK_DEBUG=True
 **Need help?** See the [complete environment variables guide](#-environment-variables) below.
 
 ### 4. Test Your Setup
+
 ```bash
 flask run
 # Visit: http://localhost:5000/docs
@@ -180,6 +197,7 @@ flask-production-template/
 ```
 
 **🎯 Quick orientation:**
+
 - **Adding a new API?** → `app/blueprints/`
 - **Business logic?** → `app/services/`
 - **Data validation?** → `app/schemas/`
@@ -211,6 +229,7 @@ flask-production-template/
 ### Quick Blueprint Creation
 
 1. **Copy the template**:
+
    ```bash
    cp -r __template__ app/blueprints/my_feature
    ```
@@ -259,6 +278,7 @@ pytest -v
 ## 🐳 Docker Deployment
 
 ### Development
+
 ```bash
 # Build and run
 docker-compose up --build
@@ -268,6 +288,7 @@ docker-compose up -d
 ```
 
 ### Production
+
 ```bash
 # Use production configuration
 docker-compose -f docker-compose.prod.yml up -d
@@ -309,12 +330,14 @@ pytest --cov=app --cov-report=html
 ## 🚀 Deployment
 
 ### Quick Deploy with Docker
+
 ```bash
 # Production deployment
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ### Production Checklist
+
 - ✅ Set `FLASK_ENV=production`
 - ✅ Use strong secret keys
 - ✅ Configure production database
@@ -329,12 +352,14 @@ docker-compose -f docker-compose.prod.yml up -d
 ### Quick Security Checklist
 
 **🔑 Environment Security:**
+
 - ✅ Never commit `.env` files
 - ✅ Use strong generated keys (see [Environment Setup](#-environment-setup))
 - ✅ Different keys per environment
 - ✅ `FLASK_DEBUG=False` in production
 
 **🛡️ Production Security:**
+
 - ✅ HTTPS enabled
 - ✅ Rate limiting configured
 - ✅ Input validation on all endpoints
@@ -360,19 +385,23 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## 📚 Resources & Support
 
-**📖 Documentation:**
+**📚 Documentation:**
+
 - [AI Instructions](AI_INSTRUCTIONS.md) - **Essential for AI coding assistants**
 - [Contributing Guide](CONTRIBUTING.md) - Development workflow
+- [Python Style Guide](docs/python_style_guide.md) - Comprehensive coding standards
 - [Testing Guide](TESTING.md) - Running tests
 - [Configuration Guide](docs/configuration.md) - Advanced settings
 - [Error Handling & Logging](docs/error_handling_and_logging.md) - Debugging
 
 **🔗 Links:**
+
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [Flask-RESTful](https://flask-restful.readthedocs.io/)
 - [SQLAlchemy](https://docs.sqlalchemy.org/)
 
 **💬 Support:**
+
 - 🐛 [Report Issues](https://github.com/your-repo/issues)
 - 💡 [Feature Requests](https://github.com/your-repo/discussions)
 - 📧 [Contact](mailto:your-email@example.com)

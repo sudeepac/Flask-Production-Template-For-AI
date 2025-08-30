@@ -24,6 +24,7 @@ We pledge to make participation in our project a harassment-free experience for 
 ### Our Standards
 
 **Positive behavior includes:**
+
 - Using welcoming and inclusive language
 - Being respectful of differing viewpoints and experiences
 - Gracefully accepting constructive criticism
@@ -31,6 +32,7 @@ We pledge to make participation in our project a harassment-free experience for 
 - Showing empathy towards other community members
 
 **Unacceptable behavior includes:**
+
 - The use of sexualized language or imagery
 - Trolling, insulting/derogatory comments, and personal or political attacks
 - Public or private harassment
@@ -49,10 +51,13 @@ We pledge to make participation in our project a harassment-free experience for 
 ### First-time Contributors
 
 1. **Fork the Repository**
+
    ```bash
    # Click the "Fork" button on GitHub
    git clone https://github.com/YOUR_USERNAME/flask-production-template.git
+
 cd flask-production-template
+
    ```
 
 2. **Set Up Remote**
@@ -61,10 +66,11 @@ cd flask-production-template
    ```
 
 3. **Run Quick Start**
+
    ```bash
    # Windows
    .\scripts\quickstart.ps1
-   
+
    # Unix/Linux/macOS
    ./scripts/quickstart.sh
    ```
@@ -78,8 +84,9 @@ If you're using AI coding assistants (GitHub Copilot, Cursor, Claude, etc.), ple
 3. **Test thoroughly** - AI-generated code should pass all existing tests and maintain code quality
 
 **Example prompt for AI assistants:**
+
 ```
-Before writing any code for this Flask project, please read and follow the guidelines in AI_INSTRUCTIONS.md. 
+Before writing any code for this Flask project, please read and follow the guidelines in AI_INSTRUCTIONS.md.
 This file contains the project architecture, coding standards, directory structure rules, and code generation templates.
 ```
 
@@ -88,29 +95,34 @@ This file contains the project architecture, coding standards, directory structu
 ### Environment Setup
 
 1. **Create Virtual Environment**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
 2. **Install Dependencies**
+
    ```bash
    pip install -r requirements.txt
    pip install -r requirements-dev.txt  # Development dependencies
    ```
 
 3. **Install Pre-commit Hooks**
+
    ```bash
    pre-commit install
    ```
 
 4. **Set Up Environment Variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your local configuration
    ```
 
 5. **Initialize Database**
+
    ```bash
    flask db init
    flask db migrate -m "Initial migration"
@@ -160,6 +172,7 @@ This file contains the project architecture, coding standards, directory structu
    - Ask questions if requirements are unclear
 
 2. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -173,24 +186,27 @@ This file contains the project architecture, coding standards, directory structu
    - Keep commits focused and atomic
 
 4. **Test Your Changes**
+
    ```bash
    # Run tests
    pytest
-   
+
    # Check coverage
    pytest --cov=app
-   
+
    # Run linting
    pre-commit run --all-files
    ```
 
 5. **Commit Changes**
+
    ```bash
    git add .
    git commit -m "feat: add new ML service for text classification"
    ```
 
 6. **Push and Create PR**
+
    ```bash
    git push origin feature/your-feature-name
    # Create pull request on GitHub
@@ -200,14 +216,33 @@ This file contains the project architecture, coding standards, directory structu
 
 ### Python Style Guide
 
-We follow [PEP 8](https://pep8.org/) with some modifications:
+We follow a comprehensive Python style guide based on [PEP 8](https://pep8.org/) with project-specific modifications and enhancements.
+
+**📖 Complete Style Guide**: See [docs/python_style_guide.md](docs/python_style_guide.md) for the full style guide including:
+
+- **Code Formatting**: Line length, indentation, quotes, blank lines
+- **Naming Conventions**: Variables, functions, classes, constants, files
+- **Import Organization**: Standard library, third-party, local imports
+- **Documentation Standards**: Google-style docstrings, comments
+- **Type Hints**: Function signatures, complex variables
+- **Error Handling**: Exception handling, custom exceptions
+- **Security Guidelines**: Input validation, sensitive data handling
+- **Performance Guidelines**: Database operations, memory management
+- **Testing Standards**: Test naming, structure, patterns
+
+### Quick Reference
 
 - **Line Length**: 88 characters (Black default)
 - **Imports**: Use `isort` for import sorting
 - **Docstrings**: Google-style docstrings
 - **Type Hints**: Use type hints for function signatures
+- **Variables/Functions**: `snake_case`
+- **Classes**: `PascalCase`
+- **Constants**: `UPPER_SNAKE_CASE`
+- **Files/Modules**: `snake_case`
+- **Packages**: `lowercase`
 
-### Code Formatting
+### Code Formatting Tools
 
 ```bash
 # Format code
@@ -218,15 +253,16 @@ isort .
 
 # Check style
 flake8 .
+
+# Type checking
+mypy app/
+
+# Security check
+bandit -r app/
+
+# Run all quality checks
+pre-commit run --all-files
 ```
-
-### Naming Conventions
-
-- **Variables/Functions**: `snake_case`
-- **Classes**: `PascalCase`
-- **Constants**: `UPPER_SNAKE_CASE`
-- **Files/Modules**: `snake_case`
-- **Packages**: `lowercase`
 
 ### Example Code Style
 
@@ -243,18 +279,18 @@ from app.utils import generate_id, get_current_timestamp
 
 class MLPredictionService:
     """Service for handling ML predictions.
-    
+
     This service provides methods for making predictions using
     registered ML models with caching and error handling.
-    
+
     Attributes:
         model_name: Name of the ML model to use
         cache_enabled: Whether to enable prediction caching
     """
-    
+
     def __init__(self, model_name: str, cache_enabled: bool = True) -> None:
         """Initialize the prediction service.
-        
+
         Args:
             model_name: Name of the ML model
             cache_enabled: Enable caching for predictions
@@ -262,30 +298,30 @@ class MLPredictionService:
         self.model_name = model_name
         self.cache_enabled = cache_enabled
         self._model = None
-    
+
     def predict(self, data: Dict) -> Dict:
         """Make a prediction using the loaded model.
-        
+
         Args:
             data: Input data for prediction
-            
+
         Returns:
             Dictionary containing prediction results
-            
+
         Raises:
             ValueError: If input data is invalid
             RuntimeError: If model is not loaded
         """
         if not self._model:
             raise RuntimeError(f"Model {self.model_name} not loaded")
-        
+
         # Validate input data
         if not isinstance(data, dict):
             raise ValueError("Input data must be a dictionary")
-        
+
         # Make prediction
         result = self._model.predict(data)
-        
+
         return {
             "prediction_id": generate_id(),
             "model_name": self.model_name,
@@ -333,29 +369,29 @@ from app.utils import generate_id
 
 class TestBaseMLService:
     """Test cases for BaseMLService."""
-    
+
     def test_service_initialization(self):
         """Test service initialization."""
         service = BaseMLService("test_model")
         assert service.model_name == "test_model"
         assert service.model is None
-    
+
     @patch('app.services.base.load_model')
     def test_load_model_success(self, mock_load_model):
         """Test successful model loading."""
         mock_model = Mock()
         mock_load_model.return_value = mock_model
-        
+
         service = BaseMLService("test_model")
         service.load_model()
-        
+
         assert service.model == mock_model
         mock_load_model.assert_called_once()
-    
+
     def test_predict_without_model(self):
         """Test prediction without loaded model."""
         service = BaseMLService("test_model")
-        
+
         with pytest.raises(RuntimeError, match="Model not loaded"):
             service.predict({"input": "test"})
 ```
@@ -405,24 +441,24 @@ Use Google-style docstrings:
 ```python
 def predict_batch(self, data_list: List[Dict]) -> List[Dict]:
     """Make predictions for multiple data points.
-    
+
     This method processes a list of input data and returns
     predictions for each item using the loaded ML model.
-    
+
     Args:
         data_list: List of dictionaries containing input data
             for prediction. Each dictionary should contain
             the required features for the model.
-    
+
     Returns:
         List of dictionaries containing prediction results.
         Each result includes prediction_id, model_name,
         result, and timestamp.
-    
+
     Raises:
         ValueError: If data_list is empty or contains invalid data
         RuntimeError: If model is not loaded
-        
+
     Example:
         >>> service = MLPredictionService("text_classifier")
         >>> service.load_model()
@@ -443,18 +479,20 @@ def predict_batch(self, data_list: List[Dict]) -> List[Dict]:
    - Update API documentation
 
 2. **Run Quality Checks**
+
    ```bash
    # Run all tests
    pytest
-   
+
    # Check code style
    pre-commit run --all-files
-   
+
    # Check type hints
    mypy app/
    ```
 
 3. **Update Dependencies**
+
    ```bash
    # If you added new dependencies
    pip freeze > requirements.txt
@@ -550,7 +588,9 @@ Any other context about the problem.
 ## Logs
 
 ```
+
 Paste relevant logs here
+
 ```
 ```
 
@@ -598,6 +638,7 @@ Any other context or screenshots.
 ### Recognition
 
 Contributors are recognized in:
+
 - GitHub contributors list
 - Release notes
 - Project documentation

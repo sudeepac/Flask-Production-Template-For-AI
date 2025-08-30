@@ -14,11 +14,11 @@ try:
     from app.schemas.v2.base import BaseSchema
     from app.schemas.v2.common import (
         ErrorSchema,
-        SuccessSchema,
-        PaginationSchema,
         MetadataSchema,
+        PaginationSchema,
+        SuccessSchema,
     )
-    
+
     # Feature schemas (add as you create them)
     # from app.schemas.v2.users import UserSchema, UserCreateSchema, UserUpdateSchema
     # from app.schemas.v2.auth import LoginSchema, TokenSchema, RefreshSchema
@@ -33,7 +33,7 @@ try:
     #     ModelMetricsSchema,
     #     ModelVersionSchema,
     # )
-    
+
 except ImportError:
     # Schemas not yet created
     BaseSchema = None
@@ -43,10 +43,10 @@ except ImportError:
     MetadataSchema = None
 
 # Version metadata
-VERSION = 'v2'
-STATUS = 'active'  # active, legacy, deprecated
+VERSION = "v2"
+STATUS = "active"  # active, legacy, deprecated
 DEPRECATED = False
-RELEASE_DATE = '2024-01-01'  # ISO date when version was released
+RELEASE_DATE = "2024-01-01"  # ISO date when version was released
 
 # Schema validation settings
 STRICT_VALIDATION = True
@@ -56,15 +56,14 @@ REQUIRE_ALL_FIELDS = True
 # Export all v2 schemas
 __all__ = [
     # Base schemas
-    'BaseSchema',
-    'ErrorSchema',
-    'SuccessSchema', 
-    'PaginationSchema',
-    'MetadataSchema',
-    
+    "BaseSchema",
+    "ErrorSchema",
+    "SuccessSchema",
+    "PaginationSchema",
+    "MetadataSchema",
     # Feature schemas (uncomment as you add them)
     # 'UserSchema',
-    # 'UserCreateSchema', 
+    # 'UserCreateSchema',
     # 'UserUpdateSchema',
     # 'LoginSchema',
     # 'TokenSchema',
@@ -76,13 +75,12 @@ __all__ = [
     # 'MLModelSchema',
     # 'ModelMetricsSchema',
     # 'ModelVersionSchema',
-    
     # Metadata
-    'VERSION',
-    'STATUS',
-    'DEPRECATED',
-    'RELEASE_DATE',
-    'STRICT_VALIDATION',
-    'ALLOW_UNKNOWN_FIELDS',
-    'REQUIRE_ALL_FIELDS',
+    "VERSION",
+    "STATUS",
+    "DEPRECATED",
+    "RELEASE_DATE",
+    "STRICT_VALIDATION",
+    "ALLOW_UNKNOWN_FIELDS",
+    "REQUIRE_ALL_FIELDS",
 ]

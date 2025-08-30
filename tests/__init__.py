@@ -21,13 +21,13 @@ Test Categories:
 Usage:
     # Run all tests
     pytest
-    
+
     # Run specific test file
     pytest tests/test_api.py
-    
+
     # Run with coverage
     pytest --cov=app
-    
+
     # Run specific test category
     pytest -m unit
     pytest -m integration
@@ -40,31 +40,31 @@ import sys
 from pathlib import Path
 
 # Add the app directory to the Python path for imports
-app_dir = Path(__file__).parent.parent / 'app'
+app_dir = Path(__file__).parent.parent / "app"
 sys.path.insert(0, str(app_dir))
 
 # Test configuration
 TEST_CONFIG = {
-    'TESTING': True,
-    'WTF_CSRF_ENABLED': False,
-    'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-    'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-    'SECRET_KEY': 'test-secret-key',
-    'JWT_SECRET_KEY': 'test-jwt-secret',
-    'CACHE_TYPE': 'simple',
-    'ML_MODEL_PATH': 'tests/fixtures/models',
-    'ML_AUTO_DISCOVER_SERVICES': False,
+    "TESTING": True,
+    "WTF_CSRF_ENABLED": False,
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+    "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+    "SECRET_KEY": "test-secret-key",
+    "JWT_SECRET_KEY": "test-jwt-secret",
+    "CACHE_TYPE": "simple",
+    "ML_MODEL_PATH": "tests/fixtures/models",
+    "ML_AUTO_DISCOVER_SERVICES": False,
 }
 
 # Test markers for pytest
 pytest_plugins = [
-    'tests.fixtures.app_fixtures',
-    'tests.fixtures.db_fixtures', 
-    'tests.fixtures.ml_fixtures',
-    'tests.fixtures.api_fixtures',
+    "tests.fixtures.app_fixtures",
+    "tests.fixtures.db_fixtures",
+    "tests.fixtures.ml_fixtures",
+    "tests.fixtures.api_fixtures",
 ]
 
 # Export test utilities
 __all__ = [
-    'TEST_CONFIG',
+    "TEST_CONFIG",
 ]

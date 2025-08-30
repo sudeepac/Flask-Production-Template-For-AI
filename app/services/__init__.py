@@ -9,7 +9,8 @@ Usage:
 """
 
 import logging
-from typing import Dict, Any, List, Type
+from typing import Any, Dict, List, Type
+
 from flask import current_app
 
 logger = logging.getLogger(__name__)

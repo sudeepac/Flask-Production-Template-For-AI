@@ -6,7 +6,7 @@
 .DESCRIPTION
     This script sets up the development environment, installs dependencies,
     initializes the database, and starts the development server.
-    
+
     Features:
     - Virtual environment creation and activation
     - Dependency installation
@@ -65,25 +65,25 @@ param(
     [Parameter(Mandatory=$false)]
     [ValidateSet('development', 'testing', 'production')]
     [string]$Environment = 'development',
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$SkipVenv,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$SkipDeps,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$SkipDB,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$SkipPreCommit,
-    
+
     [Parameter(Mandatory=$false)]
     [int]$Port = 5000,
-    
+
     [Parameter(Mandatory=$false)]
     [string]$Host = 'localhost',
-    
+
     [Parameter(Mandatory=$false)]
     [bool]$Debug = ($Environment -eq 'development')
 )
@@ -97,7 +97,7 @@ function Write-ColorOutput {
         [string]$Message,
         [string]$Color = 'White'
     )
-    
+
     $colors = @{
         'Red' = 'Red'
         'Green' = 'Green'
@@ -107,7 +107,7 @@ function Write-ColorOutput {
         'Cyan' = 'Cyan'
         'White' = 'White'
     }
-    
+
     Write-Host $Message -ForegroundColor $colors[$Color]
 }
 
@@ -140,7 +140,7 @@ function Write-Header {
 # Check if command exists
 function Test-Command {
     param([string]$Command)
-    
+
     try {
         Get-Command $Command -ErrorAction Stop | Out-Null
         return $true
@@ -159,14 +159,14 @@ function Get-ProjectRoot {
 # Check system requirements
 function Test-SystemRequirements {
     Write-Header "Checking System Requirements"
-    
+
     $requirements = @(
         @{ Name = 'Python'; Command = 'python'; MinVersion = '3.8' },
         @{ Name = 'Git'; Command = 'git'; MinVersion = '2.0' }
     )
-    
+
     $allMet = $true
-    
+
     foreach ($req in $requirements) {
         if (Test-Command $req.Command) {
             try {
@@ -182,46 +182,46 @@ function Test-SystemRequirements {
             $allMet = $false
         }
     }
-    
+
     if (-not $allMet) {
         Write-Error "Please install missing requirements before continuing"
         exit 1
     }
-    
+
     Write-Success "All system requirements met"
 }
 
 # Create and activate virtual environment
 function Initialize-VirtualEnvironment {
     param([string]$ProjectRoot)
-    
+
     if ($SkipVenv) {
         Write-Info "Skipping virtual environment setup"
         return
     }
-    
+
     Write-Header "Setting Up Virtual Environment"
-    
+
     $venvPath = Join-Path $ProjectRoot 'venv'
-    
+
     if (Test-Path $venvPath) {
         Write-Info "Virtual environment already exists at $venvPath"
     }
     else {
         Write-Info "Creating virtual environment at $venvPath"
         python -m venv $venvPath
-        
+
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to create virtual environment"
             exit 1
         }
-        
+
         Write-Success "Virtual environment created"
     }
-    
+
     # Activate virtual environment
     $activateScript = Join-Path $venvPath 'Scripts\Activate.ps1'
-    
+
     if (Test-Path $activateScript) {
         Write-Info "Activating virtual environment"
         & $activateScript
@@ -235,55 +235,55 @@ function Initialize-VirtualEnvironment {
 # Install dependencies
 function Install-Dependencies {
     param([string]$ProjectRoot)
-    
+
     if ($SkipDeps) {
         Write-Info "Skipping dependency installation"
         return
     }
-    
+
     Write-Header "Installing Dependencies"
-    
+
     $requirementsFile = Join-Path $ProjectRoot 'requirements.txt'
-    
+
     if (-not (Test-Path $requirementsFile)) {
         Write-Error "requirements.txt not found at $requirementsFile"
         exit 1
     }
-    
+
     Write-Info "Installing Python dependencies from requirements.txt"
     python -m pip install --upgrade pip
     python -m pip install -r $requirementsFile
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to install dependencies"
         exit 1
     }
-    
+
     Write-Success "Dependencies installed successfully"
 }
 
 # Setup pre-commit hooks
 function Initialize-PreCommitHooks {
     param([string]$ProjectRoot)
-    
+
     if ($SkipPreCommit) {
         Write-Info "Skipping pre-commit hooks setup"
         return
     }
-    
+
     Write-Header "Setting Up Pre-commit Hooks"
-    
+
     $preCommitConfig = Join-Path $ProjectRoot '.pre-commit-config.yaml'
-    
+
     if (-not (Test-Path $preCommitConfig)) {
         Write-Warning "Pre-commit config not found, skipping hooks setup"
         return
     }
-    
+
     if (Test-Command 'pre-commit') {
         Write-Info "Installing pre-commit hooks"
         pre-commit install
-        
+
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Pre-commit hooks installed"
         }
@@ -299,18 +299,18 @@ function Initialize-PreCommitHooks {
 # Initialize database
 function Initialize-Database {
     param([string]$ProjectRoot)
-    
+
     if ($SkipDB) {
         Write-Info "Skipping database initialization"
         return
     }
-    
+
     Write-Header "Initializing Database"
-    
+
     # Set environment variables
     $env:FLASK_APP = 'app'
     $env:FLASK_ENV = $Environment
-    
+
     # Check if Flask CLI is available
     try {
         $flaskVersion = flask --version 2>$null
@@ -320,10 +320,10 @@ function Initialize-Database {
         Write-Warning "Flask CLI not available, skipping database initialization"
         return
     }
-    
+
     # Initialize database
     Write-Info "Creating database tables"
-    
+
     try {
         flask db init 2>$null
         Write-Info "Database migration repository initialized"
@@ -331,7 +331,7 @@ function Initialize-Database {
     catch {
         Write-Info "Database migration repository already exists"
     }
-    
+
     try {
         flask db migrate -m "Initial migration" 2>$null
         Write-Info "Database migration created"
@@ -339,7 +339,7 @@ function Initialize-Database {
     catch {
         Write-Info "No new migrations to create"
     }
-    
+
     try {
         flask db upgrade
         Write-Success "Database initialized successfully"
@@ -352,14 +352,14 @@ function Initialize-Database {
 # Create environment file
 function Initialize-Environment {
     param([string]$ProjectRoot)
-    
+
     Write-Header "Setting Up Environment"
-    
+
     $envFile = Join-Path $ProjectRoot '.env'
-    
+
     if (-not (Test-Path $envFile)) {
         Write-Info "Creating .env file"
-        
+
         $envContent = @"
 # Flask Configuration
 FLASK_APP=app
@@ -389,14 +389,14 @@ CACHE_TYPE=simple
 LOG_LEVEL=INFO
 LOG_FILE=logs/app.log
 "@
-        
+
         $envContent | Out-File -FilePath $envFile -Encoding UTF8
         Write-Success ".env file created"
     }
     else {
         Write-Info ".env file already exists"
     }
-    
+
     # Load environment variables
     if (Test-Path $envFile) {
         Get-Content $envFile | ForEach-Object {
@@ -411,14 +411,14 @@ LOG_FILE=logs/app.log
 # Start development server
 function Start-DevelopmentServer {
     param([string]$ProjectRoot)
-    
+
     Write-Header "Starting Development Server"
-    
+
     # Set Flask environment variables
     $env:FLASK_APP = 'app'
     $env:FLASK_ENV = $Environment
     $env:FLASK_DEBUG = $Debug.ToString().ToLower()
-    
+
     Write-Info "Starting Flask development server..."
     Write-Info "Environment: $Environment"
     Write-Info "Host: $Host"
@@ -430,7 +430,7 @@ function Start-DevelopmentServer {
     Write-Info ""
     Write-Info "Press Ctrl+C to stop the server"
     Write-Info ""
-    
+
     try {
         flask run --host=$Host --port=$Port
     }
@@ -449,13 +449,13 @@ function Main {
         Write-Info "Host: $Host"
         Write-Info "Port: $Port"
         Write-Info "Debug: $Debug"
-        
+
         $projectRoot = Get-ProjectRoot
         Write-Info "Project root: $projectRoot"
-        
+
         # Change to project directory
         Set-Location $projectRoot
-        
+
         # Run setup steps
         Test-SystemRequirements
         Initialize-VirtualEnvironment -ProjectRoot $projectRoot
@@ -463,11 +463,11 @@ function Main {
         Initialize-PreCommitHooks -ProjectRoot $projectRoot
         Initialize-Environment -ProjectRoot $projectRoot
         Initialize-Database -ProjectRoot $projectRoot
-        
+
         Write-Header "Setup Complete"
         Write-Success "All setup steps completed successfully!"
         Write-Info ""
-        
+
         # Start development server
         Start-DevelopmentServer -ProjectRoot $projectRoot
     }

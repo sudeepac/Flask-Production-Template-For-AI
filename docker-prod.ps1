@@ -6,7 +6,7 @@ param(
     [Parameter(Position=0)]
     [ValidateSet('deploy', 'stop', 'restart', 'logs', 'status', 'scale', 'backup', 'restore', 'update')]
     [string]$Command = 'deploy',
-    
+
     [string]$Service = 'app',
     [int]$Replicas = 2,
     [switch]$Build,
@@ -67,7 +67,7 @@ function Test-DockerRunning {
 function Test-EnvironmentFile {
     if (-not (Test-Path ".env.prod")) {
         Write-ColorOutput "Warning: .env.prod file not found. Creating template..." $Yellow
-        
+
         $envTemplate = @"
 # Production Environment Variables
 # Copy this file to .env.prod and update with your production values
@@ -90,7 +90,7 @@ SSL_KEY_PATH=/etc/nginx/ssl/key.pem
 SENTRY_DSN=
 NEW_RELIC_LICENSE_KEY=
 "@
-        
+
         $envTemplate | Out-File -FilePath ".env.prod" -Encoding UTF8
         Write-ColorOutput "Template .env.prod created. Please update with your production values." $Red
         return $false
@@ -100,29 +100,29 @@ NEW_RELIC_LICENSE_KEY=
 
 function Deploy-Production {
     Write-ColorOutput "Deploying production environment..." $Green
-    
+
     if (-not (Test-EnvironmentFile)) {
         Write-ColorOutput "Please configure .env.prod before deploying." $Red
         return
     }
-    
+
     $buildFlag = if ($Build) { "--build" } else { ""
-    
+
     # Use production compose file
     $cmd = "docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d $buildFlag --remove-orphans"
     Write-ColorOutput "Running: $cmd" $Yellow
-    
+
     Invoke-Expression $cmd
-    
+
     if ($LASTEXITCODE -eq 0) {
         Write-ColorOutput "Production environment deployed successfully!" $Green
         Write-ColorOutput "Application: https://localhost (via Nginx)" $Blue
         Write-ColorOutput "Direct access: http://localhost:5000" $Blue
-        
+
         # Wait for health checks
         Write-ColorOutput "Waiting for health checks..." $Yellow
         Start-Sleep -Seconds 30
-        
+
         Show-Status
     }
 }
@@ -153,11 +153,11 @@ function Scale-Service {
 function Backup-Database {
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
     $backupFile = "backup_$timestamp.sql"
-    
+
     Write-ColorOutput "Creating database backup: $backupFile" $Green
-    
+
     docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db pg_dump -U postgres flask_production_template_prod > $backupFile
-    
+
     if ($LASTEXITCODE -eq 0) {
         Write-ColorOutput "Database backup created successfully: $backupFile" $Green
     } else {
@@ -167,32 +167,32 @@ function Backup-Database {
 
 function Restore-Database {
     $backupFiles = Get-ChildItem -Path "." -Filter "backup_*.sql" | Sort-Object LastWriteTime -Descending
-    
+
     if ($backupFiles.Count -eq 0) {
         Write-ColorOutput "No backup files found!" $Red
         return
     }
-    
+
     Write-ColorOutput "Available backup files:" $Blue
     for ($i = 0; $i -lt $backupFiles.Count; $i++) {
         Write-Host "  [$i] $($backupFiles[$i].Name) ($($backupFiles[$i].LastWriteTime))"
     }
-    
+
     $selection = Read-Host "Select backup file to restore (0-$($backupFiles.Count-1))"
-    
+
     if ($selection -match '^\d+$' -and [int]$selection -lt $backupFiles.Count) {
         $selectedFile = $backupFiles[[int]$selection].Name
         Write-ColorOutput "Restoring database from: $selectedFile" $Yellow
-        
+
         # Stop app containers to prevent connections
         docker-compose -f docker-compose.yml -f docker-compose.prod.yml stop app
-        
+
         # Restore database
         Get-Content $selectedFile | docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db psql -U postgres -d flask_production_template_prod
-        
+
         # Restart app containers
         docker-compose -f docker-compose.yml -f docker-compose.prod.yml start app
-        
+
         Write-ColorOutput "Database restored successfully." $Green
     } else {
         Write-ColorOutput "Invalid selection." $Red
@@ -201,23 +201,23 @@ function Restore-Database {
 
 function Update-Application {
     Write-ColorOutput "Performing rolling update..." $Green
-    
+
     # Build new image
     docker-compose -f docker-compose.yml -f docker-compose.prod.yml build app
-    
+
     # Rolling update
     docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps app
-    
+
     Write-ColorOutput "Rolling update completed." $Green
 }
 
 function Show-Status {
     Write-ColorOutput "Production Deployment Status:" $Blue
     docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps
-    
+
     Write-Host ""
     Write-ColorOutput "Health Checks:" $Blue
-    
+
     # Check app health
     try {
         $response = Invoke-WebRequest -Uri "http://localhost:5000/health/" -TimeoutSec 10
@@ -229,7 +229,7 @@ function Show-Status {
     } catch {
         Write-ColorOutput "✗ Application health check: FAILED (Connection error)" $Red
     }
-    
+
     Write-Host ""
     Write-ColorOutput "Resource Usage:" $Blue
     docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"

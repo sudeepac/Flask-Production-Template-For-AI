@@ -5,15 +5,17 @@
 **Before generating ANY code suggestions, you MUST read and follow the guidelines in [`../AI_INSTRUCTIONS.md`](../AI_INSTRUCTIONS.md).**
 
 This file contains:
+
 - Project architecture and coding standards
 - Directory structure rules
-- Development workflow guidelines  
+- Development workflow guidelines
 - Code generation templates
 - Testing guidelines
 
 ## Project Overview
 
 This is a production-ready Flask template with:
+
 - ✅ Security (JWT authentication, input validation)
 - ✅ Scalability (caching, database optimization)
 - ✅ Maintainability (testing, documentation, CI/CD)

@@ -38,24 +38,70 @@ jobs:
           pip install flake8 black isort bandit safety mypy
 
       - name: Code formatting check (Black)
-        run: black --check --diff app tests
+        run: |
+          black --check --diff app tests
+          if [ $? -ne 0 ]; then
+            echo "❌ Code formatting check failed. Run 'make fix-format' to fix."
+            exit 1
+          fi
 
       - name: Import sorting check (isort)
-        run: isort --check-only --diff app tests
+        run: |
+          isort --check-only --diff app tests
+          if [ $? -ne 0 ]; then
+            echo "❌ Import sorting check failed. Run 'make fix-imports' to fix."
+            exit 1
+          fi
 
       - name: Linting (flake8)
-        run: flake8 app tests --max-line-length=88 --extend-ignore=E203,W503
+        run: |
+          flake8 app tests --max-line-length=88 --extend-ignore=E203,W503 --statistics
+          if [ $? -ne 0 ]; then
+            echo "❌ Linting check failed. Fix the issues above."
+            exit 1
+          fi
 
       - name: Type checking (mypy)
-        run: mypy app --ignore-missing-imports
+        run: |
+          mypy app --ignore-missing-imports --strict-optional
+          if [ $? -ne 0 ]; then
+            echo "❌ Type checking failed. Add proper type hints."
+            exit 1
+          fi
 
       - name: Security check (bandit)
-        run: bandit -r app -f json -o bandit-report.json
-        continue-on-error: true
+        run: |
+          bandit -r app -f json -o bandit-report.json
+          bandit -r app -f txt
+          if [ $? -eq 1 ]; then
+            echo "❌ Security vulnerabilities found. Check bandit-report.json"
+            exit 1
+          fi
 
       - name: Dependency security check (safety)
-        run: safety check --json --output safety-report.json
-        continue-on-error: true
+        run: |
+          safety check --json --output safety-report.json
+          safety check
+          if [ $? -ne 0 ]; then
+            echo "❌ Vulnerable dependencies found. Update dependencies."
+            exit 1
+          fi
+
+      - name: Docstring coverage check
+        run: |
+          docstring-coverage app --fail-under=90
+          if [ $? -ne 0 ]; then
+            echo "❌ Docstring coverage below 90%. Add missing docstrings."
+            exit 1
+          fi
+
+      - name: Custom style compliance check
+        run: |
+          python scripts/check_style_compliance.py
+          if [ $? -ne 0 ]; then
+            echo "❌ Style compliance check failed. Fix the issues above."
+            exit 1
+          fi
 
       - name: Upload security reports
         uses: actions/upload-artifact@v3
@@ -66,14 +112,31 @@ jobs:
             bandit-report.json
             safety-report.json
 
+  # Quality Gate - Prevents proceeding if code quality fails
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [code-quality]
+    if: always()
+    steps:
+      - name: Check code quality status
+        run: |
+          if [ "${{ needs.code-quality.result }}" != "success" ]; then
+            echo "❌ Code quality checks failed. Cannot proceed with testing."
+            echo "Please fix all code quality issues before merging."
+            exit 1
+          fi
+          echo "✅ All code quality checks passed. Proceeding with tests."
+
   # Unit and Integration Tests
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    needs: [quality-gate]
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
-    
+        python-version: ["3.9", "3.10", "3.11"]
+
     services:
       postgres:
         image: postgres:15
@@ -87,7 +150,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:7
         options: >-
@@ -168,8 +231,39 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
+  # Deployment Gate - Ensures all checks pass before deployment
+  deployment-gate:
+    name: Deployment Gate
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, performance, docker]
+    if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'release')
     steps:
+      - name: Check all required jobs status
+        run: |
+          echo "Checking status of all required jobs..."
+
+          if [ "${{ needs.code-quality.result }}" != "success" ]; then
+            echo "❌ Code quality checks failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "❌ Test suite failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.performance.result }}" != "success" ] && [ "${{ needs.performance.result }}" != "skipped" ]; then
+            echo "❌ Performance tests failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.docker.result }}" != "success" ]; then
+            echo "❌ Docker build and test failed"
+            exit 1
+          fi
+
+          echo "✅ All required checks passed. Deployment is authorized."
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -202,7 +296,7 @@ jobs:
     name: Docker Build & Test
     runs-on: ubuntu-latest
     needs: [code-quality, test]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -247,11 +341,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [docker]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -295,7 +389,7 @@ jobs:
     needs: [build-and-push]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -320,7 +414,7 @@ jobs:
     needs: [deploy-staging]
     if: github.event_name == 'release' && github.event.action == 'published'
     environment: production
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -348,7 +442,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-production]
     if: always()
-    
+
     steps:
       - name: Clean up old images
         run: |

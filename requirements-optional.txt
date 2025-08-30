@@ -2,6 +2,9 @@
 # Install specific sections as needed:
 # pip install -r requirements-optional.txt
 
+
+# Development and Testing
+faker==19.6.2                 # Generate fake data for testing and development
 # Database Drivers (choose one based on your database)
 # PostgreSQL
 # psycopg2-binary==2.9.9
@@ -49,6 +52,3 @@
 
 # Production WSGI Server
 gunicorn==21.2.0
-
-# Development and Testing
-faker==19.6.2                 # Generate fake data for testing and development

@@ -10,13 +10,10 @@ This blueprint showcases:
 """
 
 from flask import Blueprint
+
 from app.urls import get_url_prefix
 
-blueprint = Blueprint(
-    'examples',
-    __name__,
-    url_prefix=get_url_prefix('examples')
-)
+blueprint = Blueprint("examples", __name__, url_prefix=get_url_prefix("examples"))
 
 from . import routes
 

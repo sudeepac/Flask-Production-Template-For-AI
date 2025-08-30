@@ -22,20 +22,20 @@ The system provides several custom exception classes in `app/utils/error_handler
 # Base API error
 class APIError(Exception):
     """Base API error with structured response"""
-    
+
 # Specific error types
 class ValidationError(APIError):
     """Input validation errors"""
-    
+
 class NotFoundError(APIError):
     """Resource not found errors"""
-    
+
 class DatabaseError(APIError):
     """Database operation errors"""
-    
+
 class AuthenticationError(APIError):
     """Authentication/authorization errors"""
-    
+
 class RateLimitError(APIError):
     """Rate limiting errors"""
 ```
@@ -50,7 +50,7 @@ def get_user(user_id):
     user = User.query.get(user_id)
     if not user:
         raise NotFoundError(f"User with ID {user_id} not found")
-    
+
     return jsonify(user.to_dict())
 ```
 
@@ -127,6 +127,7 @@ def get_users():
 ```
 
 This automatically logs:
+
 - Request start time
 - Request duration
 - Response status code
@@ -160,31 +161,31 @@ The `app/services/example_service.py` demonstrates best practices:
 class ExampleService:
     def create_user_with_posts(self, username: str, email: str, post_titles: List[str]):
         """Create user with posts using proper error handling and logging."""
-        
+
         # Input validation
         self._validate_user_input(username, email)
-        
+
         try:
             # Database operations with transaction
             user = User(username=username, email=email)
             db.session.add(user)
             db.session.flush()  # Get ID without committing
-            
+
             # Create posts
             for title in post_titles:
                 post = Post(title=title, user_id=user.id)
                 db.session.add(post)
-            
+
             db.session.commit()
-            
+
             # Log success
             logger.info("User and posts created", extra={
                 'user_id': user.id,
                 'post_count': len(post_titles)
             })
-            
+
             return self._format_response(user, posts)
-            
+
         except ValidationError:
             db.session.rollback()
             raise
@@ -223,6 +224,7 @@ Content-Type: application/json
 ```
 
 Demonstrates:
+
 - Schema validation with Marshmallow
 - Business logic validation
 - Database transaction management

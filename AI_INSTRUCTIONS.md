@@ -3,9 +3,9 @@
 AI_INSTRUCTIONS.md
 “Flask + ML Project – Consistent, Human-Friendly, Future-Proof”
 ──────────────────────────────────────────────────────────────── -->
-**Keep this file in repo root and commit to git.**  
+**Keep this file in repo root and commit to git.**
 Every AI agent (Copilot, Cursor, GPT, Claude, LangChain, etc.) must
-read this *before* writing or moving a single line of code.  
+read this *before* writing or moving a single line of code.
 Humans: skim the **Quickstart** and **Rules** sections; everything
 else is for maintainability.
 
@@ -16,11 +16,13 @@ else is for maintainability.
 ./scripts/quickstart.sh          # macOS / Linux
 .\scripts\quickstart.ps1         # Windows (PowerShell)
 ```
-Does *all* of the following:  
-1. Creates `.venv` (Python ≥ 3.10) if missing.  
-2. Installs `requirements.txt` + pre-commit hooks.  
-3. Runs DB migrations.  
-4. Starts the dev server on http://127.0.0.1:5000 with hot-reload.
+
+Does *all* of the following:
+
+1. Creates `.venv` (Python ≥ 3.10) if missing.
+2. Installs `requirements.txt` + pre-commit hooks.
+3. Runs DB migrations.
+4. Starts the dev server on <http://127.0.0.1:5000> with hot-reload.
 
 Nothing else is required to be “up and running”.
 
@@ -62,32 +64,34 @@ your_app/
 <!-- ────────────────────────────────────────────────────────────────
 2. Creating a New Feature (Deterministic)
 ──────────────────────────────────────────────────────────────── -->
-1. **Scaffold**  
+1. **Scaffold**
+
    ```bash
    python scripts/make_blueprint.py <feature_name>
    # or: cp -r __template__/my_blueprint app/blueprints/<feature_name>
    ```
 
-2. **Register URL**  
-   Add to `app/urls.py`:  
+2. **Register URL**
+   Add to `app/urls.py`:
+
    ```python
    URL_PREFIX = {..., "<feature_name>": "/<feature_name>"}
    ```
 
-3. **Fill Blueprint Files**  
-   `app/blueprints/<feature_name>/`  
-   - `models.py` – SQLAlchemy / Pydantic models  
-   - `services.py` – MUST inherit from `BaseMLService`; load/serve ML models here  
-   - `controllers.py` – Request/response logic  
-   - `routes.py` – Flask routes using `URL_PREFIX[<feature_name>]`  
+3. **Fill Blueprint Files**
+   `app/blueprints/<feature_name>/`
+   - `models.py` – SQLAlchemy / Pydantic models
+   - `services.py` – MUST inherit from `BaseMLService`; load/serve ML models here
+   - `controllers.py` – Request/response logic
+   - `routes.py` – Flask routes using `URL_PREFIX[<feature_name>]`
    - `tests/` – auto-generated test stubs via `scripts/gen_tests.py <feature_name>`
 
-4. **Versioned Schemas**  
-   Add input/output schemas under the **latest**  
-   `app/schemas/v*/<feature_name>.py`  
+4. **Versioned Schemas**
+   Add input/output schemas under the **latest**
+   `app/schemas/v*/<feature_name>.py`
    Export alias in `app/schemas/__init__.py`.
 
-5. **Commit**  
+5. **Commit**
    Pre-commit hooks enforce style, type checks, docstring coverage, and
    required files.
 
@@ -111,10 +115,11 @@ your_app/
 4. Docstring & Comment Guidelines (for Humans)
 ──────────────────────────────────────────────────────────────── -->
 - **Every public module, class, and function** must have a Google-style
-  docstring explaining **why** it exists and **how to use it**.  
+  docstring explaining **why** it exists and **how to use it**.
 - **Inline comments** must clarify non-obvious logic, edge cases, or
-  business rules.  
-- **Template reminder** (auto-inserted in stubs):  
+  business rules.
+- **Template reminder** (auto-inserted in stubs):
+
   ```python
   """One-sentence summary.
 
@@ -123,7 +128,7 @@ your_app/
   - Non-obvious side effects.
   - One short usage example.
 
-  See CONTRIBUTING.md §5 for style.
+  See docs/python_style_guide.md for comprehensive style guidelines.
   """
   ```
 
@@ -158,7 +163,8 @@ pytest tests/fraud_detector/
 | File | Audience | Purpose |
 |------|----------|---------|
 | `README.md` | New humans | One-screen setup, quickstart link |
-| `CONTRIBUTING.md` | All devs | Deep style guide, architecture, FAQ |
+| `CONTRIBUTING.md` | All devs | Development workflow, contribution guidelines |
+| `docs/python_style_guide.md` | All devs | Comprehensive Python coding standards |
 | `AI_INSTRUCTIONS.md` | AI agents | Zero-ambiguity rules & templates |
 | `docs/` (optional) | End users | API docs, tutorials, changelogs |
 | `docs/arch/` | Maintainers | ADRs, decision logs |
@@ -167,6 +173,7 @@ pytest tests/fraud_detector/
 7. Scripts (place in /scripts)
 ──────────────────────────────────────────────────────────────── -->
 **scripts/quickstart.sh**
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -183,6 +190,7 @@ exec flask run --host=0.0.0.0 --port=5000 --reload
 ```
 
 **scripts/quickstart.ps1**
+
 ```powershell
 #Requires -Version 5.1
 Write-Host "🚀 Bootstrapping Flask + ML project …" -ForegroundColor Green
@@ -196,7 +204,8 @@ Write-Host "✅ Ready. Starting dev server http://127.0.0.1:5000" -ForegroundCol
 flask run --host=0.0.0.0 --port=5000 --reload
 ```
 
-Make them executable:  
+Make them executable:
+
 ```bash
 chmod +x scripts/quickstart.sh
 # Windows:  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned

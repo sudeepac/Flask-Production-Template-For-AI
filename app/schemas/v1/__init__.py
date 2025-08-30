@@ -13,11 +13,11 @@ See CONTRIBUTING.md §5 for schema versioning guidelines.
 try:
     from app.schemas.v1.base import BaseSchema
     from app.schemas.v1.common import ErrorSchema, SuccessSchema
-    
+
     # Legacy feature schemas (add as needed)
     # from app.schemas.v1.users import UserSchemaV1
     # from app.schemas.v1.predictions import PredictionSchemaV1
-    
+
 except ImportError:
     # Schemas not yet created
     BaseSchema = None
@@ -25,18 +25,18 @@ except ImportError:
     SuccessSchema = None
 
 # Version metadata
-VERSION = 'v1'
-STATUS = 'legacy'  # legacy, active, deprecated
+VERSION = "v1"
+STATUS = "legacy"  # legacy, active, deprecated
 DEPRECATED = True
-SUPPORTED_UNTIL = '2025-12-31'  # ISO date when support ends
+SUPPORTED_UNTIL = "2025-12-31"  # ISO date when support ends
 
 # Export all v1 schemas
 __all__ = [
-    'BaseSchema',
-    'ErrorSchema', 
-    'SuccessSchema',
-    'VERSION',
-    'STATUS',
-    'DEPRECATED',
-    'SUPPORTED_UNTIL',
+    "BaseSchema",
+    "ErrorSchema",
+    "SuccessSchema",
+    "VERSION",
+    "STATUS",
+    "DEPRECATED",
+    "SUPPORTED_UNTIL",
 ]

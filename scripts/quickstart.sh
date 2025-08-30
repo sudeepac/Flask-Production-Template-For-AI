@@ -175,14 +175,14 @@ get_project_root() {
 # Check system requirements
 check_requirements() {
     log_header "Checking System Requirements"
-    
+
     local requirements=("python3:Python 3.8+" "git:Git 2.0+" "pip3:pip")
     local all_met=true
-    
+
     for req in "${requirements[@]}"; do
         local cmd="${req%%:*}"
         local name="${req##*:}"
-        
+
         if command_exists "$cmd"; then
             local version
             case "$cmd" in
@@ -205,12 +205,12 @@ check_requirements() {
             all_met=false
         fi
     done
-    
+
     if [ "$all_met" = false ]; then
         log_error "Please install missing requirements before continuing"
         exit 1
     fi
-    
+
     log_success "All system requirements met"
 }
 
@@ -220,13 +220,13 @@ setup_virtual_environment() {
         log_info "Skipping virtual environment setup"
         return
     fi
-    
+
     log_header "Setting Up Virtual Environment"
-    
+
     local project_root
     project_root="$(get_project_root)"
     local venv_path="$project_root/venv"
-    
+
     if [ -d "$venv_path" ]; then
         log_info "Virtual environment already exists at $venv_path"
     else
@@ -234,10 +234,10 @@ setup_virtual_environment() {
         python3 -m venv "$venv_path"
         log_success "Virtual environment created"
     fi
-    
+
     # Activate virtual environment
     local activate_script="$venv_path/bin/activate"
-    
+
     if [ -f "$activate_script" ]; then
         log_info "Activating virtual environment"
         # shellcheck source=/dev/null
@@ -254,26 +254,26 @@ install_dependencies() {
         log_info "Skipping dependency installation"
         return
     fi
-    
+
     log_header "Installing Dependencies"
-    
+
     local project_root
     project_root="$(get_project_root)"
     local requirements_file="$project_root/requirements.txt"
-    
+
     if [ ! -f "$requirements_file" ]; then
         log_error "requirements.txt not found at $requirements_file"
         exit 1
     fi
-    
+
     log_info "Installing Python dependencies from requirements.txt"
-    
+
     # Upgrade pip first
     python3 -m pip install --upgrade pip
-    
+
     # Install requirements
     python3 -m pip install -r "$requirements_file"
-    
+
     log_success "Dependencies installed successfully"
 }
 
@@ -283,18 +283,18 @@ setup_precommit_hooks() {
         log_info "Skipping pre-commit hooks setup"
         return
     fi
-    
+
     log_header "Setting Up Pre-commit Hooks"
-    
+
     local project_root
     project_root="$(get_project_root)"
     local precommit_config="$project_root/.pre-commit-config.yaml"
-    
+
     if [ ! -f "$precommit_config" ]; then
         log_warning "Pre-commit config not found, skipping hooks setup"
         return
     fi
-    
+
     if command_exists "pre-commit"; then
         log_info "Installing pre-commit hooks"
         pre-commit install
@@ -310,13 +310,13 @@ init_database() {
         log_info "Skipping database initialization"
         return
     fi
-    
+
     log_header "Initializing Database"
-    
+
     # Set environment variables
     export FLASK_APP="app"
     export FLASK_ENV="$ENVIRONMENT"
-    
+
     # Check if Flask CLI is available
     if command_exists "flask"; then
         local flask_version
@@ -326,24 +326,24 @@ init_database() {
         log_warning "Flask CLI not available, skipping database initialization"
         return
     fi
-    
+
     # Initialize database
     log_info "Creating database tables"
-    
+
     # Initialize migration repository
     if flask db init >/dev/null 2>&1; then
         log_info "Database migration repository initialized"
     else
         log_verbose "Database migration repository already exists"
     fi
-    
+
     # Create migration
     if flask db migrate -m "Initial migration" >/dev/null 2>&1; then
         log_info "Database migration created"
     else
         log_verbose "No new migrations to create"
     fi
-    
+
     # Apply migrations
     if flask db upgrade; then
         log_success "Database initialized successfully"
@@ -355,14 +355,14 @@ init_database() {
 # Create environment file
 setup_environment() {
     log_header "Setting Up Environment"
-    
+
     local project_root
     project_root="$(get_project_root)"
     local env_file="$project_root/.env"
-    
+
     if [ ! -f "$env_file" ]; then
         log_info "Creating .env file"
-        
+
         cat > "$env_file" << EOF
 # Flask Configuration
 FLASK_APP=app
@@ -392,12 +392,12 @@ CACHE_TYPE=simple
 LOG_LEVEL=INFO
 LOG_FILE=logs/app.log
 EOF
-        
+
         log_success ".env file created"
     else
         log_info ".env file already exists"
     fi
-    
+
     # Load environment variables
     if [ -f "$env_file" ]; then
         # shellcheck source=/dev/null
@@ -409,12 +409,12 @@ EOF
 # Create necessary directories
 setup_directories() {
     log_header "Setting Up Directories"
-    
+
     local project_root
     project_root="$(get_project_root)"
-    
+
     local directories=("logs" "models" "uploads" "temp")
-    
+
     for dir in "${directories[@]}"; do
         local dir_path="$project_root/$dir"
         if [ ! -d "$dir_path" ]; then
@@ -424,19 +424,19 @@ setup_directories() {
             log_verbose "Directory already exists: $dir"
         fi
     done
-    
+
     log_success "Directories setup complete"
 }
 
 # Start development server
 start_development_server() {
     log_header "Starting Development Server"
-    
+
     # Set Flask environment variables
     export FLASK_APP="app"
     export FLASK_ENV="$ENVIRONMENT"
     export FLASK_DEBUG="$DEBUG"
-    
+
     log_info "Starting Flask development server..."
     log_info "Environment: $ENVIRONMENT"
     log_info "Host: $HOST"
@@ -448,7 +448,7 @@ start_development_server() {
     echo ""
     log_info "Press Ctrl+C to stop the server"
     echo ""
-    
+
     # Start the server
     if command_exists "flask"; then
         flask run --host="$HOST" --port="$PORT"
@@ -480,14 +480,14 @@ validate_environment() {
             exit 1
             ;;
     esac
-    
+
     # Validate port
     if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
         log_error "Invalid port: $PORT"
         log_error "Port must be a number between 1 and 65535"
         exit 1
     fi
-    
+
     # Validate debug
     case "$DEBUG" in
         true|false)
@@ -504,33 +504,33 @@ validate_environment() {
 main() {
     # Parse command line arguments
     parse_args "$@"
-    
+
     # Show help if requested
     if [ "$HELP" = true ]; then
         show_help
         exit 0
     fi
-    
+
     # Validate inputs
     validate_environment
-    
+
     log_header "$SCRIPT_NAME"
     log_info "Version: $SCRIPT_VERSION"
     log_info "Environment: $ENVIRONMENT"
     log_info "Host: $HOST"
     log_info "Port: $PORT"
     log_info "Debug: $DEBUG"
-    
+
     local project_root
     project_root="$(get_project_root)"
     log_info "Project root: $project_root"
-    
+
     # Change to project directory
     cd "$project_root" || {
         log_error "Failed to change to project directory: $project_root"
         exit 1
     }
-    
+
     # Run setup steps
     check_requirements
     setup_virtual_environment
@@ -539,11 +539,11 @@ main() {
     setup_environment
     setup_directories
     init_database
-    
+
     log_header "Setup Complete"
     log_success "All setup steps completed successfully!"
     echo ""
-    
+
     # Start development server
     start_development_server
 }

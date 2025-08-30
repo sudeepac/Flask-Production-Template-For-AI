@@ -14,16 +14,15 @@ Usage:
 """
 
 from flask import Blueprint
+
 from app.urls import get_url_prefix
 
 # Blueprint configuration
-BLUEPRINT_NAME = 'api'
+BLUEPRINT_NAME = "api"
 
 # Create blueprint instance
 blueprint = Blueprint(
-    BLUEPRINT_NAME,
-    __name__,
-    url_prefix=get_url_prefix(BLUEPRINT_NAME)
+    BLUEPRINT_NAME, __name__, url_prefix=get_url_prefix(BLUEPRINT_NAME)
 )
 
 # Import routes to register them with the blueprint
@@ -37,9 +36,9 @@ except ImportError:
     pass
 
 # Blueprint metadata
-__version__ = '1.0.0'
-__description__ = 'Core API endpoints and examples'
-__author__ = 'Flask Production Template for AI'
+__version__ = "1.0.0"
+__description__ = "Core API endpoints and examples"
+__author__ = "Flask Production Template for AI"
 
 # Export blueprint for registration
-__all__ = ['blueprint']
+__all__ = ["blueprint"]

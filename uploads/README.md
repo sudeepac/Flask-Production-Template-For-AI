@@ -29,12 +29,14 @@ uploads/
 ### Allowed File Types
 
 **Images:**
+
 - `.jpg`, `.jpeg` - JPEG images
 - `.png` - PNG images
 - `.gif` - GIF images
 - `.webp` - WebP images
 
 **Documents:**
+
 - `.pdf` - PDF documents
 - `.doc`, `.docx` - Microsoft Word
 - `.xls`, `.xlsx` - Microsoft Excel
@@ -42,12 +44,14 @@ uploads/
 - `.txt` - Plain text files
 
 **Data Files:**
+
 - `.csv` - Comma-separated values
 - `.json` - JSON data
 - `.xml` - XML data
 - `.parquet` - Parquet data files
 
 **Archives:**
+
 - `.zip` - ZIP archives
 - `.tar.gz` - Compressed tar archives
 
@@ -130,6 +134,7 @@ class UploadedFile(db.Model):
 ## API Endpoints
 
 ### Upload File
+
 ```
 POST /api/v2/files/upload
 Content-Type: multipart/form-data
@@ -141,18 +146,21 @@ Parameters:
 ```
 
 ### Download File
+
 ```
 GET /api/v2/files/{file_id}/download
 Authorization: Bearer {token}
 ```
 
 ### Get File Info
+
 ```
 GET /api/v2/files/{file_id}
 Authorization: Bearer {token}
 ```
 
 ### Delete File
+
 ```
 DELETE /api/v2/files/{file_id}
 Authorization: Bearer {token}
@@ -161,11 +169,13 @@ Authorization: Bearer {token}
 ## Storage Backends
 
 ### Local Storage (Default)
+
 - Files stored in local filesystem
 - Suitable for development and small deployments
 - Configure path in `UPLOAD_FOLDER` environment variable
 
 ### Cloud Storage (Production)
+
 - AWS S3
 - Google Cloud Storage
 - Azure Blob Storage
@@ -174,17 +184,20 @@ Authorization: Bearer {token}
 ## Monitoring and Maintenance
 
 ### Disk Usage Monitoring
+
 - Monitor available disk space
 - Set up alerts for low disk space
 - Implement automatic cleanup policies
 
 ### Performance Optimization
+
 - Use CDN for file delivery
 - Implement file compression
 - Cache frequently accessed files
 - Use streaming for large file downloads
 
 ### Backup Strategy
+
 - Regular backup of uploaded files
 - Verify backup integrity
 - Test restore procedures
@@ -218,15 +231,15 @@ def handle_file_upload(file):
     # Validate file
     if not allowed_file(file.filename):
         raise ValidationError('File type not allowed')
-    
+
     # Save file
     filename = secure_filename(file.filename)
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(file_path)
-    
+
     # Process file
     result = process_uploaded_file(file_path)
-    
+
     return result
 ```
 

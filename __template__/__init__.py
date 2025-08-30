@@ -24,10 +24,11 @@ See AI_INSTRUCTIONS.md §4 for blueprint implementation guidelines.
 """
 
 from flask import Blueprint
+
 from app.urls import get_url_prefix
 
 # TODO: Replace 'template' with your blueprint name
-BLUEPRINT_NAME = 'template'
+BLUEPRINT_NAME = "template"
 
 # Create blueprint instance
 # TODO: Update the blueprint name and description
@@ -35,8 +36,8 @@ blueprint = Blueprint(
     BLUEPRINT_NAME,
     __name__,
     url_prefix=get_url_prefix(BLUEPRINT_NAME),
-    template_folder='templates',
-    static_folder='static'
+    template_folder="templates",
+    static_folder="static",
 )
 
 # Import routes to register them with the blueprint
@@ -47,9 +48,9 @@ from . import routes
 # from . import models, services, utils
 
 # Blueprint metadata
-__version__ = '1.0.0'
-__description__ = 'Template blueprint for creating new blueprints'
-__author__ = 'Your Name'
+__version__ = "1.0.0"
+__description__ = "Template blueprint for creating new blueprints"
+__author__ = "Your Name"
 
 # Export blueprint for registration
-__all__ = ['blueprint']
+__all__ = ["blueprint"]
