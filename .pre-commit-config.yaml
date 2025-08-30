@@ -3,14 +3,15 @@
 # Run: pre-commit install (after pip install pre-commit)
 
 repos:
-  # Built-in hooks for basic file checks
+  # Built-in hooks for basic file checks (file-modifying hooks disabled)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        exclude: ^migrations/
-      - id: end-of-file-fixer
-        exclude: ^migrations/
+      # File-modifying hooks disabled to prevent circular loops
+      # - id: trailing-whitespace
+      #   exclude: ^migrations/
+      # - id: end-of-file-fixer
+      #   exclude: ^migrations/
       - id: check-yaml
       - id: check-json
       - id: check-toml
@@ -21,33 +22,33 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: detect-private-key
-      - id: fix-byte-order-marker
-      - id: mixed-line-ending
-        args: ['--fix=lf']
-      - id: requirements-txt-fixer
+      # - id: fix-byte-order-marker
+      # - id: mixed-line-ending
+      #   args: ['--fix=lf']
+      # - id: requirements-txt-fixer
 
-  # Python import sorting
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args: ["--profile", "black", "--filter-files"]
-        exclude: ^migrations/
+  # Python import sorting (DISABLED - causes circular loops)
+  # - repo: https://github.com/pycqa/isort
+  #   rev: 6.0.1
+  #   hooks:
+  #     - id: isort
+  #       args: ["--profile", "black", "--filter-files"]
+  #       exclude: ^migrations/
 
-  # Python code formatting
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-        language_version: python3
-        exclude: ^migrations/
+  # Python code formatting (DISABLED - causes circular loops)
+  # - repo: https://github.com/psf/black
+  #   rev: 25.1.0
+  #   hooks:
+  #     - id: black
+  #       language_version: python3
+  #       exclude: ^migrations/
 
-  # Python linting with auto-fixing
+  # Python linting (check-only, no auto-fixing)
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.12.11
     hooks:
       - id: ruff
-        args: ["--fix", "--exit-non-zero-on-fix"]
+        args: ["--exit-non-zero-on-fix"]
         exclude: ^migrations/
       - id: ruff-format
         exclude: ^migrations/
@@ -89,12 +90,11 @@ repos:
   #     - id: yamllint
   #       args: ["-d", "relaxed"]
 
-  # Markdown linting with auto-fixing
+  # Markdown linting (check-only, no auto-fixing)
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.45.0
     hooks:
       - id: markdownlint
-        args: ["--fix"]
         exclude: ^(CHANGELOG.md|migrations/)
 
   # Shell script linting (disabled on Windows)
@@ -141,32 +141,32 @@ repos:
         files: ^app/(blueprints/.*routes\.py|urls\.py)$
         pass_filenames: false
 
-      # Python Style Compliance Check with Auto-Fix
+      # Python Style Compliance Check (check-only, no auto-fix)
       - id: style-compliance-check
         name: Python Style Compliance Check
         entry: python scripts/check_style_compliance.py
         language: python
         files: \.py$
-        args: ["--directory", "app", "--fix"]
-        pass_filenames: false
-
-      # Auto-fix common style issues
-      - id: auto-fix-style-issues
-        name: Auto-fix Style Issues
-        entry: python scripts/fix_style_issues.py
-        language: python
-        files: \.py$
         args: ["--directory", "app"]
         pass_filenames: false
 
-      # Auto-generate missing docstrings
-      - id: auto-generate-docstrings
-        name: Auto-generate Missing Docstrings
-        entry: python scripts/fix_specific_docstrings.py
-        language: python
-        files: \.py$
-        args: ["--directory", "app", "--auto-generate"]
-        pass_filenames: false
+      # Auto-fix common style issues (DISABLED - causes circular loops)
+      # - id: auto-fix-style-issues
+      #   name: Auto-fix Style Issues
+      #   entry: python scripts/fix_style_issues.py
+      #   language: python
+      #   files: \.py$
+      #   args: ["--directory", "app"]
+      #   pass_filenames: false
+
+      # Auto-generate missing docstrings (DISABLED - causes circular loops)
+      # - id: auto-generate-docstrings
+      #   name: Auto-generate Missing Docstrings
+      #   entry: python scripts/fix_specific_docstrings.py
+      #   language: python
+      #   files: \.py$
+      #   args: ["--directory", "app", "--auto-generate"]
+      #   pass_filenames: false
 
       # Check docstring coverage (using interrogate which is already configured above)
       # Removed docstring-coverage due to installation issues
