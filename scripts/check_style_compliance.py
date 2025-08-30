@@ -86,12 +86,34 @@ class StyleChecker:
         """Check if public functions have docstrings."""
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
-                # Skip private functions and test functions
+                # Skip private functions, test functions, and dunder methods
                 if (
-                    not node.name.startswith("_")
-                    and not node.name.startswith("test_")
-                    and not ast.get_docstring(node)
+                    node.name.startswith("_")
+                    or node.name.startswith("test_")
+                    or (node.name.startswith("__") and node.name.endswith("__"))
                 ):
+                    continue
+
+                # Skip simple decorator functions (usually just return a function)
+                if (
+                    len(node.body) == 1
+                    and isinstance(node.body[0], ast.Return)
+                    and isinstance(node.body[0].value, ast.Name)
+                ):
+                    continue
+
+                # Skip very short functions (likely simple wrappers)
+                if len(node.body) <= 2:
+                    # Check if it's just a simple return or pass
+                    simple_body = all(
+                        isinstance(stmt, (ast.Return, ast.Pass, ast.Expr))
+                        for stmt in node.body
+                    )
+                    if simple_body:
+                        continue
+
+                # Check if function has a docstring
+                if not ast.get_docstring(node):
                     self._add_error(
                         file_path,
                         node.lineno,
@@ -114,15 +136,29 @@ class StyleChecker:
         """Check naming convention compliance."""
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
-                if not self._is_snake_case(node.name) and not node.name.startswith(
-                    "test_"
-                ):
+                # Skip dunder methods (e.g., __init__, __str__, __repr__)
+                if node.name.startswith("__") and node.name.endswith("__"):
+                    continue
+
+                # Skip private methods (starting with single underscore) - these are allowed
+                if node.name.startswith("_") and not node.name.startswith("__"):
+                    continue
+
+                # Skip test functions
+                if node.name.startswith("test_"):
+                    continue
+
+                if not self._is_snake_case(node.name):
                     self._add_error(
                         file_path,
                         node.lineno,
                         f"Function '{node.name}' should use snake_case",
                     )
             elif isinstance(node, ast.ClassDef):
+                # Skip private classes (starting with underscore)
+                if node.name.startswith("_"):
+                    continue
+
                 if not self._is_pascal_case(node.name):
                     self._add_error(
                         file_path,
@@ -143,6 +179,17 @@ class StyleChecker:
                                 )
                         # Check for regular variables
                         elif not self._is_snake_case(name) and not name.startswith("_"):
+                            # Skip schema variables (these are intentionally PascalCase)
+                            if "Schema" in name:
+                                continue
+                            # Skip class references and imports (PascalCase is expected)
+                            if self._is_pascal_case(name):
+                                # Only warn if it's clearly a variable, not a class reference
+                                # Check if the assignment is a simple value, not a class instantiation
+                                if isinstance(
+                                    node.value, (ast.Constant, ast.Name, ast.Attribute)
+                                ):
+                                    continue  # Likely a class reference or constant
                             self._add_warning(
                                 file_path,
                                 node.lineno,

@@ -380,6 +380,7 @@ def log_performance(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        """Wrapper function for logging decorator."""
         start_time = time.time()
         logger = get_logger(f"performance.{func.__module__}.{func.__name__}")
 

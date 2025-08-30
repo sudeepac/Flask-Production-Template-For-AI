@@ -133,6 +133,7 @@ def require_api_key(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        """Decorated function with API key validation."""
         api_key = request.headers.get("X-API-Key")
 
         if not api_key:
@@ -171,6 +172,7 @@ def require_auth(f):
     @wraps(f)
     @jwt_required()
     def decorated_function(*args, **kwargs):
+        """Decorated function with role-based access control."""
         # Additional security checks can be added here
         # For example: check if user is active, not banned, etc.
 

@@ -372,6 +372,8 @@ def create_config_class(env: str = None):
     config_dict = get_config(env)
 
     class DynamicConfig:
+        """Dynamic configuration class generated at runtime."""
+
         pass
 
     # Set all configuration values as class attributes

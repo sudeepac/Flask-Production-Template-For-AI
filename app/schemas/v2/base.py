@@ -178,6 +178,8 @@ class BaseSchema(Schema):
         """
 
         class ResponseSchema(BaseSchema):
+            """Base response schema with common fields."""
+
             success = fields.Bool(default=True)
             message = fields.Str(default="Success")
             data = fields.Nested(data_schema)
@@ -201,6 +203,8 @@ class BaseSchema(Schema):
         """
 
         class ListSchema(BaseSchema):
+            """Schema for paginated list responses."""
+
             items = fields.List(fields.Nested(item_schema))
             count = fields.Int(dump_only=True)
             total = fields.Int(dump_only=True)
@@ -209,6 +213,7 @@ class BaseSchema(Schema):
 
             @post_load
             def add_count(self, data: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+                """Add count field to the schema."""
                 if "items" in data:
                     data["count"] = len(data["items"])
                 return data

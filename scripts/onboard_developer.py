@@ -261,29 +261,67 @@ class DeveloperOnboarding:
         self.print_success("IDE integration configured")
         return True
 
+    def fix_style_issues(self) -> bool:
+        """Automatically fix common style issues."""
+        self.print_step("Fixing common style issues...")
+
+        try:
+            # Run black formatter
+            self.print_step("Running black formatter...")
+            result = self.run_command(
+                ["black", "app/", "scripts/", "tests/"], check=False
+            )
+            if result.returncode == 0:
+                self.print_success("Code formatting applied")
+            else:
+                self.print_warning("Some formatting issues remain")
+
+            # Run isort for import sorting
+            self.print_step("Sorting imports...")
+            result = self.run_command(
+                ["isort", "app/", "scripts/", "tests/"], check=False
+            )
+            if result.returncode == 0:
+                self.print_success("Import sorting applied")
+            else:
+                self.print_warning("Some import sorting issues remain")
+
+            return True
+        except Exception as e:
+            self.print_error(f"Failed to fix style issues: {e}")
+            return False
+
     def run_initial_quality_check(self) -> bool:
         """Run initial code quality checks."""
         self.print_step("Running initial code quality checks...")
 
         try:
+            # First, try to fix common style issues
+            self.fix_style_issues()
+
             # Run style compliance check
             style_script = self.project_root / "scripts" / "check_style_compliance.py"
             if style_script.exists():
                 result = self.run_command(
-                    [sys.executable, str(style_script)], check=False
+                    [sys.executable, str(style_script), "--directory", "app"],
+                    check=False,
                 )
                 if result.returncode == 0:
                     self.print_success("Style compliance check passed")
                 else:
                     self.print_warning("Style compliance check found issues")
+                    self.print_warning(
+                        "Run 'python scripts/check_style_compliance.py --directory app' for details"
+                    )
 
-            # Run basic linting
-            result = self.run_command(["flake8", "--version"], check=False)
+            # Run pre-commit to validate everything
+            self.print_step("Running pre-commit validation...")
+            result = self.run_command(["pre-commit", "run", "--all-files"], check=False)
             if result.returncode == 0:
-                self.print_success("Code quality tools are working")
+                self.print_success("All quality checks passed")
             else:
                 self.print_warning(
-                    "Some code quality tools may not be properly installed"
+                    "Some quality checks failed - this is normal for initial setup"
                 )
 
             return True

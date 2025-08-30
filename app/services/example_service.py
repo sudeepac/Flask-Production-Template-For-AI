@@ -369,6 +369,8 @@ class ExampleService:
         """
 
         class PostSchema(Schema):
+            """Schema for post data validation."""
+
             title = fields.Str(required=True, validate=lambda x: len(x.strip()) > 0)
             content = fields.Str(required=True, validate=lambda x: len(x.strip()) > 0)
             excerpt = fields.Str(missing="")

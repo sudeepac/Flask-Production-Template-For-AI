@@ -338,8 +338,11 @@ def retry_on_exception(
     """
 
     def decorator(func):
+        """Decorator function for utility operations."""
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Wrapper function for decorated operations."""
             import time
 
             current_delay = delay

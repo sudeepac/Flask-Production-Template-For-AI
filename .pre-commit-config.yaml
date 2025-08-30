@@ -142,14 +142,14 @@ repos:
         files: ^app/(blueprints/.*routes\.py|urls\.py)$
         pass_filenames: false
 
-      # Python Style Compliance Check (temporarily disabled)
-      # - id: style-compliance-check
-      #   name: Python Style Compliance Check
-      #   entry: python scripts/check_style_compliance.py
-      #   language: python
-      #   files: \.py$
-      #   args: ["--directory", "app"]
-      #   pass_filenames: false
+      # Python Style Compliance Check
+      - id: style-compliance-check
+        name: Python Style Compliance Check
+        entry: python scripts/check_style_compliance.py
+        language: python
+        files: \.py$
+        args: ["--directory", "app"]
+        pass_filenames: false
 
       # Check docstring coverage (using interrogate which is already configured above)
       # Removed docstring-coverage due to installation issues
