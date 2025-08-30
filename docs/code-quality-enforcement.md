@@ -118,36 +118,7 @@ pre-commit autoupdate
 
 ## 🔧 IDE Integration
 
-### VS Code Configuration
 
-The project includes comprehensive VS Code settings:
-
-#### Automatic Setup
-
-- **Python interpreter** - Points to project virtual environment
-- **Linting** - flake8, mypy, bandit enabled
-- **Formatting** - Black with 88 character line length
-- **Import sorting** - isort integration
-- **Format on save** - Automatic code formatting
-- **Organize imports** - Automatic import organization
-
-#### Recommended Extensions
-
-The `.vscode/extensions.json` file recommends essential extensions:
-
-- Python development tools
-- Code quality and security tools
-- Testing frameworks
-- Git integration
-- Docker support
-
-### PyCharm/IntelliJ Integration
-
-Basic configuration is provided in `.idea/` directory for:
-
-- Code inspection profiles
-- Code style settings
-- External tools integration
 
 ## 🚦 CI/CD Quality Gates
 
@@ -322,13 +293,6 @@ pip install -r requirements.txt
 # Or run onboarding again
 make onboard-force
 ```
-
-#### VS Code Not Using Project Settings
-
-1. Ensure you're opening the project root directory
-2. Check that `.vscode/settings.json` exists
-3. Reload VS Code window: `Ctrl+Shift+P` → "Developer: Reload Window"
-4. Select correct Python interpreter: `Ctrl+Shift+P` → "Python: Select Interpreter"
 
 #### CI/CD Pipeline Failing
 

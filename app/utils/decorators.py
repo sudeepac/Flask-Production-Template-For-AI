@@ -73,11 +73,26 @@ def validate_json_input(schema_class: Any, location: str = "json") -> Callable:
     """
 
     def decorator(f: Callable) -> Callable:
-        """Decorator function for JSON input validation."""
+        """Decorator function that applies validation to the wrapped function.
+
+        Args:
+            f: The function to be decorated
+
+        Returns:
+            The decorated function with validation applied
+        """
 
         @functools.wraps(f)
         def decorated_function(*args, **kwargs):
-            """Validate input data using the provided schema."""
+            """Decorated function that performs request validation before calling the original function.
+
+            Args:
+                *args: Variable length argument list
+                **kwargs: Arbitrary keyword arguments
+
+            Returns:
+                The result of the original function call
+            """
             schema = schema_class()
 
             if location == "json":

@@ -158,47 +158,6 @@ class DevEnvironmentSetup:
             print(f"⚠️  Warning: Could not backup git hooks: {e}")
             return True  # Non-critical error
 
-    def setup_ide_integration(self) -> bool:
-        """Setup IDE integration files."""
-        success = True
-
-        # Create .vscode settings if it doesn't exist
-        vscode_dir = self.project_root / ".vscode"
-        vscode_dir.mkdir(exist_ok=True)
-
-        settings_file = vscode_dir / "settings.json"
-        if not settings_file.exists() or self.force:
-            vscode_settings = {
-                "python.defaultInterpreterPath": "./venv/bin/python",
-                "python.linting.enabled": True,
-                "python.linting.flake8Enabled": True,
-                "python.linting.mypyEnabled": True,
-                "python.formatting.provider": "black",
-                "python.sortImports.args": ["--profile", "black"],
-                "editor.formatOnSave": True,
-                "editor.codeActionsOnSave": {"source.organizeImports": True},
-                "files.exclude": {
-                    "**/__pycache__": True,
-                    "**/*.pyc": True,
-                    "**/node_modules": True,
-                    ".pytest_cache": True,
-                    ".coverage": True,
-                    "htmlcov": True,
-                },
-            }
-
-            try:
-                import json
-
-                with open(settings_file, "w") as f:
-                    json.dump(vscode_settings, f, indent=2)
-                print("✅ Created VS Code settings")
-            except Exception as e:
-                print(f"⚠️  Warning: Could not create VS Code settings: {e}")
-                success = False
-
-        return success
-
     def validate_setup(self) -> bool:
         """Validate that the setup was successful."""
         print("\n🔍 Validating setup...")
@@ -235,7 +194,6 @@ class DevEnvironmentSetup:
             ("Install development dependencies", self.install_development_dependencies),
             ("Install pre-commit", self.install_pre_commit),
             ("Setup pre-commit hooks", self.setup_pre_commit_hooks),
-            ("Setup IDE integration", self.setup_ide_integration),
             ("Run initial pre-commit check", self.run_initial_pre_commit),
             ("Validate setup", self.validate_setup),
         ]
@@ -247,9 +205,8 @@ class DevEnvironmentSetup:
 
         print("\n🎉 Development environment setup completed successfully!")
         print("\n📋 Next steps:")
-        print("   1. Restart your IDE to pick up new settings")
-        print("   2. Make a test commit to verify pre-commit hooks")
-        print("   3. Run 'pre-commit run --all-files' to check all files")
+        print("   1. Make a test commit to verify pre-commit hooks")
+        print("   2. Run 'pre-commit run --all-files' to check all files")
 
         if self.errors:
             print("\n⚠️  Warnings encountered during setup:")

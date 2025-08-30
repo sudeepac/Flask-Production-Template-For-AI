@@ -230,35 +230,7 @@ class DeveloperOnboarding:
         """Set up IDE integration files."""
         self.print_step("Setting up IDE integration...")
 
-        # VS Code settings should already exist
-        vscode_dir = self.project_root / ".vscode"
-        if vscode_dir.exists():
-            self.print_success("VS Code configuration found")
-        else:
-            self.print_warning("VS Code configuration not found")
-
-        # PyCharm/IntelliJ settings
-        idea_dir = self.project_root / ".idea"
-        if not idea_dir.exists():
-            idea_dir.mkdir(exist_ok=True)
-
-        # Create basic PyCharm configuration
-        pycharm_config = idea_dir / "inspectionProfiles" / "profiles_settings.xml"
-        pycharm_config.parent.mkdir(exist_ok=True)
-
-        if not pycharm_config.exists():
-            pycharm_config.write_text(
-                """
-<component name="InspectionProjectProfileManager">
-  <settings>
-    <option name="USE_PROJECT_PROFILE" value="true" />
-    <version value="1.0" />
-  </settings>
-</component>
-"""
-            )
-
-        self.print_success("IDE integration configured")
+        self.print_success("Development environment configured")
         return True
 
     def fix_style_issues(self) -> bool:

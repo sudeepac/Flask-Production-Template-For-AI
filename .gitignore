@@ -152,15 +152,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be added to the global gitignore or merged into this project gitignore.  For a PyCharm
-#  project, it is recommended to use the following settings:
-#  https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-.idea/
 
-# VS Code
-.vscode/
 
 # Flask Production Template for AI Specific
 # Environment files
@@ -297,39 +289,7 @@ Thumbs.db
 # Linux
 *~
 
-# Vim
-*.swp
-*.swo
 
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# JetBrains IDEs
-.idea/
-*.iml
-*.ipr
-*.iws
-
-# Visual Studio Code
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Atom
-.atom/
 
 # Local environment variables
 .env.local
@@ -470,6 +430,3 @@ jspm_packages/
 
 # TernJS port file
 .tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
