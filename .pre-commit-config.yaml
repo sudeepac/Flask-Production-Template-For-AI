@@ -47,8 +47,9 @@ repos:
     rev: 1.8.6
     hooks:
       - id: bandit
-        args: ["-r", "app/", "--skip", "B101", "-q"]
+        args: ["--skip", "B101", "-q"]
         exclude: ^(tests/|migrations/)
+        files: ^app/
 
   # Docstring coverage check
   - repo: https://github.com/econchick/interrogate

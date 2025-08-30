@@ -386,23 +386,13 @@ def require_template_permission(permission: str):
 
     def decorator(f: Callable) -> Callable:
         """
-        TODO: Add return description
-            """
-            TODO: Add return description
-            Returns:
-
-            TODO: Add function description.
-
-            Function decorated_function.
-            """
-        Returns:
-
-        f: TODO: Add description
+        Decorator function that wraps the original function with permission checking.
+        
         Args:
-
-        TODO: Add function description.
-
-        Function decorator.
+            f: The function to be decorated
+            
+        Returns:
+            Callable: The decorated function with permission checking
         """
         @wraps(f)
         def decorated_function(*args, **kwargs):

@@ -91,15 +91,13 @@ class TestCacheExtension:
             @cache.memoize(timeout=60)
             def expensive_function(x):
                 """
-                TODO: Add return description
-                Returns:
-
-                x: TODO: Add description
+                Expensive function for testing memoization.
+                
                 Args:
-
-                TODO: Add function description.
-
-                Function expensive_function.
+                    x: Input parameter for calculation
+                    
+                Returns:
+                    int: Calculated result
                 """
                 nonlocal call_count
                 call_count += 1

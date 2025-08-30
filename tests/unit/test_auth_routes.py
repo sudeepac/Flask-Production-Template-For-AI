@@ -248,12 +248,13 @@ class TestRegisterEndpoint:
         # Mock no existing username but existing email
         def mock_filter_by(**kwargs):
             """
-            TODO: Add return description
+            Mock filter_by method for testing.
+            
+            Args:
+                **kwargs: Filter criteria
+                
             Returns:
-
-            TODO: Add function description.
-
-            Function mock_filter_by.
+                Mock: Mock object with appropriate behavior
             """
             if "username" in kwargs:
                 return Mock(first=Mock(return_value=None))
