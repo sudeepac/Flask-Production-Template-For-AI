@@ -6,15 +6,26 @@ RESTful patterns and request/response handling.
 
 from datetime import datetime
 
-from flask import current_app, g, jsonify, request
-from flask_jwt_extended import jwt_required
-from marshmallow import Schema, ValidationError, fields
-
-from app.extensions import limiter
-from app.models.example import Post, User
 from app.services.example_service import ExampleService
-from app.utils.error_handlers import APIError, NotFoundAPIError, ValidationAPIError
-from app.utils.logging_config import get_logger, log_performance, log_security_event
+from app.utils.common_imports import (
+    APIError,
+    Schema,
+    ValidationAPIError,
+    current_app,
+    fields,
+    get_module_logger,
+    handle_api_errors,
+    jsonify,
+    jwt_required,
+    limiter,
+    log_endpoint_access,
+    log_performance,
+    log_security_event,
+    request,
+    success_response,
+    validate,
+    validate_json_input,
+)
 
 from . import blueprint
 
@@ -22,7 +33,11 @@ from . import blueprint
 class EchoRequestSchema(Schema):
     """Schema for echo endpoint requests."""
 
-    message = fields.Str(required=True, validate=lambda x: len(x) <= 1000)
+    message = fields.Str(
+        required=True,
+        validate=validate.Length(max=1000),
+        description="Message to echo (max 1000 characters)",
+    )
     metadata = fields.Dict(required=False)
 
 
@@ -39,7 +54,7 @@ echo_request_schema = EchoRequestSchema()
 echo_response_schema = EchoResponseSchema()
 
 # Logger
-logger = get_logger(__name__)
+logger = get_module_logger(__name__)
 
 
 @blueprint.route("/status", methods=["GET"])
@@ -65,17 +80,13 @@ def api_status():
             ]
         }
     """
-    return (
-        jsonify(
-            {
-                "status": "operational",
-                "version": current_app.config.get("API_VERSION", "v2"),
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "endpoints": ["/api/status", "/api/info", "/api/echo"],
-            }
-        ),
-        200,
-    )
+    data = {
+        "status": "operational",
+        "version": current_app.config.get("API_VERSION", "v2"),
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "endpoints": ["/api/status", "/api/info", "/api/echo"],
+    }
+    return success_response(data=data, message="API is operational")
 
 
 @blueprint.route("/info", methods=["GET"])
@@ -104,111 +115,73 @@ def api_info():
             }
         }
     """
-    return (
-        jsonify(
-            {
-                "name": "Flask Production Template for AI",
-                "description": "Flask Production Template for AI",
-                "version": getattr(current_app, "version", "1.0.0"),
-                "environment": current_app.config.get("FLASK_ENV", "development"),
-                "debug": current_app.debug,
-                "features": {
-                    "authentication": True,
-                    "caching": True,
-                    "rate_limiting": True,
-                    "cors": True,
-                },
-            }
-        ),
-        200,
-    )
+    data = {
+        "name": "Flask Production Template for AI",
+        "description": "Flask Production Template for AI",
+        "version": getattr(current_app, "version", "1.0.0"),
+        "environment": current_app.config.get("FLASK_ENV", "development"),
+        "debug": current_app.debug,
+        "features": {
+            "authentication": True,
+            "caching": True,
+            "rate_limiting": True,
+            "cors": True,
+        },
+    }
+    return success_response(data=data, message="Application information retrieved")
 
 
 @blueprint.route("/echo", methods=["POST"])
 @limiter.limit("10 per minute")
 @log_performance
-def echo():
-    """Echo endpoint for testing requests.
+@handle_api_errors
+@validate_json_input(EchoRequestSchema)
+@log_endpoint_access
+def echo(validated_data):
+    """Echo endpoint that returns the input message with timestamp.
 
-    Accepts JSON data and returns it back with timestamp.
-    Useful for testing API connectivity and request formatting.
+    This endpoint demonstrates:
+    - Input validation using Marshmallow schemas
+    - Request/response logging
+    - Error handling patterns
+    - Rate limiting
 
     Request Body:
         {
             "message": "Hello, World!",
-            "metadata": {"key": "value"}
+            "metadata": {"test": true}  // optional
         }
 
     Returns:
-        JSON response echoing the input with timestamp
-
-    Example:
-        POST /api/echo
-        Content-Type: application/json
-
-        {
-            "message": "Hello, World!",
-            "metadata": {"test": true}
-        }
-
-        Response:
         {
             "echo": "Hello, World!",
             "timestamp": "2024-01-01T12:00:00Z",
             "metadata": {"test": true}
         }
     """
-    try:
-        logger.info("Echo endpoint called", extra={"endpoint": "echo"})
+    # Log security event for echo requests
+    log_security_event(
+        "echo_request",
+        {
+            "message_length": len(validated_data["message"]),
+            "has_metadata": bool(validated_data.get("metadata")),
+            "ip_address": request.remote_addr,
+        },
+    )
 
-        # Validate request data
-        json_data = request.get_json()
-        if not json_data:
-            raise ValidationAPIError("Request must contain JSON data")
+    # Create response
+    response_data = {
+        "echo": validated_data["message"],
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "metadata": validated_data.get("metadata", {}),
+    }
 
-        # Validate using schema
-        validated_data = echo_request_schema.load(json_data)
+    logger.info(
+        "Echo request processed successfully",
+        extra={"message_length": len(validated_data["message"])},
+    )
 
-        # Log security event for echo requests
-        log_security_event(
-            "echo_request",
-            {
-                "message_length": len(validated_data["message"]),
-                "has_metadata": bool(validated_data.get("metadata")),
-                "ip_address": request.remote_addr,
-            },
-        )
-
-        # Create response
-        response_data = {
-            "echo": validated_data["message"],
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-            "metadata": validated_data.get("metadata", {}),
-        }
-
-        logger.info(
-            "Echo request processed successfully",
-            extra={"message_length": len(validated_data["message"])},
-        )
-
-        return jsonify(response_data), 200
-
-    except ValidationError as e:
-        logger.warning(
-            f"Schema validation error: {e.messages}",
-            extra={"validation_errors": e.messages},
-        )
-        raise ValidationAPIError("Invalid request data", details=e.messages)
-
-    except ValidationAPIError:
-        raise  # Re-raise custom validation errors
-
-    except Exception as e:
-        logger.error(
-            f"Unexpected error in echo endpoint: {str(e)}",
-            extra={"error_type": type(e).__name__},
-        )
-        raise APIError("An unexpected error occurred")
+    return success_response(data=response_data, message="Echo processed successfully")
 
 
 @blueprint.route("/users/bulk", methods=["POST"])
@@ -242,7 +215,7 @@ def create_user_with_posts():
         result = service.create_user_with_posts(username, email, post_titles)
 
         logger.info(
-            f"Successfully created user with posts via service",
+            "Successfully created user with posts via service",
             extra={"user_id": result["user"]["id"], "post_count": len(result["posts"])},
         )
 

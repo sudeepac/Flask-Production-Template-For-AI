@@ -20,7 +20,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.extensions import db
-from app.utils import generate_uuid, sanitize_string, validate_email
 
 from .models import Template
 from .schemas import TemplateRequestSchema, TemplateSearchSchema
@@ -390,7 +389,8 @@ class TemplateService:
                 category_stats[category] = count
 
         # Popular tags (this is a simplified version)
-        # In a real implementation, you might want to use a more efficient query
+        # In a real implementation, you might want to use a more efficient
+        # query
         all_templates = self.session.query(Template).all()
         tag_counts = {}
         for template in all_templates:
@@ -568,7 +568,8 @@ class TemplateAnalyticsService:
             Dict[str, Any]: Usage trend data
         """
         # This is a simplified implementation
-        # In a real system, you'd want to track usage events in a separate table
+        # In a real system, you'd want to track usage events in a separate
+        # table
 
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=days)

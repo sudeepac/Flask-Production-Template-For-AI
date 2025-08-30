@@ -4,25 +4,12 @@ This module contains tests for machine learning services,
 model management, and ML-related functionality.
 """
 
-import json
-import os
-import tempfile
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
 
 # Import fixtures
-from tests.fixtures.ml_fixtures import (
-    mock_experiment_tracker,
-    mock_model_registry,
-    mock_sklearn_model,
-    sample_model_config,
-    sample_prediction_data,
-    sample_training_data,
-)
 
 
 class TestMLModelService:
@@ -393,7 +380,6 @@ class TestMLDataProcessing:
         df = sample_dataframe
 
         train_size = int((1 - test_size) * len(df))
-        train_df = df.iloc[:train_size]
         test_df = df.iloc[train_size:]
 
         actual_test_ratio = len(test_df) / len(df)

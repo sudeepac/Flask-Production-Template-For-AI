@@ -6,8 +6,7 @@ mock objects, and test data for various test scenarios.
 
 import datetime
 import io
-import json
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 from werkzeug.datastructures import FileStorage
@@ -119,7 +118,8 @@ def mock_image_upload():
         )
 
         return FileStorage(
-            stream=io.BytesIO(jpeg_header + b"\x00" * 100),  # Minimal JPEG data
+            stream=io.BytesIO(jpeg_header + b"\x00" * 100),
+            # Minimal JPEG data
             filename=filename,
             content_type=content_type,
         )

@@ -8,19 +8,17 @@ from datetime import datetime
 
 from flask import current_app, request
 from flask_restx import Resource, fields
-from marshmallow import ValidationError
 
 from app.api_docs import api_docs
 from app.extensions import limiter
-from app.utils.error_handlers import APIError, ValidationAPIError
+from app.utils.decorators import (
+    handle_api_errors,
+    log_endpoint_access,
+    validate_json_input,
+)
 from app.utils.logging_config import get_logger, log_performance
 
-from .routes import (
-    EchoRequestSchema,
-    EchoResponseSchema,
-    echo_request_schema,
-    echo_response_schema,
-)
+from .routes import echo_request_schema
 
 # Get logger
 logger = get_logger(__name__)
@@ -281,8 +279,11 @@ class EchoResource(Resource):
     @api_ns.response(429, "Rate Limit Exceeded", rate_limit_response_model)
     @api_ns.response(500, "Internal Server Error", error_response_model)
     @limiter.limit("10 per minute")
+    @handle_api_errors
+    @validate_json_input(echo_request_schema)
+    @log_endpoint_access
     @log_performance
-    def post(self):
+    def post(self, validated_data):
         """Echo endpoint for testing requests.
 
         Accepts JSON data and returns it back with a timestamp.
@@ -293,47 +294,19 @@ class EchoResource(Resource):
 
         Rate limited to 10 requests per minute per IP address.
         """
-        try:
-            logger.info("Echo endpoint called", extra={"endpoint": "echo"})
+        # Create response
+        response_data = {
+            "message": validated_data["message"],
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "metadata": validated_data.get("metadata", {}),
+        }
 
-            # Get and validate request data
-            json_data = request.get_json()
-            if not json_data:
-                raise ValidationAPIError("Request must contain JSON data")
+        logger.info(
+            "Echo request processed successfully",
+            extra={"message_length": len(validated_data["message"])},
+        )
 
-            # Validate using schema
-            validated_data = echo_request_schema.load(json_data)
-
-            # Create response
-            response_data = {
-                "echo": validated_data["message"],
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "metadata": validated_data.get("metadata", {}),
-            }
-
-            logger.info(
-                "Echo request processed successfully",
-                extra={"message_length": len(validated_data["message"])},
-            )
-
-            return response_data
-
-        except ValidationError as e:
-            logger.warning(
-                f"Schema validation error: {e.messages}",
-                extra={"validation_errors": e.messages},
-            )
-            api_ns.abort(400, "Invalid request data", details=e.messages)
-
-        except ValidationAPIError as e:
-            api_ns.abort(400, str(e))
-
-        except Exception as e:
-            logger.error(
-                f"Unexpected error in echo endpoint: {str(e)}",
-                extra={"error_type": type(e).__name__},
-            )
-            api_ns.abort(500, "An unexpected error occurred")
+        return response_data
 
 
 @api_ns.route("/users/bulk")
@@ -391,7 +364,7 @@ class BulkUserResource(Resource):
             result = service.create_user_with_posts(username, email, post_titles)
 
             logger.info(
-                f"Successfully created user with posts via service",
+                "Successfully created user with posts via service",
                 extra={
                     "user_id": result["user"]["id"],
                     "post_count": len(result["posts"]),

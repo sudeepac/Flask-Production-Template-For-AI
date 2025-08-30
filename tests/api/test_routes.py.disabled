@@ -1,0 +1,72 @@
+"""Test routes for api blueprint.
+
+See AI_INSTRUCTIONS.md §5 for testing guidelines.
+"""
+
+import pytest
+from flask import url_for
+
+
+class TestApiRoutes:
+    """Test class for api routes."""
+
+    def test_api_status(self, client, auth_headers):
+        """Test api_status endpoint."""
+        # TODO: Implement test for api_status
+
+    def test_api_info(self, client, auth_headers):
+        """Test api_info endpoint."""
+        # TODO: Implement test for api_info
+
+    def test_echo(self, client, auth_headers, sample_api_data):
+        """Test echo endpoint."""
+        response = client.post(
+            url_for('api.echo'),
+            json=sample_api_data,
+            headers=auth_headers
+        )
+        assert response.status_code in [200, 201]
+        data = response.get_json()
+        assert 'status' in data
+        assert data['status'] == 'success'
+
+    def test_create_user_with_posts(
+            self,
+            client,
+            auth_headers,
+            sample_api_data):
+        """Test create_user_with_posts endpoint."""
+        response = client.post(
+            url_for('api.create_user_with_posts'),
+            json=sample_api_data,
+            headers=auth_headers
+        )
+        assert response.status_code in [200, 201]
+        data = response.get_json()
+        assert 'status' in data
+        assert data['status'] == 'success'
+
+
+@pytest.fixture
+def sample_api_data():
+    """Sample data for api tests."""
+    return {
+        'name': 'Test Api',
+        'description': 'Test description',
+        # TODO: Add more fields based on your schema
+    }
+
+
+@pytest.fixture
+def sample_api_id():
+    """Sample ID for api tests."""
+    return 1
+
+
+@pytest.fixture
+def auth_headers(jwt_token):
+    """Authentication headers for API requests."""
+    return {
+        'Authorization': f'Bearer {jwt_token}',
+        'Content-Type': 'application/json'
+    }

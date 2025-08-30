@@ -35,7 +35,6 @@ Usage:
 See AI_INSTRUCTIONS.md §7 for testing guidelines.
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -59,9 +58,7 @@ TEST_CONFIG = {
 # Test markers for pytest
 pytest_plugins = [
     "tests.fixtures.app_fixtures",
-    "tests.fixtures.db_fixtures",
-    "tests.fixtures.ml_fixtures",
-    "tests.fixtures.api_fixtures",
+    "tests.fixtures.data_fixtures",
 ]
 
 # Export test utilities

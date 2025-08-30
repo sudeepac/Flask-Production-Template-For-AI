@@ -42,7 +42,6 @@ blueprint = Blueprint(
 
 # Import routes to register them with the blueprint
 # This import must come after blueprint creation to avoid circular imports
-from . import routes
 
 # Optional: Import other modules
 # from . import models, services, utils

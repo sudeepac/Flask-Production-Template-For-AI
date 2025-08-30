@@ -4,10 +4,7 @@ This module tests the initialization and functionality of
 Flask extensions used in the application.
 """
 
-import pytest
-from flask import Flask
 
-from app import create_app
 from app.extensions import cache, db, migrate
 
 

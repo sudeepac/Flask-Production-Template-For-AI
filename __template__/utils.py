@@ -16,9 +16,9 @@ See AI_INSTRUCTIONS.md §6 for utility implementation guidelines.
 import hashlib
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import urljoin, urlparse
 
 from flask import current_app, request, url_for

@@ -23,7 +23,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 
 class StyleChecker:
@@ -94,7 +94,8 @@ class StyleChecker:
                 ):
                     continue
 
-                # Skip simple decorator functions (usually just return a function)
+                # Skip simple decorator functions (usually just return a
+                # function)
                 if (
                     len(node.body) == 1
                     and isinstance(node.body[0], ast.Return)
@@ -140,7 +141,8 @@ class StyleChecker:
                 if node.name.startswith("__") and node.name.endswith("__"):
                     continue
 
-                # Skip private methods (starting with single underscore) - these are allowed
+                # Skip private methods (starting with single underscore) -
+                # these are allowed
                 if node.name.startswith("_") and not node.name.startswith("__"):
                     continue
 
@@ -179,13 +181,16 @@ class StyleChecker:
                                 )
                         # Check for regular variables
                         elif not self._is_snake_case(name) and not name.startswith("_"):
-                            # Skip schema variables (these are intentionally PascalCase)
+                            # Skip schema variables (these are intentionally
+                            # PascalCase)
                             if "Schema" in name:
                                 continue
-                            # Skip class references and imports (PascalCase is expected)
+                            # Skip class references and imports (PascalCase is
+                            # expected)
                             if self._is_pascal_case(name):
                                 # Only warn if it's clearly a variable, not a class reference
-                                # Check if the assignment is a simple value, not a class instantiation
+                                # Check if the assignment is a simple value,
+                                # not a class instantiation
                                 if isinstance(
                                     node.value, (ast.Constant, ast.Name, ast.Attribute)
                                 ):

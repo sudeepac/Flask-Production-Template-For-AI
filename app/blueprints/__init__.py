@@ -29,8 +29,6 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Flask
 
-from app.urls import get_url_prefix
-
 logger = logging.getLogger(__name__)
 
 # Blueprint registry
@@ -141,7 +139,8 @@ def register_blueprints(app: Flask) -> None:
                     f"Blueprint name: {blueprint.name}, url_prefix: {blueprint.url_prefix}"
                 )
 
-                # Register with Flask app (blueprint already has url_prefix set)
+                # Register with Flask app (blueprint already has url_prefix
+                # set)
                 app.register_blueprint(blueprint)
                 logger.info(f"Registered blueprint with Flask app: {module_name}")
 

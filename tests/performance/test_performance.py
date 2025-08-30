@@ -5,7 +5,6 @@ throughput, memory usage, and other performance characteristics.
 """
 
 import statistics
-import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -177,7 +176,8 @@ class TestThroughputPerformance:
 
         # Performance assertions
         assert successful_requests == total_requests  # All requests should succeed
-        assert statistics.mean(response_times) < 1.0  # Average response time < 1s
+        # Average response time < 1s
+        assert statistics.mean(response_times) < 1.0
         assert max(response_times) < 2.0  # Max response time < 2s
 
     def test_sustained_load(self, client):
@@ -372,7 +372,8 @@ class TestScalabilityPerformance:
             if times:  # Only check if requests succeeded
                 avg_time = statistics.mean(times)
                 # Response time should scale reasonably with payload size
-                max_expected_time = 0.1 + (size / 100000)  # Base time + scaling factor
+                # Base time + scaling factor
+                max_expected_time = 0.1 + (size / 100000)
                 assert (
                     avg_time < max_expected_time
                 ), f"Size {size}: {avg_time}s > {max_expected_time}s"

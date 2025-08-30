@@ -8,33 +8,24 @@ See CONTRIBUTING.md §5 for ML service implementation guidelines.
 """
 
 import abc
-import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from concurrent.futures import Future, ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
-import joblib
-import numpy as np
 from flask import current_app
 
 from app.extensions import cache, get_logger
+from app.utils.service_helpers import (
+    ModelLoadError,
+    PredictionError,
+    handle_service_errors,
+    log_service_operation,
+)
 
 logger = get_logger("app.services.base")
-
-
-class ModelLoadError(Exception):
-    """Exception raised when model loading fails."""
-
-    pass
-
-
-class PredictionError(Exception):
-    """Exception raised when prediction fails."""
-
-    pass
 
 
 class BaseMLService(abc.ABC):
@@ -173,41 +164,60 @@ class BaseMLService(abc.ABC):
             if self.is_loaded and not force_reload:
                 return  # Double-check after acquiring lock
 
-            try:
-                start_time = time.time()
-                logger.info(f"Loading model '{self.model_name}' from {self.model_path}")
+            self._load_model_with_error_handling()
 
-                # Check if model file exists
-                if not Path(self.model_path).exists():
-                    raise ModelLoadError(f"Model file not found: {self.model_path}")
+    @handle_service_errors(
+        error_message="Failed to load model '{service}': {error}",
+        error_type=ModelLoadError,
+    )
+    @log_service_operation("model_loading")
+    def _load_model_with_error_handling(self) -> None:
+        """Load model with centralized error handling.
 
-                # Load model using subclass implementation
-                self._model = self._load_model()
-                self._model_loaded_at = datetime.utcnow()
+        This method handles the actual model loading process with proper
+        error handling and logging. It checks for file existence, loads
+        the model using the subclass implementation, and validates it.
 
-                load_time = time.time() - start_time
-                logger.info(
-                    f"Model '{self.model_name}' loaded successfully in {load_time:.2f}s"
-                )
+        Raises:
+            ModelLoadError: If model file doesn't exist or loading fails
+        """
+        start_time = time.time()
+        logger.info(f"Loading model '{self.model_name}' from {self.model_path}")
 
-                # Validate model after loading
-                self._validate_model(self._model)
+        # Check if model file exists
+        if not Path(self.model_path).exists():
+            raise ModelLoadError(f"Model file not found: {self.model_path}")
 
-            except Exception as e:
-                self._model = None
-                self._model_loaded_at = None
-                error_msg = f"Failed to load model '{self.model_name}': {str(e)}"
-                logger.error(error_msg)
-                raise ModelLoadError(error_msg) from e
+        # Load model using subclass implementation
+        self._model = self._load_model()
+        self._model_loaded_at = datetime.utcnow()
+
+        load_time = time.time() - start_time
+        logger.info(
+            f"Model '{self.model_name}' loaded successfully in {load_time:.2f}s"
+        )
+
+        # Validate model after loading
+        self._validate_model(self._model)
 
     def unload_model(self) -> None:
-        """Unload model from memory to free resources."""
+        """Unload model from memory to free resources.
+
+        This method safely unloads the model from memory and resets
+        the loading timestamp. It's thread-safe and can be called
+        multiple times without issues.
+        """
         with self._model_lock:
             if self._model is not None:
                 logger.info(f"Unloading model '{self.model_name}'")
                 self._model = None
                 self._model_loaded_at = None
 
+    @handle_service_errors(
+        error_message="Prediction failed for model '{service}': {error}",
+        error_type=PredictionError,
+    )
+    @log_service_operation("prediction", log_args=False, log_result=True)
     def predict(
         self, data: Union[Dict, List[Dict]], use_cache: bool = None
     ) -> Union[Dict, List[Dict]]:
@@ -215,7 +225,8 @@ class BaseMLService(abc.ABC):
 
         Args:
             data: Input data for prediction (single dict or list of dicts)
-            use_cache: Whether to use prediction caching (overrides instance setting)
+            use_cache: Whether to use prediction caching (overrides instance
+                setting)
 
         Returns:
             Prediction results (single dict or list of dicts)
@@ -243,47 +254,43 @@ class BaseMLService(abc.ABC):
             if cached_results:
                 return cached_results[0] if not is_batch else cached_results
 
-        try:
-            start_time = time.time()
+        start_time = time.time()
 
-            # Make predictions
-            with self._model_lock:
-                results = []
-                for item in input_data:
-                    result = self._predict(self._model, item)
-                    results.append(result)
+        # Make predictions
+        with self._model_lock:
+            results = []
+            for item in input_data:
+                result = self._predict(self._model, item)
+                results.append(result)
 
-            prediction_time = time.time() - start_time
+        prediction_time = time.time() - start_time
 
-            # Update statistics
-            if self.enable_monitoring:
-                self._update_prediction_stats(len(input_data), prediction_time)
+        # Update statistics
+        if self.enable_monitoring:
+            self._update_prediction_stats(len(input_data), prediction_time)
 
-            # Cache results if enabled
-            if use_cache:
-                self._cache_predictions(input_data, results)
+        # Cache results if enabled
+        if use_cache:
+            self._cache_predictions(input_data, results)
 
-            logger.debug(
-                f"Predicted {len(input_data)} samples in {prediction_time:.3f}s "
-                f"({prediction_time/len(input_data)*1000:.1f}ms per sample)"
-            )
+        logger.debug(
+            f"Predicted {len(input_data)} samples in {prediction_time:.3f}s "
+            f"({prediction_time / len(input_data) * 1000:.1f}ms per sample)"
+        )
 
-            return results[0] if not is_batch else results
-
-        except Exception as e:
-            self._error_count += 1
-            error_msg = f"Prediction failed for model '{self.model_name}': {str(e)}"
-            logger.error(error_msg)
-            raise PredictionError(error_msg) from e
+        return results[0] if not is_batch else results
 
     def predict_async(self, data: Union[Dict, List[Dict]]) -> "Future":
         """Make asynchronous predictions.
 
+        This method submits prediction tasks to a thread pool executor
+        for non-blocking prediction processing.
+
         Args:
-            data: Input data for prediction
+            data: Input data for prediction (single dict or list of dicts)
 
         Returns:
-            Future: Future object for async prediction
+            Future: Future object for async prediction that can be awaited
         """
         return self._executor.submit(self.predict, data)
 
@@ -305,8 +312,8 @@ class BaseMLService(abc.ABC):
                 try:
                     self.load_model()
                     model_loaded = True
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to load model {self.model_name}: {e}")
 
             # Perform test prediction if model is loaded
             test_prediction_ok = False
@@ -316,8 +323,10 @@ class BaseMLService(abc.ABC):
                     if test_data:
                         self.predict(test_data, use_cache=False)
                         test_prediction_ok = True
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(
+                        f"Health check prediction failed for {self.model_name}: {e}"
+                    )
 
             status = (
                 "healthy"
@@ -343,7 +352,12 @@ class BaseMLService(abc.ABC):
             }
 
     def cleanup(self) -> None:
-        """Clean up resources."""
+        """Clean up resources.
+
+        This method unloads the model and shuts down the thread pool
+        executor. Should be called when the service is no longer needed
+        to properly release resources.
+        """
         self.unload_model()
         self._executor.shutdown(wait=True)
         logger.info(f"Cleaned up {self.__class__.__name__}")
@@ -360,7 +374,6 @@ class BaseMLService(abc.ABC):
         Raises:
             Exception: If model loading fails
         """
-        pass
 
     @abc.abstractmethod
     def _predict(self, model: Any, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -376,12 +389,15 @@ class BaseMLService(abc.ABC):
         Raises:
             Exception: If prediction fails
         """
-        pass
 
     # Optional methods that subclasses can override
 
     def _validate_model(self, model: Any) -> None:
         """Validate the loaded model.
+
+        This method can be overridden by subclasses to perform
+        model-specific validation after loading. The default
+        implementation does nothing.
 
         Args:
             model: Loaded model object
@@ -390,10 +406,13 @@ class BaseMLService(abc.ABC):
             Exception: If model validation fails
         """
         # Default implementation does nothing
-        pass
 
     def _get_test_data(self) -> Optional[Dict[str, Any]]:
         """Get test data for health checks.
+
+        This method can be overridden by subclasses to provide
+        test data for health check predictions. The default
+        implementation returns None to skip the test.
 
         Returns:
             dict: Test data for prediction, or None to skip test
@@ -404,7 +423,18 @@ class BaseMLService(abc.ABC):
     # Private helper methods
 
     def _get_cached_predictions(self, data: List[Dict]) -> Optional[List[Dict]]:
-        """Get cached predictions if available."""
+        """Get cached predictions if available.
+
+        This method attempts to retrieve cached prediction results
+        for the given input data. If any item in the batch is not
+        cached, returns None to indicate a cache miss.
+
+        Args:
+            data: List of input data dictionaries
+
+        Returns:
+            List of cached prediction results, or None if cache miss
+        """
         if not cache:
             return None
 
@@ -426,7 +456,16 @@ class BaseMLService(abc.ABC):
             return None
 
     def _cache_predictions(self, data: List[Dict], results: List[Dict]) -> None:
-        """Cache prediction results."""
+        """Cache prediction results.
+
+        This method stores prediction results in the cache for future
+        retrieval. Each input-result pair is cached with a generated
+        cache key and the configured TTL.
+
+        Args:
+            data: List of input data dictionaries
+            results: List of corresponding prediction results
+        """
         if not cache:
             return
 
@@ -441,23 +480,49 @@ class BaseMLService(abc.ABC):
             logger.warning(f"Cache storage failed: {str(e)}")
 
     def _get_cache_key(self, data: Dict) -> str:
-        """Generate cache key for input data."""
+        """Generate cache key for input data.
+
+        Creates a deterministic cache key by hashing the input data.
+        The key includes the model name and version to ensure cache
+        isolation between different models.
+
+        Args:
+            data: Input data dictionary
+
+        Returns:
+            str: Generated cache key
+        """
         import hashlib
         import json
 
         # Create deterministic hash of input data
         data_str = json.dumps(data, sort_keys=True, separators=(",", ":"))
-        data_hash = hashlib.md5(data_str.encode()).hexdigest()
+        data_hash = hashlib.sha256(data_str.encode()).hexdigest()
 
         return f"ml_prediction:{self.model_name}:{self.model_version}:{data_hash}"
 
     def _update_prediction_stats(self, count: int, time_taken: float) -> None:
-        """Update prediction statistics."""
+        """Update prediction statistics.
+
+        This method updates internal counters for monitoring
+        prediction performance and usage.
+
+        Args:
+            count: Number of predictions made
+            time_taken: Total time taken for predictions in seconds
+        """
         self._prediction_count += count
         self._total_prediction_time += time_taken
 
     def _get_avg_prediction_time(self) -> float:
-        """Get average prediction time in milliseconds."""
+        """Get average prediction time in milliseconds.
+
+        Calculates the average time per prediction based on
+        accumulated statistics.
+
+        Returns:
+            float: Average prediction time in milliseconds, or 0.0 if no predictions made
+        """
         if self._prediction_count == 0:
             return 0.0
         return (self._total_prediction_time / self._prediction_count) * 1000

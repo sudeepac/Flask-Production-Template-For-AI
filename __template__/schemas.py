@@ -11,7 +11,7 @@ Schema Types:
 See AI_INSTRUCTIONS.md §3 for schema implementation guidelines.
 """
 
-from marshmallow import Schema, ValidationError, fields, validate, validates
+from marshmallow import ValidationError, fields, validate, validates
 
 from app.schemas.v2.base import BaseSchema, TimestampMixin
 from app.schemas.v2.common import DataResponseSchema, PaginatedResponseSchema

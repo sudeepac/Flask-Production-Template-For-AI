@@ -7,13 +7,11 @@ extension initialization.
 See CONTRIBUTING.md §5 for style guidelines.
 """
 
-import logging
 import time
 from datetime import datetime
 
 from flask import Flask, jsonify
 
-from app.api_docs import APIDocumentation
 from app.config_manager import ConfigManager
 from app.extensions import cache, db, jwt, migrate
 
@@ -28,7 +26,7 @@ def create_app(config_name="development"):
     - Error handlers setup
 
     Args:
-        config_name: Configuration environment name (defaults to 'development')
+        config_name: Configuration environment name or dict config (defaults to 'development')
 
     Returns:
         Flask: Configured Flask application instance
@@ -39,14 +37,19 @@ def create_app(config_name="development"):
     """
     app = Flask(__name__)
 
-    # Load configuration using simplified config manager
-    config_manager = ConfigManager(config_name)
-    config_manager.validate()
-    app.config.update(config_manager.get_config())
+    # Handle both string config names and direct config dictionaries
+    if isinstance(config_name, dict):
+        # Direct config dictionary (for testing)
+        app.config.update(config_name)
+    else:
+        # Load configuration using simplified config manager
+        config_manager = ConfigManager(config_name)
+        config_manager.validate()
+        app.config.update(config_manager.get_config())
 
-    # Print config summary in development
-    if config_name == "development":
-        config_manager.print_summary()
+        # Print config summary in development
+        if config_name == "development":
+            config_manager.print_summary()
 
     # Track application start time for uptime calculations
     app._start_time = time.time()
@@ -62,7 +65,6 @@ def create_app(config_name="development"):
     _setup_api_docs(app)
 
     # Import models to register them with SQLAlchemy
-    from app import models
 
     # Register blueprints
     _register_blueprints(app)

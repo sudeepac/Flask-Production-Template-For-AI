@@ -8,7 +8,6 @@ Checks that all blueprints follow the required structure:
 - resources.py (for API blueprints)
 """
 
-import os
 import sys
 from pathlib import Path
 

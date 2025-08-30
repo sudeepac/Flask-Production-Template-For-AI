@@ -13,11 +13,10 @@ Features:
 - Error response documentation
 """
 
-import os
 from typing import Any, Dict, Optional
 
 from flask import Flask
-from flask_restx import Api, Namespace, Resource, fields
+from flask_restx import Api, Namespace, fields
 from marshmallow import Schema, ValidationError
 
 

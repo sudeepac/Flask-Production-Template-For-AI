@@ -26,11 +26,10 @@ blueprint = Blueprint(
 )
 
 # Import routes to register them with the blueprint
-from . import routes
 
 # Import Flask-RESTX resources for API documentation
 try:
-    from . import resources
+    pass
 except ImportError:
     # Resources module is optional for backward compatibility
     pass

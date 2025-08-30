@@ -4,7 +4,6 @@ This module tests the application factory function and core
 application functionality.
 """
 
-import pytest
 from flask import Flask
 
 from app import create_app

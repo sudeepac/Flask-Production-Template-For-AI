@@ -1,6 +1,7 @@
 """Enhanced Error Handlers.
 
-This module provides comprehensive error handling utilities for the Flask application.
+This module provides comprehensive error handling utilities for the
+Flask application.
 Includes custom exceptions, error formatters, and centralized error handling.
 
 Features:
@@ -21,15 +22,50 @@ Usage:
 import logging
 import traceback
 from datetime import datetime
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Tuple
 from uuid import uuid4
 
-from flask import Flask, current_app, g, jsonify, request
+from flask import Flask, current_app, g, request
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.exceptions import HTTPException
 
 logger = logging.getLogger(__name__)
+
+
+def handle_validation_error(error: ValidationError):
+    """Handle Marshmallow validation errors.
+
+    This is a standalone function that can be imported and used
+    in routes for manual validation error handling.
+
+    Args:
+        error: ValidationError instance
+
+    Returns:
+        Tuple of (response_dict, status_code)
+    """
+
+    # Log the validation error
+    request_id = getattr(g, "request_id", str(uuid4()))
+    logger.warning(
+        f"Validation error [{request_id}]: {error.messages}",
+        extra={
+            "request_id": request_id,
+            "validation_errors": error.messages,
+            "endpoint": request.endpoint if request else None,
+        },
+    )
+
+    return {
+        "error": {
+            "code": "validation_error",
+            "message": "Request validation failed",
+            "details": {"field_errors": error.messages},
+            "request_id": request_id,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+    }, 400
 
 
 class APIError(Exception):

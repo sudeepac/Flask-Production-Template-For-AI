@@ -13,10 +13,31 @@ from flask_restx import Resource, fields
 
 from app.api_docs import api_docs
 from app.extensions import cache, db
+from app.utils.decorators import handle_api_errors, log_endpoint_access
 from app.utils.logging_config import get_logger, log_performance
+from app.utils.response_helpers import health_check_response
 
 # Get logger
 logger = get_logger(__name__)
+
+
+def perform_health_check(check_name: str, check_function, default_status="degraded"):
+    """Perform a health check and return standardized result.
+
+    Args:
+        check_name: Name of the health check
+        check_function: Function to execute for the check
+        default_status: Status to use if check fails but isn't critical
+
+    Returns:
+        Tuple of (check_result, overall_status_impact)
+    """
+    try:
+        return check_function(), "healthy"
+    except Exception as e:
+        logger.warning(f"{check_name} health check failed: {str(e)}")
+        return {"status": "unhealthy", "error": str(e)}, "unhealthy"
+
 
 # Get health namespace
 health_ns = api_docs.get_namespace("health")
@@ -169,6 +190,8 @@ class HealthCheckResource(Resource):
     @health_ns.marshal_with(health_status_model)
     @health_ns.response(200, "Application is healthy", health_status_model)
     @health_ns.response(503, "Application is unhealthy")
+    @handle_api_errors
+    @log_endpoint_access
     def get(self):
         """Get basic health status.
 
@@ -178,27 +201,19 @@ class HealthCheckResource(Resource):
 
         Returns HTTP 200 if healthy, HTTP 503 if unhealthy.
         """
-        try:
-            # Simple health check - just verify we can respond
-            uptime = time.time() - getattr(current_app, "_start_time", time.time())
+        # Simple health check - just verify we can respond
+        uptime = time.time() - getattr(current_app, "_start_time", time.time())
 
-            response = {
-                "status": "healthy",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "version": getattr(current_app, "version", "1.0.0"),
-                "environment": current_app.config.get("FLASK_ENV", "development"),
-                "uptime": round(uptime, 2),
-            }
+        checks = {
+            "timestamp": {"value": datetime.utcnow().isoformat() + "Z"},
+            "version": {"value": getattr(current_app, "version", "1.0.0")},
+            "environment": {
+                "value": current_app.config.get("FLASK_ENV", "development")
+            },
+            "uptime": {"value": round(uptime, 2)},
+        }
 
-            return response, 200
-
-        except Exception as e:
-            logger.error(f"Health check failed: {str(e)}")
-            return {
-                "status": "unhealthy",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "error": str(e),
-            }, 503
+        return health_check_response(checks, "healthy")
 
 
 @health_ns.route("/detailed")
@@ -210,6 +225,8 @@ class DetailedHealthCheckResource(Resource):
     @health_ns.response(200, "Detailed health information", detailed_health_model)
     @health_ns.response(503, "One or more components are unhealthy")
     @log_performance
+    @handle_api_errors
+    @log_endpoint_access
     def get(self):
         """Get detailed health information.
 
@@ -233,7 +250,8 @@ class DetailedHealthCheckResource(Resource):
             checks["database"] = {
                 "status": "healthy",
                 "response_time": round(db_response_time, 4),
-                "connection_pool": {"active": 2, "idle": 8, "total": 10},  # Mock values
+                # Mock values
+                "connection_pool": {"active": 2, "idle": 8, "total": 10},
             }
 
         except Exception as e:
@@ -351,7 +369,7 @@ class DetailedHealthCheckResource(Resource):
         status_code = 200 if overall_status in ["healthy", "degraded"] else 503
 
         logger.info(
-            f"Detailed health check completed",
+            "Detailed health check completed",
             extra={
                 "status": overall_status,
                 "check_duration": round(time.time() - start_time, 4),
@@ -412,7 +430,7 @@ class ReadinessCheckResource(Resource):
         status_code = 200 if ready else 503
 
         logger.info(
-            f"Readiness check completed",
+            "Readiness check completed",
             extra={
                 "ready": ready,
                 "failed_checks": [k for k, v in checks.items() if not v],

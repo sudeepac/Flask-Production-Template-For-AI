@@ -8,10 +8,11 @@ import time
 from datetime import datetime
 
 import psutil
-from flask import current_app, jsonify
+from flask import current_app
 from sqlalchemy import text
 
 from app.extensions import db
+from app.utils.common_imports import error_response, get_utc_timestamp, success_response
 
 from . import blueprint
 
@@ -34,16 +35,12 @@ def health_check():
             "version": "1.0.0"
         }
     """
-    return (
-        jsonify(
-            {
-                "status": "healthy",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "version": getattr(current_app, "version", "1.0.0"),
-            }
-        ),
-        200,
-    )
+    data = {
+        "status": "healthy",
+        "timestamp": get_utc_timestamp(with_z_suffix=True),
+        "version": getattr(current_app, "version", "1.0.0"),
+    }
+    return success_response(data=data, message="Application is healthy")
 
 
 @blueprint.route("/detailed", methods=["GET"])
@@ -74,7 +71,7 @@ def detailed_health_check():
     """
     health_data = {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": get_utc_timestamp(with_z_suffix=True),
         "version": getattr(current_app, "version", "1.0.0"),
         "database": _check_database(),
         "system": _get_system_info(),
@@ -83,9 +80,11 @@ def detailed_health_check():
     # Determine overall status
     if health_data["database"]["status"] != "connected":
         health_data["status"] = "unhealthy"
-        return jsonify(health_data), 503
+        return error_response(
+            message="Service unhealthy", data=health_data, status_code=503
+        )
 
-    return jsonify(health_data), 200
+    return success_response(data=health_data, message="Service is healthy")
 
 
 @blueprint.route("/ready", methods=["GET"])
@@ -102,37 +101,29 @@ def readiness_probe():
         db_status = _check_database()
 
         if db_status["status"] == "connected":
-            return (
-                jsonify(
-                    {
-                        "status": "ready",
-                        "timestamp": datetime.utcnow().isoformat() + "Z",
-                    }
-                ),
-                200,
-            )
+            data = {
+                "status": "ready",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+            }
+            return success_response(data=data, message="Application is ready")
         else:
-            return (
-                jsonify(
-                    {
-                        "status": "not_ready",
-                        "reason": "database_unavailable",
-                        "timestamp": datetime.utcnow().isoformat() + "Z",
-                    }
-                ),
-                503,
+            data = {
+                "status": "not_ready",
+                "reason": "database_unavailable",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+            }
+            return error_response(
+                message="Application not ready", data=data, status_code=503
             )
 
     except Exception as e:
-        return (
-            jsonify(
-                {
-                    "status": "not_ready",
-                    "reason": str(e),
-                    "timestamp": datetime.utcnow().isoformat() + "Z",
-                }
-            ),
-            503,
+        data = {
+            "status": "not_ready",
+            "reason": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        }
+        return error_response(
+            message="Application not ready", data=data, status_code=503
         )
 
 
@@ -145,10 +136,8 @@ def liveness_probe():
     Returns:
         JSON response indicating liveness status
     """
-    return (
-        jsonify({"status": "alive", "timestamp": datetime.utcnow().isoformat() + "Z"}),
-        200,
-    )
+    data = {"status": "alive", "timestamp": datetime.utcnow().isoformat() + "Z"}
+    return success_response(data=data, message="Application is alive")
 
 
 def _check_database():

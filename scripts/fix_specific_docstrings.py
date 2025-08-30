@@ -5,7 +5,6 @@ Specific Docstring Fixer
 This script fixes the specific docstring issues identified by the style compliance checker.
 """
 
-import os
 from pathlib import Path
 
 

@@ -20,11 +20,11 @@ Usage:
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from marshmallow import Schema, ValidationError, fields
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.models.example import Post, User
@@ -36,16 +36,23 @@ from app.utils.error_handlers import (
     ValidationAPIError,
 )
 from app.utils.logging_config import PerformanceLogger, get_logger, log_security_event
+from app.utils.service_helpers import handle_service_errors, log_service_operation
 
 
 class ExampleService:
-    """Example service demonstrating error handling and logging best practices."""
+    """Example service demonstrating error handling and logging best
+    practices.
+    """
 
     def __init__(self):
         """Initialize the service."""
         self.logger = get_logger(f"{__name__}.{self.__class__.__name__}")
         self.logger.info("ExampleService initialized")
 
+    @handle_service_errors(
+        error_message="Failed to create post in {service}: {error}", error_type=APIError
+    )
+    @log_service_operation("create_post", log_args=False, log_result=True)
     def create_post(
         self, data: Dict[str, Any], user_id: Optional[int] = None
     ) -> Dict[str, Any]:
@@ -67,106 +74,73 @@ class ExampleService:
         operation_id = str(uuid4())
 
         with PerformanceLogger(f"create_post_{operation_id}", self.logger):
-            try:
-                self.logger.info(
-                    f"Creating post for user {user_id}",
-                    extra={
-                        "context": {
-                            "operation_id": operation_id,
-                            "user_id": user_id,
-                            "data_keys": list(data.keys()),
-                        }
-                    },
-                )
-
-                # Validate input data
-                validated_data = self._validate_post_data(data)
-
-                # Check if user exists
-                if user_id:
-                    user = self._get_user_or_raise(user_id)
-                    self.logger.debug(
-                        f"User {user_id} found for post creation",
-                        extra={"context": {"operation_id": operation_id}},
-                    )
-
-                # Check for slug conflicts
-                slug = self._generate_slug(validated_data["title"])
-                if self._slug_exists(slug):
-                    self.logger.warning(
-                        f"Slug conflict detected: {slug}",
-                        extra={"context": {"operation_id": operation_id, "slug": slug}},
-                    )
-                    raise ConflictAPIError(
-                        f"Post with slug '{slug}' already exists",
-                        {
-                            "slug": slug,
-                            "suggested_slug": f"{slug}-{int(datetime.utcnow().timestamp())}",
-                        },
-                    )
-
-                # Create post with transaction
-                post = self._create_post_transaction(validated_data, slug, user_id)
-
-                # Log success
-                self.logger.info(
-                    f"Post created successfully: {post.id}",
-                    extra={
-                        "context": {
-                            "operation_id": operation_id,
-                            "post_id": post.id,
-                            "slug": post.slug,
-                        }
-                    },
-                )
-
-                # Log security event for content creation
-                log_security_event(
-                    "content_creation",
-                    f"New post created: {post.id}",
-                    {
-                        "post_id": post.id,
-                        "user_id": user_id,
+            self.logger.info(
+                f"Creating post for user {user_id}",
+                extra={
+                    "context": {
                         "operation_id": operation_id,
-                    },
-                    logging.INFO,
+                        "user_id": user_id,
+                        "data_keys": list(data.keys()),
+                    }
+                },
+            )
+
+            # Validate input data
+            validated_data = self._validate_post_data(data)
+
+            # Check if user exists
+            if user_id:
+                self._get_user_or_raise(user_id)
+                self.logger.debug(
+                    f"User {user_id} found for post creation",
+                    extra={"context": {"operation_id": operation_id}},
                 )
 
-                return self._serialize_post(post)
-
-            except ValidationAPIError:
-                # Re-raise validation errors as-is
-                raise
-            except (NotFoundAPIError, ConflictAPIError):
-                # Re-raise known API errors as-is
-                raise
-            except IntegrityError as e:
-                db.session.rollback()
-                self.logger.error(
-                    f"Database integrity error in create_post: {str(e)}",
-                    extra={"context": {"operation_id": operation_id}},
-                    exc_info=True,
+            # Check for slug conflicts
+            slug = self._generate_slug(validated_data["title"])
+            if self._slug_exists(slug):
+                self.logger.warning(
+                    f"Slug conflict detected: {slug}",
+                    extra={"context": {"operation_id": operation_id, "slug": slug}},
                 )
                 raise ConflictAPIError(
-                    "Data integrity constraint violation",
-                    {"constraint_type": "database_constraint"},
+                    f"Post with slug '{slug}' already exists",
+                    {
+                        "slug": slug,
+                        "suggested_slug": (
+                            f"{slug}-{int(datetime.utcnow().timestamp())}"
+                        ),
+                    },
                 )
-            except SQLAlchemyError as e:
-                db.session.rollback()
-                self.logger.error(
-                    f"Database error in create_post: {str(e)}",
-                    extra={"context": {"operation_id": operation_id}},
-                    exc_info=True,
-                )
-                raise APIError("Database operation failed", 500)
-            except Exception as e:
-                db.session.rollback()
-                self.logger.error(
-                    f"Unexpected error in create_post: {str(e)}",
-                    extra={"context": {"operation_id": operation_id}},
-                    exc_info=True,
-                )
-                raise APIError("An unexpected error occurred", 500)
+
+            # Create post with transaction
+            post = self._create_post_transaction(validated_data, slug, user_id)
+
+            # Log success
+            self.logger.info(
+                f"Post created successfully: {post.id}",
+                extra={
+                    "context": {
+                        "operation_id": operation_id,
+                        "post_id": post.id,
+                        "slug": post.slug,
+                    }
+                },
+            )
+
+            # Log security event for content creation
+            log_security_event(
+                "content_creation",
+                f"New post created: {post.id}",
+                {
+                    "post_id": post.id,
+                    "user_id": user_id,
+                    "operation_id": operation_id,
+                },
+                logging.INFO,
+            )
+
+            return self._serialize_post(post)
 
     def get_post(self, post_id: int) -> Dict[str, Any]:
         """Get a post by ID with error handling.

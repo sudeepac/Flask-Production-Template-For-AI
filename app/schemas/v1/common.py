@@ -10,11 +10,12 @@ See CONTRIBUTING.md §5 for schema versioning guidelines.
 """
 
 from datetime import datetime
-from typing import Any, Dict
 
 from marshmallow import fields, validate
 
 from app.schemas.v1.base import BaseSchema
+
+# typing imports removed - not used in this module
 
 
 class ErrorSchema(BaseSchema):

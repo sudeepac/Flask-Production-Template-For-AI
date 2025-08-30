@@ -14,7 +14,7 @@ Route Patterns:
 See AI_INSTRUCTIONS.md §4 for route implementation guidelines.
 """
 
-from flask import current_app, jsonify, request
+from flask import jsonify, request
 from marshmallow import ValidationError
 
 from app.extensions import get_logger

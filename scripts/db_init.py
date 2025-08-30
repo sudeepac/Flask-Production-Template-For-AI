@@ -10,13 +10,6 @@ import sys
 from pathlib import Path
 
 import click
-from flask import Flask
-from flask.cli import with_appcontext
-
-# Add the project root to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from flask_migrate import Migrate
 from flask_migrate import downgrade as flask_migrate_downgrade
 from flask_migrate import init as flask_migrate_init
 from flask_migrate import migrate as flask_migrate_migrate
@@ -25,12 +18,13 @@ from flask_migrate import upgrade as flask_migrate_upgrade
 from app import create_app
 from app.extensions import db
 
+# Add the project root to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from app import create_app
-from app.extensions import db
 
 
 def create_cli_app():
@@ -241,7 +235,6 @@ def status(ctx):
 @click.pass_context
 def setup(ctx):
     """Complete database setup (init + upgrade + seed)."""
-    app = ctx.obj["app"]
 
     click.echo("Starting complete database setup...")
 
@@ -272,7 +265,7 @@ def init(ctx):
     """Initialize the database with migrations."""
     app = ctx.obj["app"]
     with app.app_context():
-        init_database()
+        flask_migrate_init()
 
 
 @cli.command()
@@ -291,7 +284,7 @@ def upgrade(ctx):
     """Apply pending migrations."""
     app = ctx.obj["app"]
     with app.app_context():
-        upgrade_database()
+        flask_migrate_upgrade()
 
 
 @cli.command()
@@ -300,7 +293,7 @@ def downgrade(ctx):
     """Downgrade database by one migration."""
     app = ctx.obj["app"]
     with app.app_context():
-        downgrade_database()
+        flask_migrate_downgrade()
 
 
 @cli.command()
@@ -310,7 +303,8 @@ def reset(ctx):
     """Reset the database (WARNING: This will delete all data!)."""
     app = ctx.obj["app"]
     with app.app_context():
-        reset_database()
+        db.drop_all()
+        db.create_all()
 
 
 if __name__ == "__main__":

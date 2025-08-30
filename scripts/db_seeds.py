@@ -9,18 +9,19 @@ import os
 import random
 import string
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Dict, List
 
 import click
 from faker import Faker
 
-# Add the project root to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from app import create_app
 from app.extensions import db
 from app.models.example import Post, User
+
+# Add the project root to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 # Initialize Faker for generating realistic sample data
 fake = Faker()
@@ -49,8 +50,10 @@ def generate_sample_users(count: int = 10) -> List[Dict[str, Any]]:
             "email": fake.email(),
             "first_name": fake.first_name(),
             "last_name": fake.last_name(),
-            "is_active": random.choice([True, True, True, False]),  # 75% active
-            "is_admin": random.choice([True, False, False, False]),  # 25% admin
+            # 75% active
+            "is_active": random.choice([True, True, True, False]),
+            # 25% admin
+            "is_admin": random.choice([True, False, False, False]),
             "created_at": fake.date_time_between(start_date="-1y", end_date="now"),
             "last_login": fake.date_time_between(start_date="-30d", end_date="now")
             if random.random() > 0.2
@@ -102,7 +105,8 @@ def generate_sample_posts(
             "author_id": random.randint(1, user_count),
             "category": random.choice(categories),
             "status": random.choice(statuses),
-            "is_featured": random.choice([True, False, False, False]),  # 25% featured
+            # 25% featured
+            "is_featured": random.choice([True, False, False, False]),
             "view_count": random.randint(0, 1000),
             "like_count": random.randint(0, 100),
             "created_at": fake.date_time_between(start_date="-6m", end_date="now"),
@@ -155,8 +159,10 @@ def generate_sample_products(count: int = 30) -> List[Dict[str, Any]]:
             "category": random.choice(categories),
             "brand": random.choice(brands),
             "stock_quantity": random.randint(0, 100),
-            "is_active": random.choice([True, True, True, False]),  # 75% active
-            "is_featured": random.choice([True, False, False, False]),  # 25% featured
+            # 75% active
+            "is_active": random.choice([True, True, True, False]),
+            # 25% featured
+            "is_featured": random.choice([True, False, False, False]),
             "weight": round(random.uniform(0.1, 10.0), 2),
             "dimensions": {
                 "length": round(random.uniform(1, 50), 1),
@@ -374,7 +380,7 @@ def seed_all_data(sample_size: int = 10) -> None:
     Args:
         sample_size: Number of records to generate for each type
     """
-    print(f"Seeding database with sample data...")
+    print("Seeding database with sample data...")
 
     seed_users(sample_size)
     seed_posts(sample_size * 2)  # More posts than users

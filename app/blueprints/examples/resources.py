@@ -8,11 +8,9 @@ from datetime import datetime
 
 from flask import current_app, request
 from flask_restx import Resource, fields
-from marshmallow import ValidationError
 
 from app.api_docs import api_docs
 from app.extensions import db
-from app.utils.error_handlers import APIError, NotFoundAPIError, ValidationAPIError
 from app.utils.logging_config import get_logger, log_performance, log_security_event
 
 # Get logger
@@ -32,20 +30,29 @@ examples_index_model = examples_ns.model(
         ),
         "available_endpoints": fields.Raw(
             required=True,
-            description="Dictionary of available endpoints and their descriptions",
+            description="Dictionary of available endpoints and \
+                their descriptions",
             example={
                 "/examples/": "This index page",
-                "/examples/health": "Health check with database connectivity test",
-                "/examples/users/advanced": "POST - Create user with advanced validation",
-                "/examples/posts/<user_id>": "POST - Create post for specific user",
-                "/examples/simulate-error/<error_type>": "GET - Simulate different error types",
+                "/examples/health": ("Health check with database connectivity test"),
+                "/examples/users/advanced": (
+                    "POST - Create user with advanced validation"
+                ),
+                "/examples/posts/<user_id>": ("POST - Create post for specific user"),
+                "/examples/simulate-error/<error_type>": (
+                    "GET - Simulate different error types"
+                ),
                 "/examples/performance-test": "GET - Performance testing endpoint",
             },
         ),
         "description": fields.String(
             required=True,
             description="Blueprint description",
-            example="This blueprint showcases enhanced error handling, structured logging, performance monitoring, and security event logging.",
+            example=(
+                "This blueprint showcases enhanced error handling, "
+                "structured logging, performance monitoring, and "
+                "security event logging."
+            ),
         ),
         "timestamp": fields.String(
             required=True,
@@ -89,7 +96,8 @@ user_create_request_model = examples_ns.model(
     {
         "username": fields.String(
             required=True,
-            description="Username (3-50 characters, alphanumeric and underscores only)",
+            description="Username (3-50 characters, alphanumeric and \
+                underscores only)",
             example="john_doe_123",
         ),
         "email": fields.String(
@@ -428,7 +436,9 @@ class AdvancedUserCreateResource(Resource):
 
             if not username.replace("_", "").isalnum():
                 examples_ns.abort(
-                    400, "Username can only contain letters, numbers, and underscores"
+                    400,
+                    "Username can only contain letters, numbers, and \
+                        underscores",
                 )
 
             validation_summary["username_format"] = "valid"

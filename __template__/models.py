@@ -15,8 +15,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import JSON, Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
 from app.extensions import db

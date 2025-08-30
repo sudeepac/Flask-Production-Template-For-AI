@@ -1,7 +1,8 @@
 """Advanced Logging Configuration.
 
 This module provides comprehensive logging setup for the Flask application.
-Includes structured logging, multiple handlers, and environment-specific configurations.
+Includes structured logging, multiple handlers, and \
+    environment-specific configurations.
 
 Features:
 - Structured JSON logging for production
@@ -22,10 +23,9 @@ Usage:
 import json
 import logging
 import logging.handlers
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from flask import Flask, g, has_request_context, request
 
@@ -238,7 +238,8 @@ def setup_logging(app: Flask) -> None:
     else:
         file_handler.setFormatter(
             logging.Formatter(
-                "%(asctime)s %(levelname)-8s %(name)s: %(message)s [%(filename)s:%(lineno)d]"
+                "%(asctime)s %(levelname)-8s %(name)s: %(message)s "
+                "[%(filename)s:%(lineno)d]"
             )
         )
 

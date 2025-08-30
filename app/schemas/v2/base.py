@@ -9,10 +9,13 @@ See CONTRIBUTING.md §5 for schema design guidelines.
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Type
 
 from marshmallow import Schema, ValidationError, fields, post_load, pre_dump
-from marshmallow.validate import Length, Range
+
+# marshmallow validate imports removed - not used in this module
+from app.schemas.common_fields import CommonFields
+from app.schemas.common_fields import TimestampMixin as CommonTimestampMixin
 
 logger = logging.getLogger("app.schemas.v2.base")
 
@@ -48,8 +51,8 @@ class BaseSchema(Schema):
         datetimeformat = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     # Common metadata fields (optional)
-    created_at = fields.DateTime(dump_only=True, format="iso")
-    updated_at = fields.DateTime(dump_only=True, format="iso")
+    created_at = CommonFields.created_at
+    updated_at = CommonFields.updated_at
     version = fields.Str(dump_only=True, default="v2")
 
     def __init__(self, *args, **kwargs):
@@ -221,18 +224,16 @@ class BaseSchema(Schema):
         return ListSchema
 
 
-class TimestampMixin:
+class TimestampMixin(CommonTimestampMixin):
     """Mixin for schemas that need timestamp fields.
 
     Provides standard created_at and updated_at fields.
+    Inherits from common timestamp mixin to reduce duplication.
 
     Example:
         class UserSchema(BaseSchema, TimestampMixin):
             name = fields.Str(required=True)
     """
-
-    created_at = fields.DateTime(dump_only=True, format="iso")
-    updated_at = fields.DateTime(dump_only=True, format="iso")
 
 
 class MetadataMixin:

@@ -26,9 +26,9 @@ import logging
 import secrets
 from datetime import datetime, timezone
 from functools import wraps
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List
 
-from flask import current_app, jsonify, request
+# Flask imports removed - not used in this module
 
 logger = logging.getLogger(__name__)
 
@@ -297,7 +297,10 @@ def is_valid_url(url: str) -> bool:
     """
     import re
 
-    pattern = r"^https?://(?:[-\w.])+(?:[:\d]+)?(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$"
+    pattern = (
+        r"^https?://(?:[-\w.])+(?:[:\d]+)?"
+        r"(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$"
+    )
     return bool(re.match(pattern, url))
 
 
@@ -355,8 +358,7 @@ def retry_on_exception(
                         raise e
 
                     logger.warning(
-                        f"Attempt {attempt + 1} failed for {func.__name__}: {str(e)}. "
-                        f"Retrying in {current_delay}s..."
+                        f"Attempt {attempt + 1} failed for {func.__name__}: {str(e)}. Retrying in {current_delay}s..."
                     )
 
                     time.sleep(current_delay)

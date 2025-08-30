@@ -15,11 +15,10 @@ from app.urls import get_url_prefix
 
 blueprint = Blueprint("examples", __name__, url_prefix=get_url_prefix("examples"))
 
-from . import routes
 
 # Import Flask-RESTX resources for API documentation
 try:
-    from . import resources
+    pass
 except ImportError:
     # Resources module is optional for backward compatibility
     pass

@@ -6,7 +6,6 @@ Checks that URL prefixes are consistent between blueprint registration
 and route definitions.
 """
 
-import os
 import re
 import sys
 from pathlib import Path

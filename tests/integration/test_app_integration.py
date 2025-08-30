@@ -4,9 +4,7 @@ This module tests the integration between different components
 of the application, including blueprints, database, and extensions.
 """
 
-import json
 
-import pytest
 from flask import url_for
 
 from app.extensions import cache, db

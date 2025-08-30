@@ -22,12 +22,10 @@ Usage:
 import secrets
 import string
 from functools import wraps
-from typing import Optional
 
 import bcrypt
-from flask import current_app, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask import jsonify, request
+from flask_jwt_extended import jwt_required
 
 
 def hash_password(password: str) -> str:
@@ -233,3 +231,23 @@ def is_safe_url(target: str) -> bool:
             return False
 
     return True
+
+
+def log_security_event(event_type: str, details: dict = None) -> None:
+    """Log security-related events for monitoring and auditing.
+
+    Args:
+        event_type: Type of security event (e.g., 'validation_error', 'unauthorized_access')
+        details: Additional details about the event
+    """
+    from app.utils.logging_config import get_logger
+
+    logger = get_logger(__name__)
+
+    if details is None:
+        details = {}
+
+    logger.warning(
+        f"Security event: {event_type}",
+        extra={"event_type": event_type, "details": details, "security_event": True},
+    )

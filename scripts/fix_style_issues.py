@@ -14,7 +14,7 @@ import ast
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import List
 
 
 class StyleFixer:
@@ -102,7 +102,8 @@ class StyleFixer:
                 ):
                     return
 
-                # Skip simple decorator functions (usually just return a function)
+                # Skip simple decorator functions (usually just return a
+                # function)
                 if (
                     len(node.body) == 1
                     and isinstance(node.body[0], ast.Return)
@@ -146,7 +147,8 @@ class StyleFixer:
                 # Find the line after the definition
                 def_line = node.lineno - 1  # ast uses 1-based indexing
 
-                # Find the end of the definition signature (could be multi-line)
+                # Find the end of the definition signature (could be
+                # multi-line)
                 insert_line = def_line + 1
                 while insert_line < len(lines) and not lines[
                     insert_line
@@ -186,7 +188,8 @@ class StyleFixer:
         lines = content.split("\n")
         modified = False
 
-        # Common patterns for schema variables that are intentionally PascalCase
+        # Common patterns for schema variables that are intentionally
+        # PascalCase
         schema_patterns = [
             r"\w*Schema\s*=",
             r"from\s+\w+\s+import\s+.*Schema",
@@ -194,7 +197,8 @@ class StyleFixer:
         ]
 
         for i, line in enumerate(lines):
-            # Skip lines that are defining schemas (these are intentionally PascalCase)
+            # Skip lines that are defining schemas (these are intentionally
+            # PascalCase)
             if any(re.search(pattern, line) for pattern in schema_patterns):
                 continue
 
@@ -215,6 +219,68 @@ class StyleFixer:
 
         return "\n".join(lines) if modified else content
 
+    def fix_whitespace_issues(self, content: str, filepath: Path) -> str:
+        """Fix whitespace issues like blank lines with whitespace."""
+        lines = content.split("\n")
+        modified = False
+
+        for i, line in enumerate(lines):
+            # Fix blank lines with whitespace (W293)
+            if line.strip() == "" and line != "":
+                lines[i] = ""
+                modified = True
+                self.fixes_applied += 1
+
+        # Ensure file ends with newline (W292)
+        if lines and lines[-1] != "":
+            lines.append("")
+            modified = True
+            self.fixes_applied += 1
+
+        return "\n".join(lines) if modified else content
+
+    def fix_line_length(self, content: str, filepath: Path) -> str:
+        """Fix basic line length issues."""
+        lines = content.split("\n")
+        modified = False
+
+        for i, line in enumerate(lines):
+            # Skip if line is already within limit or is a comment/docstring
+            if len(line) <= 79 or line.strip().startswith("#") or '"""' in line:
+                continue
+
+            # Simple fixes for common patterns
+            if " and " in line and len(line) > 79:
+                # Try to break on 'and' operators
+                parts = line.split(" and ")
+                if len(parts) == 2:
+                    indent = len(line) - len(line.lstrip())
+                    new_line = f"{parts[0]} and \\\n{' ' * (indent + 4)}{parts[1]}"
+                    if all(len(part.strip()) <= 75 for part in new_line.split("\n")):
+                        lines[i] = new_line
+                        modified = True
+                        self.fixes_applied += 1
+
+        return "\n".join(lines) if modified else content
+
+    def remove_unused_imports(self, content: str, filepath: Path) -> str:
+        """Remove obvious unused imports."""
+        lines = content.split("\n")
+        modified = False
+
+        # Find import lines
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith("import ") or stripped.startswith("from "):
+                # Check for obvious unused imports
+                if "import logging" in line and "logging." not in content:
+                    lines[i] = ""  # Remove the line
+                    modified = True
+                    self.fixes_applied += 1
+                    self.print_info(f"Removed unused import: {stripped} in {filepath}")
+
+        return "\n".join(lines) if modified else content
+
     def fix_file(self, filepath: Path) -> bool:
         """Fix style issues in a single file."""
         try:
@@ -230,6 +296,9 @@ class StyleFixer:
         content = self.fix_snake_case_functions(content, filepath)
         content = self.add_missing_docstrings(content, filepath)
         content = self.fix_variable_naming(content, filepath)
+        content = self.fix_whitespace_issues(content, filepath)
+        content = self.fix_line_length(content, filepath)
+        content = self.remove_unused_imports(content, filepath)
 
         # Write back if changes were made
         if content != original_content:
@@ -258,7 +327,7 @@ class StyleFixer:
         for filepath in python_files:
             self.fix_file(filepath)
 
-        self.print_success(f"Style fixing complete!")
+        self.print_success("Style fixing complete!")
         self.print_success(f"Files modified: {self.files_modified}")
         self.print_success(f"Total fixes applied: {self.fixes_applied}")
 

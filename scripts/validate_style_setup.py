@@ -13,7 +13,7 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 
 class StyleSetupValidator:

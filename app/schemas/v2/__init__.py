@@ -20,7 +20,9 @@ try:
     )
 
     # Feature schemas (add as you create them)
-    # from app.schemas.v2.users import UserSchema, UserCreateSchema, UserUpdateSchema
+    # from app.schemas.v2.users import (
+    #     UserSchema, UserCreateSchema, UserUpdateSchema
+    # )
     # from app.schemas.v2.auth import LoginSchema, TokenSchema, RefreshSchema
     # from app.schemas.v2.predictions import (
     #     PredictionSchema,

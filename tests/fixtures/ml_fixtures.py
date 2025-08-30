@@ -4,11 +4,7 @@ This module contains fixtures specifically for testing
 machine learning components and services.
 """
 
-import json
 import os
-import tempfile
-from pathlib import Path
-from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd

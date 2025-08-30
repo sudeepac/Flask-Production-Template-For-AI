@@ -11,11 +11,12 @@ See CONTRIBUTING.md §5 for schema design guidelines.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from marshmallow import fields, post_load, validate
 
-from app.schemas.v2.base import BaseSchema, MetadataMixin, TimestampMixin
+from app.schemas.common_fields import CommonFields
+from app.schemas.v2.base import BaseSchema, MetadataMixin
 
 
 class ErrorSchema(BaseSchema):
@@ -42,7 +43,7 @@ class ErrorSchema(BaseSchema):
 
     success = fields.Bool(default=False, dump_only=True)
     error = fields.Dict(required=True)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    timestamp = CommonFields.created_at
     request_id = fields.Str(dump_only=True)
 
     # Error details structure
@@ -89,7 +90,7 @@ class SuccessSchema(BaseSchema):
 
     success = fields.Bool(default=True, dump_only=True)
     message = fields.Str(default="Success", validate=validate.Length(max=500))
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    timestamp = CommonFields.created_at
     request_id = fields.Str(dump_only=True)
     data = fields.Dict(missing=None)  # Optional data payload
 
@@ -194,7 +195,7 @@ class PaginatedResponseSchema(BaseSchema):
     data = fields.List(fields.Dict(), required=True)
     pagination = fields.Nested(PaginationSchema, required=True)
     metadata = fields.Nested(MetadataSchema, dump_only=True)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    timestamp = CommonFields.created_at
 
 
 class DataResponseSchema(BaseSchema):
@@ -213,7 +214,7 @@ class DataResponseSchema(BaseSchema):
     success = fields.Bool(default=True, dump_only=True)
     data = fields.Dict(required=True)
     metadata = fields.Nested(MetadataSchema, dump_only=True)
-    timestamp = fields.DateTime(default=datetime.utcnow, format="iso", dump_only=True)
+    timestamp = CommonFields.created_at
 
 
 class HealthCheckSchema(BaseSchema):

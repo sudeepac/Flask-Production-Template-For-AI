@@ -19,12 +19,10 @@ Features:
 See AI_INSTRUCTIONS.md §2 for blueprint creation guidelines.
 """
 
-import os
 import re
 import shutil
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 def validate_blueprint_name(name: str) -> bool:
@@ -232,7 +230,7 @@ def create_blueprint(blueprint_name: str) -> None:
     create_test_structure(blueprint_name, project_root)
 
     print(f"\n✅ Blueprint '{blueprint_name}' created successfully!")
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"1. Implement your routes in app/blueprints/{blueprint_name}/routes.py")
     print(f"2. Define schemas in app/blueprints/{blueprint_name}/schemas.py")
     print(f"3. Add models in app/blueprints/{blueprint_name}/models.py")

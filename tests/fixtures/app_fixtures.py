@@ -6,10 +6,8 @@ components and functionality.
 
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
-from flask import Flask
 
 from app import create_app
 from app.extensions import db as _db
@@ -37,6 +35,7 @@ def app_config():
         "RATELIMIT_STORAGE_URL": "memory://",
         "CELERY_BROKER_URL": "memory://",
         "CELERY_RESULT_BACKEND": "cache+memory://",
+        "ALLOWED_EXTENSIONS": "txt,pdf,png,jpg,jpeg,gif,csv,json",
     }
 
     yield config
@@ -199,7 +198,7 @@ def sample_file_upload(temp_directory):
 def sample_image_file(temp_directory):
     """Create sample image file for testing."""
     try:
-        import io
+        pass
 
         from PIL import Image
 

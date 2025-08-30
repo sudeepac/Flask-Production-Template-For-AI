@@ -8,8 +8,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import timedelta
-from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -129,7 +128,7 @@ class SecurityConfig:
 
             if len(key) < 32:
                 raise ValueError(
-                    f"{key_name} must be at least 32 characters long in production"
+                    f"{key_name} must be at least 32 characters long in " f"production"
                 )
 
             # Check for common weak patterns
@@ -139,7 +138,9 @@ class SecurityConfig:
         elif env == "development" and len(key) < 16:
             import logging
 
-            logging.warning(f"{key_name} is shorter than recommended (16+ characters)")
+            logging.warning(
+                f"{key_name} is shorter than recommended " f"(16+ characters)"
+            )
 
 
 @dataclass
@@ -163,7 +164,7 @@ class APIConfig:
         return cls(
             version=os.environ.get("API_VERSION", "v2"),
             rate_limit=os.environ.get("API_RATE_LIMIT", "100 per hour"),
-            docs_enabled=os.environ.get("API_DOCS_ENABLED", "True").lower() == "true",
+            docs_enabled=(os.environ.get("API_DOCS_ENABLED", "True").lower() == "true"),
             cors_origins=origins,
             max_content_length=int(
                 os.environ.get("MAX_CONTENT_LENGTH", str(16 * 1024 * 1024))
@@ -236,11 +237,15 @@ class ConfigManager:
             "SQLALCHEMY_DATABASE_URI": database.url,
             "SQLALCHEMY_TRACK_MODIFICATIONS": database.track_modifications,
             "SQLALCHEMY_RECORD_QUERIES": database.record_queries,
-            "SQLALCHEMY_ENGINE_OPTIONS": {
-                "pool_size": database.pool_size,
-                "pool_timeout": database.pool_timeout,
-                "pool_recycle": database.pool_recycle,
-            },
+            "SQLALCHEMY_ENGINE_OPTIONS": (
+                {}
+                if "sqlite" in database.url.lower()
+                else {
+                    "pool_size": database.pool_size,
+                    "pool_timeout": database.pool_timeout,
+                    "pool_recycle": database.pool_recycle,
+                }
+            ),
             # Cache
             "CACHE_TYPE": cache.type,
             "CACHE_REDIS_URL": cache.redis_url,
@@ -325,7 +330,7 @@ class ConfigManager:
             logging.warning("Using SQLite in production is not recommended")
 
         if errors:
-            raise ValueError(f"Production configuration errors:\n" + "\n".join(errors))
+            raise ValueError("Production configuration errors:\n" + "\n".join(errors))
 
     def _validate_testing(self) -> None:
         """Validate testing configuration."""
@@ -374,7 +379,9 @@ def create_config_class(env: str = None):
     class DynamicConfig:
         """Dynamic configuration class generated at runtime."""
 
-        pass
+        """Dynamic configuration class generated at runtime."""
+
+        """Dynamic configuration class generated at runtime."""
 
     # Set all configuration values as class attributes
     for key, value in config_dict.items():

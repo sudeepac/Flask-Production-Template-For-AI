@@ -15,10 +15,8 @@ See AI_INSTRUCTIONS.md §7 for testing guidelines.
 
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
-from flask import Flask
 
 from app import create_app
 from app.extensions import db as _db

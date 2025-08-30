@@ -10,7 +10,8 @@ See CONTRIBUTING.md §5 for schema versioning guidelines.
 """
 
 import logging
-from datetime import datetime
+
+# datetime import removed - not used in this module
 from typing import Any, Dict
 
 from marshmallow import Schema, fields, post_load

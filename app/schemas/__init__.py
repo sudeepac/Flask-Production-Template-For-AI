@@ -26,7 +26,9 @@ try:
 
     # Example schemas (remove when adding real schemas)
     # from app.schemas.v2.users import UserSchema as CurrentUserSchema
-    # from app.schemas.v2.predictions import PredictionSchema as CurrentPredictionSchema
+    # from app.schemas.v2.predictions import (
+    #     PredictionSchema as CurrentPredictionSchema
+    # )
 
 except ImportError:
     # Fallback if v2 schemas don't exist yet
